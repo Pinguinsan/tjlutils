@@ -1345,17 +1345,13 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
     return realReturn;
 #else
-    static std::vector<std::string> portNames{"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3",
-                                              "/dev/ttyACM4", "/dev/ttyACM5", "/dev/ttyACM6", "/dev/ttyACM7",
-                                              "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3",
-                                              "/dev/ttyUSB4", "/dev/ttyUSB5", "/dev/ttyUSB6", "/dev/ttyUSB7"};
+    static std::vector<std::string> portNames{"/dev/ttyACM", "/dev/ttyUSB"};
     std::vector<std::string> returnVector;
     for (auto &it : portNames) {
-        std::unique_ptr<SystemCommand> systemCommand{std::make_unique<SystemCommand>()};
-        systemCommand->setCommand("ls " + it);
-        systemCommand->execute();
-        if (!systemCommand->hasError()) {
-            returnVector.emplace_back(it);
+        for (int i = 0; i < 255; i++) {
+            if (FileUtilities::fileExists(it + std::to_string(i))) {
+                returnVector.emplace_back(it + std::to_string(i));
+            }
         }
     }
     std::set<std::string> uniques;
