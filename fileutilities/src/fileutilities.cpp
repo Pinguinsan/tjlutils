@@ -66,14 +66,18 @@ namespace FileUtilities
 
     bool fileExists(const std::string &fileToCheck)
     {
-        std::ifstream readFromFile;
-        readFromFile.open(fileToCheck);
-        if (readFromFile.is_open()) {
-            readFromFile.close();
-            return true;
-        } else {
-            return false;
-        }
+        #if defined(_WIN32_) || defined(__CYGWIN__)
+            std::ifstream readFromFile;
+            readFromFile.open(fileToCheck);
+            if (readFromFile.is_open()) {
+                readFromFile.close();
+                return true;
+            } else {
+                return false;
+            }
+        #else
+            return (access(fileToCheck.c_str(),F_OK) != -1);
+        #endif
     }
 
     bool fileExists(const char *fileToCheck)
