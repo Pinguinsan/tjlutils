@@ -1,2 +1,1 @@
-# tjlutils
-A collection of my own general purpose C++ libraries
+A compilation of small C++ libraries written for general use
