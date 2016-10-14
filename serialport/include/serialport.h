@@ -41,6 +41,7 @@
 #include <chrono>
 #include <algorithm>
 #include <systemcommand.h>
+#include <fileutilities.h>
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
