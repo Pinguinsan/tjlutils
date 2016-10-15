@@ -335,6 +335,10 @@ namespace GeneralUtilities
                 copyThing = copyThing.substr(1);
             }
         }
+        if (copyThing.find(delimiter) == std::string::npos) {
+            returnVector.emplace_back(copyThing);
+            return returnVector;
+        }
         while (copyThing.length() > 0) {
             size_t foundPosition{copyThing.find(delimiter)};
             if (foundPosition != std::string::npos) {
@@ -358,6 +362,10 @@ namespace GeneralUtilities
             if (copyThing[0] == delimiter) {
                 copyThing = copyThing.substr(1);
             }
+        }
+        if (copyThing.find(delimiter) == std::string::npos) {
+            returnContainer.emplace(copyThing);
+            return returnContainer;
         }
         while (copyThing.length() > 0) {
             size_t foundPosition{copyThing.find(delimiter)};
@@ -383,6 +391,10 @@ namespace GeneralUtilities
             if (copyThing[0] == delimiter) {
                 copyThing = copyThing.substr(1);
             }
+        }
+        if (copyThing.find(delimiter) == std::string::npos) {
+            returnContainer.emplace_back(copyThing);
+            return returnContainer;
         }
         while (copyThing.length() > 0) {
             size_t foundPosition{copyThing.find(delimiter)};
