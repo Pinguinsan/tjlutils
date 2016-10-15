@@ -176,9 +176,9 @@ namespace GeneralUtilities
         return copyString;
     }
 
-    bool isNonAsciiChar (unsigned char c)
+    bool isNonAsciiChar (char c)
     {  
-        return ! (c < ASCII_HIGH_LIMIT);
+        return !isprint( static_cast<unsigned char>( c ) );
     } 
 
     std::string stripNonAsciiCharacters(const std::string &str) 
@@ -325,6 +325,24 @@ namespace GeneralUtilities
             returnString += " ";
         }
         return returnString;
+    }
+
+    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth)
+    {
+        std::string copyString{inputString};
+        unsigned int copyLength{copyString.length()};
+        if (copyLength < fixedWidth) {
+            copyLength = (fixedWidth - copyLength);
+            while (copyLength--) {
+                copyString = "0" + copyString;
+            }
+        }
+        return copyString;
+    }
+
+    std::string toFixedWidth(const char *inputString, unsigned int fixedWidth)
+    {
+        return toFixedWidth(static_cast<std::string>(inputString), fixedWidth);
     }
 
     int charToInt(char charToConvert)

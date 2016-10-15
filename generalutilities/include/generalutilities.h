@@ -77,7 +77,7 @@ namespace GeneralUtilities
     const long long int constexpr HOURS_PER_DAY{24};
     const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};
 
-    bool isNonAsciiChar (unsigned char c);
+    bool isNonAsciiChar (char c);
     std::string stripNonAsciiCharacters(const std::string &str);    
     std::string stripLineEndings(const std::string &str);
 
@@ -121,6 +121,9 @@ namespace GeneralUtilities
     std::string toString(const char *convert);
     std::string tQuoted(const std::string &convert);
     std::string tQuoted(const char *convert);
+
+    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth);
+    std::string toFixedWidth(const char *inputString, unsigned int fixedWidth);
     
     std::string toBinaryString(int number);
     std::string toDecString(int number);
