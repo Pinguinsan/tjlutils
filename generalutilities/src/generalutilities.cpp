@@ -115,57 +115,33 @@ namespace GeneralUtilities
     
     std::string toBinaryString(uint32_t number)
     {
-        if (number > 2400000000L) {
-            return "";
-        } else {
-            return toBinaryString(static_cast<int>(number));
-        }
+        return toBinaryString(static_cast<int>(number));
     }
 
     std::string toDecString(uint32_t number)
     {
-        if (number > 2400000000L) {
-            return "";
-        } else {
-            return toDecString(static_cast<int>(number));
-        }
+        return toDecString(static_cast<int>(number));
     }
 
 
     std::string toHexString(uint32_t number)
     {
-        if (number > 2400000000L) {
-            return "";
-        } else {
-            return toHexString(static_cast<int>(number));
-        }
+        return toHexString(static_cast<int>(number));
     }
 
     std::string toBinaryString(uint8_t number)
     {
-        if (number > 128) {
-            return "";
-        } else {
-            return toBinaryString(static_cast<int>(number));
-        }
+        return toBinaryString(static_cast<int>(number));
     }
 
     std::string toDecString(uint8_t number)
     {
-        if (number > 128) {
-            return "";
-        } else {
-            return toHexString(static_cast<int>(number));
-        }
+        return toHexString(static_cast<int>(number));
     }    
     
     std::string toHexString(uint8_t number)
     {
-        if (number > 128) {
-            return "";
-        } else {
-            return toHexString(static_cast<int>(number));
-        }
+        return toHexString(static_cast<int>(number));
     }
 
     std::string stripLineEndings(const std::string &str)
