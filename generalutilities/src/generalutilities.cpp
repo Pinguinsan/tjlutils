@@ -23,6 +23,151 @@
 namespace GeneralUtilities
 {
 
+    std::string toBinaryString(int number)
+    {
+        if (number == 0) {
+            return "0";
+        }
+        int digitCount = 0;
+        int copy = number;
+        do {
+            digitCount++;
+        } while (copy /= 2);
+        copy = number;
+        std::string returnString{""};
+        for (int i = 0; i < digitCount; i++) {
+            copy = number % 2;
+            if (copy == 0) returnString.insert(returnString.begin(), '0');
+            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
+            number /= 2;
+        }
+        return returnString;
+    }
+
+    std::string toDecString(int number)
+    {
+        if (number == 0) {
+            return "0";
+        }
+        int digitCount = 0;
+        int copy = number;
+        while (copy > 0) {
+            copy /= 10;
+            digitCount++;
+        }
+        copy = number;
+        std::string returnString{""};
+        for (int i = 0; i < digitCount; i++) {
+            copy = number % 10;
+            if (copy == 0) returnString.insert(returnString.begin(), '0');
+            else if ((copy % 9 ) == 0) returnString.insert(returnString.begin(), '9');
+            else if ((copy % 8) == 0) returnString.insert(returnString.begin(), '8');
+            else if ((copy % 7) == 0) returnString.insert(returnString.begin(), '7');
+            else if ((copy % 6) == 0) returnString.insert(returnString.begin(), '6');
+            else if ((copy % 5) == 0) returnString.insert(returnString.begin(), '5');
+            else if ((copy % 4) == 0) returnString.insert(returnString.begin(), '4');
+            else if ((copy % 3) == 0) returnString.insert(returnString.begin(), '3');
+            else if ((copy % 2) == 0) returnString.insert(returnString.begin(), '2');
+            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
+            number /= 10;
+        }
+        return returnString;
+    }
+
+    std::string toHexString(int number)
+    {
+        if (number == 0) {
+            return "0";
+        }
+        int digitCount = 0;
+        int copy = number;
+        do {
+            digitCount++;
+        } while (copy /= 16);
+        copy = number;
+        std::string returnString{""};
+        for (int i = 0; i < digitCount; i++) {
+            copy = number % 16;
+            if (copy == 0) returnString.insert(returnString.begin(), '0');
+            else if ((copy % 15) == 0) returnString.insert(returnString.begin(), 'f');
+            else if ((copy % 14) == 0) returnString.insert(returnString.begin(), 'e');
+            else if ((copy % 13) == 0) returnString.insert(returnString.begin(), 'd');
+            else if ((copy % 12) == 0) returnString.insert(returnString.begin(), 'c');
+            else if ((copy % 11) == 0) returnString.insert(returnString.begin(), 'b');
+            else if ((copy % 10) == 0) returnString.insert(returnString.begin(), 'a');                        
+            else if ((copy % 9) == 0) returnString.insert(returnString.begin(), '9');
+            else if ((copy % 8) == 0) returnString.insert(returnString.begin(), '8');
+            else if ((copy % 7) == 0) returnString.insert(returnString.begin(), '7');
+            else if ((copy % 6) == 0) returnString.insert(returnString.begin(), '6');
+            else if ((copy % 5) == 0) returnString.insert(returnString.begin(), '5');
+            else if ((copy % 4) == 0) returnString.insert(returnString.begin(), '4');
+            else if ((copy % 3) == 0) returnString.insert(returnString.begin(), '3');
+            else if ((copy % 2) == 0) returnString.insert(returnString.begin(), '2');
+            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
+            number /= 16;
+        }
+        return returnString;
+    }
+
+    std::string toBinaryString(bool number) { return (number ? toBinaryString("1") : toBinaryString("0")); }
+    std::string toDecString(bool number) { return (number ? toDecString("1") : toDecString("0")); }
+    std::string toHexString(bool number) { return (number ? toHexString("1") : toHexString("0")); }
+    
+    std::string toBinaryString(uint32_t number)
+    {
+        if (number > 2400000000L) {
+            return "";
+        } else {
+            return toBinaryString(static_cast<int>(number));
+        }
+    }
+
+    std::string toDecString(uint32_t number)
+    {
+        if (number > 2400000000L) {
+            return "";
+        } else {
+            return toDecString(static_cast<int>(number));
+        }
+    }
+
+
+    std::string toHexString(uint32_t number)
+    {
+        if (number > 2400000000L) {
+            return "";
+        } else {
+            return toHexString(static_cast<int>(number));
+        }
+    }
+
+    std::string toBinaryString(uint8_t number)
+    {
+        if (number > 128) {
+            return "";
+        } else {
+            return toBinaryString(static_cast<int>(number));
+        }
+    }
+
+    std::string toDecString(uint8_t number)
+    {
+        if (number > 128) {
+            return "";
+        } else {
+            return toHexString(static_cast<int>(number));
+        }
+    }    
+    
+    std::string toHexString(uint8_t number)
+    {
+        if (number > 128) {
+            return "";
+        } else {
+            return toHexString(static_cast<int>(number));
+        }
+    }
+
     std::string stripLineEndings(const std::string &str)
     {
         std::string copyString{str};
@@ -381,83 +526,6 @@ namespace GeneralUtilities
     std::string tQuoted(const char *convert)
     {
         return ("\"" + static_cast<std::string>(convert) + "\"");
-    }
-
-    std::string toBinaryString(int number)
-    {
-        int digitCount = 0;
-        int copy = number;
-        do {
-            digitCount++;
-        } while (copy /= 2);
-        copy = number;
-        std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
-            copy = number % 2;
-            if (copy == 0) returnString.insert(returnString.begin(), '0');
-            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
-            number /= 2;
-        }
-        return returnString;
-    }
-
-    std::string toDecString(int number)
-    {
-        int digitCount = 0;
-        int copy = number;
-        while (copy > 0) {
-            copy /= 10;
-            digitCount++;
-        }
-        copy = number;
-        std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
-            copy = number % 10;
-            if (copy == 0) returnString.insert(returnString.begin(), '0');
-            else if ((copy % 9 ) == 0) returnString.insert(returnString.begin(), '9');
-            else if ((copy % 8) == 0) returnString.insert(returnString.begin(), '8');
-            else if ((copy % 7) == 0) returnString.insert(returnString.begin(), '7');
-            else if ((copy % 6) == 0) returnString.insert(returnString.begin(), '6');
-            else if ((copy % 5) == 0) returnString.insert(returnString.begin(), '5');
-            else if ((copy % 4) == 0) returnString.insert(returnString.begin(), '4');
-            else if ((copy % 3) == 0) returnString.insert(returnString.begin(), '3');
-            else if ((copy % 2) == 0) returnString.insert(returnString.begin(), '2');
-            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
-            number /= 10;
-        }
-        return returnString;
-    }
-
-    std::string toHexString(int number)
-    {
-        int digitCount = 0;
-        int copy = number;
-        do {
-            digitCount++;
-        } while (copy /= 16);
-        copy = number;
-        std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
-            copy = number % 16;
-            if (copy == 0) returnString.insert(returnString.begin(), '0');
-            else if ((copy % 15) == 0) returnString.insert(returnString.begin(), 'f');
-            else if ((copy % 14) == 0) returnString.insert(returnString.begin(), 'e');
-            else if ((copy % 13) == 0) returnString.insert(returnString.begin(), 'd');
-            else if ((copy % 12) == 0) returnString.insert(returnString.begin(), 'c');
-            else if ((copy % 11) == 0) returnString.insert(returnString.begin(), 'b');
-            else if ((copy % 10) == 0) returnString.insert(returnString.begin(), 'a');
-            else if ((copy % 9) == 0) returnString.insert(returnString.begin(), '9');
-            else if ((copy % 8) == 0) returnString.insert(returnString.begin(), '8');
-            else if ((copy % 7) == 0) returnString.insert(returnString.begin(), '7');
-            else if ((copy % 6) == 0) returnString.insert(returnString.begin(), '6');
-            else if ((copy % 5) == 0) returnString.insert(returnString.begin(), '5');
-            else if ((copy % 4) == 0) returnString.insert(returnString.begin(), '4');
-            else if ((copy % 3) == 0) returnString.insert(returnString.begin(), '3');
-            else if ((copy % 2) == 0) returnString.insert(returnString.begin(), '2');
-            else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
-            number /= 16;
-        }
-        return returnString;
     }
 
     std::string stripTrailingWhitespace(const std::string &stringToStrip)

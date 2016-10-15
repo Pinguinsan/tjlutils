@@ -121,9 +121,23 @@ namespace GeneralUtilities
     std::string toString(const char *convert);
     std::string tQuoted(const std::string &convert);
     std::string tQuoted(const char *convert);
+    
     std::string toBinaryString(int number);
     std::string toDecString(int number);
     std::string toHexString(int number);
+
+    std::string toBinaryString(uint32_t number);
+    std::string toDecString(uint32_t number);
+    std::string toHexString(uint32_t number);
+
+    std::string toBinaryString(uint8_t number);
+    std::string toDecString(uint8_t number);
+    std::string toHexString(uint8_t number);
+    
+    std::string toBinaryString(bool number);
+    std::string toDecString(bool number);
+    std::string toHexString(bool number);
+
     std::string stripTrailingWhitespace(const std::string &stringToStrip);
     std::string tEndl();
     std::string tParenthesis(const std::string &convert);
