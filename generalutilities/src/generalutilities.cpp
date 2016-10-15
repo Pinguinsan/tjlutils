@@ -461,6 +461,24 @@ namespace GeneralUtilities
         return ((charToCheck == '0') || (charToCheck == '1') || (charToCheck == '2') || (charToCheck == '3') || (charToCheck == '4') || (charToCheck == '5') || (charToCheck == '6') || (charToCheck == '7') || (charToCheck == '8') || (charToCheck == '9'));
     }
 
+    unsigned int hexStringToUInt(const std::string &str)
+    {
+        unsigned int ret{0};   
+        std::stringstream ss;
+        ss << std::hex << str;
+        ss >> ret;
+        return ret;
+    }
+
+    unsigned char hexStringToUChar(const std::string &str)
+    {
+        unsigned char ret{0};   
+        std::stringstream ss;
+        ss << std::hex << str;
+        ss >> ret;
+        return ret;
+    }
+
     bool endsWith(const std::string &stringToCheck, const std::string &matchString)
     {
         if (stringToCheck.length() < matchString.length()) {

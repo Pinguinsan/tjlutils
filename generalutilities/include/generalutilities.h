@@ -121,6 +121,8 @@ namespace GeneralUtilities
     std::string toString(const char *convert);
     std::string tQuoted(const std::string &convert);
     std::string tQuoted(const char *convert);
+    unsigned int hexStringToUInt(const std::string &str);
+    unsigned char hexStringToUChar(const std::string &str);
 
     std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth);
     std::string toFixedWidth(const char *inputString, unsigned int fixedWidth);
