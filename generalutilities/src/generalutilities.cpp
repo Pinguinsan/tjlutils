@@ -31,9 +31,9 @@ namespace GeneralUtilities
         return copyString;
     }
 
-    bool isNonAsciiChar (char c) 
+    bool isNonAsciiChar (unsigned char c)
     {  
-        return ! (c >= ASCII_LOW_LIMIT && c < ASCII_HIGH_LIMIT);   
+        return ! (c < ASCII_HIGH_LIMIT);
     } 
 
     std::string stripNonAsciiCharacters(const std::string &str) 

@@ -53,8 +53,8 @@ namespace GeneralUtilities
 {
     const size_t generalnpos{std::string::npos};
     const int constexpr ASCII_WHITESPACE_MAXIMUM_VALUE{32};
-    const int constexpr ASCII_HIGH_LIMIT{128};
-    const int constexpr ASCII_LOW_LIMIT{0};
+    const unsigned int constexpr ASCII_HIGH_LIMIT{128};
+    const unsigned int constexpr ASCII_LOW_LIMIT{0};
     const long long int constexpr NANOSECONDS_PER_MICROSECOND{1000};
     const long long int constexpr NANOSECONDS_PER_MILLISECOND{1000000};
     const long long int constexpr NANOSECONDS_PER_SECOND{1000000000};
@@ -77,7 +77,7 @@ namespace GeneralUtilities
     const long long int constexpr HOURS_PER_DAY{24};
     const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};
 
-    bool isNonAsciiChar (char c);
+    bool isNonAsciiChar (unsigned char c);
     std::string stripNonAsciiCharacters(const std::string &str);    
     std::string stripLineEndings(const std::string &str);
 
