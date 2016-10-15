@@ -29,15 +29,9 @@ std::string Crypto::getHash(HashType hashType, const std::string &stringToHash)
         unsigned char *in = static_cast<unsigned char *>( malloc(sizeof(stringToHash.c_str()) ) );
         if (!in) {
             std::cout << "Error allocating memory for input buffer from Crpto::getHash512";
+            return "";
         }
-        memcpy(in, stringToHash.c_str(), sizeof(stringToHash.c_str()));
-        //strcpy( static_cast<char *>(in), stringToHash.c_str() );
-        int returnVal{crypto_hash_sha512(out, in, static_cast<unsigned long long>(stringToHash.length()))};
-        (void) returnVal;
-        char *temp{(char *) malloc(sizeof(out))};
-        memcpy(temp, out, sizeof(out));
-        const char *otherTemp{temp};
-        return static_cast<std::string>(otherTemp);
+        return static_cast<std::string>(reinterpret_cast<const char *>(out));
     } else {
         throw std::runtime_error("Unknown hash type requested");
     }

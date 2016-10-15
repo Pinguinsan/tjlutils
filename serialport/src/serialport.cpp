@@ -596,12 +596,12 @@ std::string SerialPort::readString()
 #if (defined(_WIN32) || defined(__CYGWIN__))
     /* added the void pointer cast, otherwise gcc will serialplain about */
     /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
-    unsigned char *buffer = static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX));
+    unsigned char *buffer{static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX))};
     long int returnedBytes{0};
     ReadFile(this->m_serialPort[this->m_portNumber], buffer, SERIAL_PORT_BUF_MAX, (LPDWORD)((void *)&returnedBytes), NULL);
     return static_cast<std::string>(reinterpret_cast<const char *>(buffer));
 #else
-    unsigned char *buffer = static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX));
+    unsigned char *buffer{static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX))};
     long int returnedBytes{read(this->m_serialPort[this->m_portNumber], buffer, SERIAL_PORT_BUF_MAX)};
     if(returnedBytes < 0) {
         if(errno == EAGAIN)  {
