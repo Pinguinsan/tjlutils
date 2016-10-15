@@ -463,18 +463,26 @@ namespace GeneralUtilities
 
     unsigned int hexStringToUInt(const std::string &str)
     {
+        std::string copyString{str};
+        if (startsWith(copyString, "0x")) {
+            copyString = copyString.substr(2);
+        }
         unsigned int ret{0};   
         std::stringstream ss;
-        ss << std::hex << str;
+        ss << std::hex << copyString;
         ss >> ret;
         return ret;
     }
 
     unsigned char hexStringToUChar(const std::string &str)
     {
-        unsigned char ret{0};   
+        std::string copyString{str};
+        if (startsWith(copyString, "0x")) {
+            copyString = copyString.substr(2);
+        }
+        unsigned int ret{0};   
         std::stringstream ss;
-        ss << std::hex << str;
+        ss << std::hex << copyString;
         ss >> ret;
         return ret;
     }
