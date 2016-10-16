@@ -18,7 +18,6 @@
 
 #include "serialport.h"
 
-const std::vector<std::string> SerialPort::SERIAL_PORT_NAMES{SerialPort::generateSerialPortNames()};
 const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
@@ -51,6 +50,8 @@ const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"8", "7", "6",
                                                                     "576000", "921600", "1000000", "1152000", "1500000",
                                                                     "2000000", "2500000", "3000000", "3500000", "4000000"};
 #endif
+
+const std::vector<std::string> SerialPort::SERIAL_PORT_NAMES{SerialPort::generateSerialPortNames()};
 
 SerialPort::SerialPort(const std::string &name) :
     m_portName{name},
