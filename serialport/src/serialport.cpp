@@ -837,13 +837,6 @@ std::pair<int, std::string> SerialPort::getPortNameAndNumber(const std::string &
     throw std::runtime_error("ERROR: " + name + " is an invalid serial port name");
 #else
     std::string str{name};
-    if (str.find("/dev/") == std::string::npos) {
-        if (str.find("tty") == std::string::npos) {
-            str = "/dev/tty" + str;
-        } else {
-            str = "/dev/" + str;
-        }
-    }
     int i{0};
     for (auto &it : SerialPort::SERIAL_PORT_NAMES) {
         if (str == it) {
@@ -851,6 +844,31 @@ std::pair<int, std::string> SerialPort::getPortNameAndNumber(const std::string &
         }
         i++;
     }
+    str = name;
+    if (str.find("/dev/tty") == std::string::npos) {
+        str = "/dev/tty" + str;
+    }
+    i = 0;
+    for (auto &it : SerialPort::SERIAL_PORT_NAMES) {
+        if (str == it) {
+            return std::make_pair(i, str);
+        }
+        i++;
+    }
+    str = name;
+    if (str.find("/dev/") == std::string::npos) {
+        str = "/dev/" + str;
+    }
+    i = 0;
+    for (auto &it : SerialPort::SERIAL_PORT_NAMES) {
+        if (str == it) {
+            return std::make_pair(i, str);
+        }
+        i++;
+    }
+    
+    
+
     throw std::runtime_error("ERROR: " + name + " is an invalid serial port name");
 #endif
 }
