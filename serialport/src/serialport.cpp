@@ -34,7 +34,8 @@
                                                                 "/dev/ttyACM3", "/dev/ttyACM4", "/dev/ttyACM5", "/dev/ttyACM6", "/dev/ttyACM7",
                                                                 "/dev/rfserialm0","/dev/rfserialm1","/dev/irserialm0","/dev/irserialm1",
                                                                 "/dev/cuau0","/dev/cuau1","/dev/cuau2","/dev/cuau3",
-                                                                "/dev/cuaU0","/dev/cuaU1","/dev/cuaU2","/dev/cuaU3"};
+                                                                "/dev/cuaU0","/dev/cuaU1","/dev/cuaU2","/dev/cuaU3"
+                                                                "/dev/rfcomm0", "/dev/rfcomm1", "/dev/rfcomm2", "/dev/rfcomm3"};
 #endif
 
 const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
@@ -1345,7 +1346,7 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
     return realReturn;
 #else
-    static std::vector<std::string> portNames{"/dev/ttyACM", "/dev/ttyUSB"};
+    static std::vector<std::string> portNames{"/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA", "/dev/rfserialm", "/dev/cuau", "/dev/cuaU", "/dev/rfcomm"};
     std::vector<std::string> returnVector;
     for (auto &it : portNames) {
         for (int i = 0; i < 255; i++) {
