@@ -178,10 +178,10 @@ public:
 private:
     #if (defined(_WIN32) || defined(__CYGWIN__))
         static const std::string DTR_RTS_ON_IDENTIFIER;
-        static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{16};
+        static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{256};
         HANDLE m_serialPort[NUMBER_OF_POSSIBLE_SERIAL_PORTS];
     #else
-        static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{38};
+        static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{256*9};
         int m_serialPort[NUMBER_OF_POSSIBLE_SERIAL_PORTS];
         struct termios m_oldPortSettings[NUMBER_OF_POSSIBLE_SERIAL_PORTS];
         struct termios m_newPortSettings;
@@ -198,6 +198,7 @@ private:
     static const int constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);
     static std::pair<int, std::string> getPortNameAndNumber(const std::string &name);
+    static std::vector<std::string> generateSerialPortNames();
 
     void writeCString(const char *str);
     int writeByte(unsigned char byteToSend);
@@ -208,6 +209,7 @@ private:
     static int parseBaudRate(BaudRate baudRate);
     static std::pair<int, int> parseParity(Parity parity);
 
+    static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
     static const std::vector<const char *> s_AVAILABLE_PARITY;
     static const std::vector<const char *> s_AVAILABLE_STOP_BITS;
     static const std::vector<const char *> s_AVAILABLE_DATA_BITS;

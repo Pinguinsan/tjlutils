@@ -18,26 +18,7 @@
 
 #include "serialport.h"
 
-
-#if (defined(_WIN32) || defined(__CYGWIN__))
-    const std::string SerialPort::DTR_RTS_ON_IDENTIFIER{"dtr=on rts=on"};
-    const std::vector<std::string> SerialPort::SERIAL_PORT_NAMES{"\\\\.\\COM1",  "\\\\.\\COM2",  "\\\\.\\COM3",  "\\\\.\\COM4",
-                                                                 "\\\\.\\COM5",  "\\\\.\\COM6",  "\\\\.\\COM7",  "\\\\.\\COM8",
-                                                                 "\\\\.\\COM9",  "\\\\.\\COM10", "\\\\.\\COM11", "\\\\.\\COM12",
-                                                                 "\\\\.\\COM13", "\\\\.\\COM14", "\\\\.\\COM15", "\\\\.\\COM16"};
-#else
-    const std::vector<std::string> SerialPort::SERIAL_PORT_NAMES{"/dev/ttyS0","/dev/ttyS1","/dev/ttyS2","/dev/ttyS3","/dev/ttyS4","/dev/ttyS5",
-                                                                "/dev/ttyS6","/dev/ttyS7","/dev/ttyS8","/dev/ttyS9","/dev/ttyS10","/dev/ttyS11",
-                                                                "/dev/ttyS12","/dev/ttyS13","/dev/ttyS14","/dev/ttyS15","/dev/ttyUSB0",
-                                                                "/dev/ttyUSB1","/dev/ttyUSB2","/dev/ttyUSB3","/dev/ttyUSB4","/dev/ttyUSB5",
-                                                                "/dev/ttyAMA0","/dev/ttyAMA1","/dev/ttyACM0","/dev/ttyACM1", "/dev/ttyACM2",
-                                                                "/dev/ttyACM3", "/dev/ttyACM4", "/dev/ttyACM5", "/dev/ttyACM6", "/dev/ttyACM7",
-                                                                "/dev/rfserialm0","/dev/rfserialm1","/dev/irserialm0","/dev/irserialm1",
-                                                                "/dev/cuau0","/dev/cuau1","/dev/cuau2","/dev/cuau3",
-                                                                "/dev/cuaU0","/dev/cuaU1","/dev/cuaU2","/dev/cuaU3",
-                                                                "/dev/rfcomm0", "/dev/rfcomm1", "/dev/rfcomm2", "/dev/rfcomm3"};
-#endif
-
+const std::vector<std::string> SerialPort::SERIAL_PORT_NAMES{SerialPort::generateSerialPortNames()};
 const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
@@ -50,6 +31,14 @@ const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"2", "1"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"8", "7", "6", "5"};
+#if defined(_WIN32) || defined(__CYGWIN__)
+    const std::vector<const char *> SerialPort::s_AVAILABLE_PORT_NAMES_BASE{"\\\\.\\COM"};
+    const std::string SerialPort::DTR_RTS_ON_IDENTIFIER{"dtr=on rts=on"};
+#else
+    const std::vector<const char *> SerialPort::s_AVAILABLE_PORT_NAMES_BASE{"/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", 
+                                                                            "/dev/ttyAMA", "/dev/ttyrfserialm", "/dev/irserialm",
+                                                                            "/dev/cuau", "/dev/cuaU", "devrfcomm"};
+#endif
 
 #if defined(_WIN32) || defined(__CYGWIN__)
     const std::vector<const char *> SerialPort::s_AVAILABLE_BAUD_RATE{"110", "300", "600", "1200", "2400", "4800", 
@@ -1335,10 +1324,6 @@ std::vector<const char *> SerialPort::availableDataBits()
 std::vector<std::string> SerialPort::availableSerialPorts()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
-    static std::vector<std::string> portNames{"COM1", "COM2", "COM3", "COM4",
-                                              "COM5", "COM6", "COM7", "COM8",
-                                              "COM9", "COM10", "COM11", "COM12",
-                                              "COM13", "COM14", "COM15", "COM16"};
     std::vector<std::string> returnVector;
     std::unique_ptr<SystemCommand> systemCommand{std::make_unique<SystemCommand>()};
     systemCommand->setCommand("wmic path Win32_SerialPort get /format:list");
@@ -1348,8 +1333,9 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
 
     for (auto &it : returnString) {
-        for (auto &innerIt : portNames) {
-            if (it.find(innerIt) != std::string::npos) {
+        for (auto &innerIt : SERIAL_PORT_NAMES) {
+            std::string copyString{innerIt.substr(innerIt.find("COM"))};
+            if (it.find(copyString) != std::string::npos) {
                 returnVector.emplace_back(innerIt);
             }
         }
@@ -1364,13 +1350,10 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
     return realReturn;
 #else
-    static std::vector<std::string> portNames{"/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA", "/dev/rfserialm", "/dev/cuau", "/dev/cuaU", "/dev/rfcomm"};
     std::vector<std::string> returnVector;
-    for (auto &it : portNames) {
-        for (int i = 0; i < 255; i++) {
-            if (FileUtilities::fileExists(it + std::to_string(i))) {
-                returnVector.emplace_back(it + std::to_string(i));
-            }
+    for (auto &it : SERIAL_PORT_NAMES) {
+        if (FileUtilities::fileExists(it)) {
+            returnVector.emplace_back(it);
         }
     }
     std::set<std::string> uniques;
@@ -1383,4 +1366,15 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
     return realReturn;
 #endif
+}
+
+std::vector<std::string> SerialPort::generateSerialPortNames()
+{
+    std::vector<std::string> returnVector;
+    for (auto &it : SerialPort::s_AVAILABLE_PORT_NAMES_BASE) {
+        for (int i = 0; i < 256; i++) {
+            returnVector.emplace_back(it + std::to_string(i));
+        }
+    }
+    return returnVector;
 }
