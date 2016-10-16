@@ -119,6 +119,7 @@ public:
     void flushRX();
     void flushTX();
     void flushRXTX();
+    void flushTXRX();
 
     void setPortName(const std::string &name);
     void setBaudRate(BaudRate baudRate);

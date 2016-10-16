@@ -806,6 +806,11 @@ void SerialPort::flushRXTX()
     #endif
 }
 
+void SerialPort::flushTXRX()
+{
+    return this->flushRXTX();
+}
+
 bool SerialPort::isAvailableSerialPort(const std::string &name)
 {
     //TODO: Implement
