@@ -34,7 +34,7 @@
                                                                 "/dev/ttyACM3", "/dev/ttyACM4", "/dev/ttyACM5", "/dev/ttyACM6", "/dev/ttyACM7",
                                                                 "/dev/rfserialm0","/dev/rfserialm1","/dev/irserialm0","/dev/irserialm1",
                                                                 "/dev/cuau0","/dev/cuau1","/dev/cuau2","/dev/cuau3",
-                                                                "/dev/cuaU0","/dev/cuaU1","/dev/cuaU2","/dev/cuaU3"
+                                                                "/dev/cuaU0","/dev/cuaU1","/dev/cuaU2","/dev/cuaU3",
                                                                 "/dev/rfcomm0", "/dev/rfcomm1", "/dev/rfcomm2", "/dev/rfcomm3"};
 #endif
 
