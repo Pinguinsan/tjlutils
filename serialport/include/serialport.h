@@ -86,6 +86,7 @@ public:
     SerialPort(const std::string &name, BaudRate baudRate, DataBits dataBits, Parity parity);
     SerialPort(const std::string &name, BaudRate baudRate, StopBits stopBits, Parity parity);
     SerialPort(const std::string &name, BaudRate baudRate, DataBits dataBits, StopBits stopBits, Parity parity);
+    SerialPort(const std::string &name, BaudRate baudRate, StopBits stopBits, DataBits dataBits, Parity parity);
 
     SerialPort(const std::string &name, DataBits dataBits);
     SerialPort(const std::string &name, DataBits dataBits, StopBits stopBits);

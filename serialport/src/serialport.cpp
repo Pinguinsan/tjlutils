@@ -158,6 +158,21 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     this->m_portName = truePortNameAndNumber.second;
 }
 
+SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stopBits, DataBits dataBits, Parity parity) :
+    m_portName{name},
+    m_portNumber{0},
+    m_baudRate{baudRate},
+    m_stopBits{stopBits},
+    m_dataBits{dataBits},
+    m_parity{parity},
+    m_timeout{DEFAULT_TIMEOUT},
+    m_isOpen{false}
+{
+    std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
+    this->m_portNumber = truePortNameAndNumber.first;
+    this->m_portName = truePortNameAndNumber.second;
+}
+
 SerialPort::SerialPort(const std::string &name, DataBits dataBits) :
     m_portName{name},
     m_portNumber{0},
@@ -1331,20 +1346,27 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     std::vector<std::string> returnVector;
-    std::unique_ptr<SystemCommand> systemCommand{std::make_unique<SystemCommand>()};
-    systemCommand->setCommand("wmic path Win32_SerialPort get /format:list");
-    std::vector<std::string> returnString{systemCommand->executeAndWaitForOutputAsVector()};
-    if (returnString.size() == 1) {
-        return returnVector;
-    }
+    const std::string BASE{"COM"};
+    //const std::string BASE{"\\\\.\\COM"};
+    for (int i = 1; i < 256; i++) {
+        BOOL bSuccess{false};
+        std::string check{BASE + std::to_string(i)};
+        HANDLE Port = CreateFileA(check.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+        if (Port == INVALID_HANDLE_VALUE) {
+            DWORD dwError = GetLastError();
 
-    for (auto &it : returnString) {
-        for (auto &innerIt : SERIAL_PORT_NAMES) {
-            std::string copyString{innerIt.substr(innerIt.find("COM"))};
-            if (it.find(copyString) != std::string::npos) {
-                returnVector.emplace_back(innerIt);
+            //Check to see if the error was because some other app had the port open or a general failure
+            if (dwError == ERROR_ACCESS_DENIED || dwError == ERROR_GEN_FAILURE || dwError == ERROR_SHARING_VIOLATION || dwError == ERROR_SEM_TIMEOUT) {
+                bSuccess = FALSE;
+            } else {
+                //The port was opened successfully
+                bSuccess = TRUE;
             }
         }
+        if (!bSuccess) {
+            returnVector.emplace_back(check);
+        }
+        CloseHandle(Port);
     }
     std::set<std::string> uniques;
     for (auto &it : returnVector) {
