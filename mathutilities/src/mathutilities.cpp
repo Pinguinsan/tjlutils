@@ -156,6 +156,11 @@ namespace MathUtilities
         return total;
     }
 
+    int tAbs(int val)
+    {
+        return ((val >= 0) ? val : -1*val);
+    }
+
     int tAbs(int lhs, int rhs)
     {
         return (lhs-rhs >= 0 ) ? (lhs-rhs) : -1*(lhs-rhs);

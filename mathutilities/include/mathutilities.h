@@ -61,6 +61,7 @@ namespace MathUtilities
     int roundUp(float numberToRound, double threshold=0.00000001);
     int roundDown(float numberToRound, double threshold=0.999999999);
     int intExp(int base, int super);
+    int tAbs(int val);
     int tAbs(int lhs, int rhs);
     int tMax(int lhs, int rhs);
     int tMin(int lhs, int rhs);
