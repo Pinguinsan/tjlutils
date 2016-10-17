@@ -36,7 +36,7 @@ const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"8", "7", "6",
 #else
     const std::vector<const char *> SerialPort::s_AVAILABLE_PORT_NAMES_BASE{"/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", 
                                                                             "/dev/ttyAMA", "/dev/ttyrfserialm", "/dev/irserialm",
-                                                                            "/dev/cuau", "/dev/cuaU", "devrfcomm"};
+                                                                            "/dev/cuau", "/dev/cuaU", "/dev/rfcomm"};
 #endif
 
 #if defined(_WIN32) || defined(__CYGWIN__)
