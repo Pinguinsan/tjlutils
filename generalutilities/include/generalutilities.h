@@ -296,12 +296,40 @@ namespace GeneralUtilities
     template<typename T>
     struct isCallable : std::conditional < std::is_class<T>::value, isCallableImplicit<T>, std::false_type >::type { };
 
+    template <typename Container, typename T>
+    bool safeEraseExactMatch(const Container &container, const T &searchTerm)
+    {
+        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        while (itemExists(container, searchTerm)) {
+            for (auto iter = std::begin(container); iter != std::end(container); iter++) {
+                if (*iter == searchTerm) {
+                    container.erase(iter);
+                    break;
+                }
+            }
+        }
+    }
+
+    template <typename Container, typename T>
+    bool safeErasePartialMatch(const Container &container, const T &searchTerm)
+    {
+        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        while (itemExists(container, searchTerm)) {
+            for (auto iter = std::begin(container); iter != std::end(container); iter++) {
+                if (iter->find(searchTerm) != generalnpos) {
+                    container.erase(iter);
+                    break;
+                }
+            }
+        }
+    }
+
     template <typename BeginningIterator, typename EndingIterator, typename T>
     bool itemExists(const BeginningIterator &bit, const EndingIterator &eit, const T &searchTerm)
     {
-        static_assert(std::is_same<typename std::iterator_traits<BeginningIterator>::value_type,  typename std::decay<T>::type>::value, "BeginningIter must be of same type as search term");
-        static_assert(std::is_same<typename std::iterator_traits<EndingIterator>::value_type,  typename std::decay<T>::type>::value, "EndingIter must be of same type as search term");
-        static_assert(std::is_same<typename std::decay<decltype(*bit)>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        //static_assert(std::is_same<typename std::iterator_traits<BeginningIterator>::value_type,  typename std::decay<T>::type>::value, "BeginningIter must be of same type as search term");
+        //static_assert(std::is_same<typename std::iterator_traits<EndingIterator>::value_type,  typename std::decay<T>::type>::value, "EndingIter must be of same type as search term");
+        //static_assert(std::is_same<typename std::decay<decltype(*bit)>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = bit; iter != eit; iter++) {
             if (*iter == searchTerm) {
                 return true;
@@ -313,7 +341,7 @@ namespace GeneralUtilities
     template <typename Container, typename T>
     bool itemExists(const Container &container, const T &searchTerm)
     {
-        static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = std::begin(container); iter != std::end(container); iter++) {
             if (*iter == searchTerm) {
                 return true;
