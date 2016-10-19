@@ -670,12 +670,12 @@ void SerialPort::closePort()
     #else
         int status{0};
         if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMGET, &status) == -1) {
-            std::cout << "WARNING: Unable to get port status while closing serial port " << this->m_portName << std::endl;
+            //std::cout << "WARNING: Unable to get port status while closing serial port " << this->m_portName << std::endl;
         }
         status &= ~TIOCM_DTR;    /* turn off DTR */
         status &= ~TIOCM_RTS;    /* turn off RTS */
         if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMSET, &status) == -1) {
-            std::cout << "WARNING: Unable to get port status while closing serial port " << this->m_portName << std::endl;
+            //std::cout << "WARNING: Unable to get port status while closing serial port " << this->m_portName << std::endl;
         }
 
         tcsetattr(this->m_serialPort[this->m_portNumber], TCSANOW, this->m_oldPortSettings + this->m_portNumber);
