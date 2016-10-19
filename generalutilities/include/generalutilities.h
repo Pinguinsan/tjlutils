@@ -332,6 +332,31 @@ namespace GeneralUtilities
         return false;
     }
 
+    template <typename BeginningIterator, typename EndingIterator, typename T>
+    bool itemPartiallyExists(const BeginningIterator &bit, const EndingIterator &eit, const T &searchTerm)
+    {
+        //static_assert(std::is_same<typename std::iterator_traits<BeginningIterator>::value_type,  typename std::decay<T>::type>::value, "BeginningIter must be of same type as search term");
+        //static_assert(std::is_same<typename std::iterator_traits<EndingIterator>::value_type,  typename std::decay<T>::type>::value, "EndingIter must be of same type as search term");
+        //static_assert(std::is_same<typename std::decay<decltype(*bit)>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        for (auto iter = bit; iter != eit; iter++) {
+            if (iter->find(searchTerm) != generalnpos) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template <typename Container, typename T>
+    bool itemPartiallyExists(const Container &container, const T &searchTerm)
+    {
+        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
+        for (auto iter = std::begin(container); iter != std::end(container); iter++) {
+            if (iter->find(searchTerm) != generalnpos) {
+                return true;
+            }
+        }
+    }
+
     
     template <typename Container, typename T>
     bool safeEraseExactMatch(Container &container, const T &searchTerm)
@@ -351,7 +376,7 @@ namespace GeneralUtilities
     bool safeErasePartialMatch(Container &container, const T &searchTerm)
     {
         //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
-        while (itemExists(container, searchTerm)) {
+        while (itemPartiallyExists(container, searchTerm)) {
             for (auto iter = std::begin(container); iter != std::end(container); iter++) {
                 if (iter->find(searchTerm) != generalnpos) {
                     container.erase(iter);
