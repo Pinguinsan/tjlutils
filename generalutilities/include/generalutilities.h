@@ -352,14 +352,17 @@ namespace GeneralUtilities
         //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = std::begin(container); iter != std::end(container); iter++) {
             if (iter->find(searchTerm) != generalnpos) {
+                std::cout << "searchTerm = " << searchTerm << std::endl;
+                std::cout << "iter = " << *iter << std::endl;
                 return true;
             }
         }
+        return false;
     }
 
     
     template <typename Container, typename T>
-    bool safeEraseExactMatch(Container &container, const T &searchTerm)
+    void safeEraseExactMatch(Container &container, const T &searchTerm)
     {
         //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         while (itemExists(container, searchTerm)) {
@@ -373,7 +376,7 @@ namespace GeneralUtilities
     }
 
     template <typename Container, typename T>
-    bool safeErasePartialMatch(Container &container, const T &searchTerm)
+    void safeErasePartialMatch(Container &container, const T &searchTerm)
     {
         //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         while (itemPartiallyExists(container, searchTerm)) {
