@@ -352,8 +352,6 @@ namespace GeneralUtilities
         //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = std::begin(container); iter != std::end(container); iter++) {
             if (iter->find(searchTerm) != generalnpos) {
-                std::cout << "searchTerm = " << searchTerm << std::endl;
-                std::cout << "iter = " << *iter << std::endl;
                 return true;
             }
         }
