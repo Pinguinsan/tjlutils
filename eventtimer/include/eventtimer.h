@@ -32,15 +32,17 @@ public:
     EventTimer();
 
     void start();
+    void restart();
     void pause();
     void unpause();
     void update();
 
-    long long int totalTimeMicroseconds() const;
-    long long int totalTimeMilliseconds() const;
-    long long int totalTimeSeconds() const;
-    long long int totalTimeMinutes() const;
-    long long int totalTimeHours() const;
+    long long int totalMicroseconds() const;
+    long long int totalMilliseconds() const;
+    long long int totalSeconds() const;
+    long long int totalMinutes() const;
+    long long int totalHours() const;
+    long long int totalTime() const;
     long long int hours() const;
     long long int minutes() const;
     long long int seconds() const;

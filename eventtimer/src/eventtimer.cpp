@@ -31,6 +31,11 @@ EventTimer::EventTimer() :
 
 }
 
+void EventTimer::restart()
+{
+    return start();
+}
+
 void EventTimer::start()
 {
     this->m_totalTime = 0;
@@ -93,34 +98,39 @@ void EventTimer::update()
     }
 }
 
-long long int EventTimer::totalTimeMicroseconds() const
+long long int EventTimer::totalMicroseconds() const
 {
     using namespace GeneralUtilities;
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) * MICROSECONDS_PER_MILLISECOND);
 }
 
-long long int EventTimer::totalTimeMilliseconds() const
+long long int EventTimer::totalMilliseconds() const
 {
     return this->m_totalTime;
 }
 
-long long int EventTimer::totalTimeSeconds() const
+long long int EventTimer::totalSeconds() const
 {
     using namespace GeneralUtilities;
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_SECOND);
 }
 
-long long int EventTimer::totalTimeMinutes() const
+long long int EventTimer::totalMinutes() const
 {
     using namespace GeneralUtilities;
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_MINUTE);
 }
 
-long long int EventTimer::totalTimeHours() const
+long long int EventTimer::totalHours() const
 {
     using namespace GeneralUtilities;
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_HOUR);
     
+}
+
+long long int EventTimer::totalTime() const
+{
+    return this->m_totalTime;
 }
 
 
