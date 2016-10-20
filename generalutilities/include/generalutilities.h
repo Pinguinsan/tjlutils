@@ -77,50 +77,6 @@ namespace GeneralUtilities
     const long long int constexpr HOURS_PER_DAY{24};
     const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};
 
-    template <typename Function, typename...FunctionArgs>
-    void delaySecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
-    {
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_SECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
-        do {
-            (void)function(functionArgs...);
-            endTime = std::chrono::high_resolution_clock::now();
-            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
-        } while (elapsedTime <= microsecondsToDelay);
-    }
-
-    template <typename Function, typename...FunctionArgs>
-    void delayMillisecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
-    {
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
-        do {
-            (void)function(functionArgs...);
-            endTime = std::chrono::high_resolution_clock::now();
-            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
-        } while (elapsedTime <= microsecondsToDelay);
-    }
-
-    template <typename Function, typename...FunctionArgs>
-    void delayMicrosecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
-    {
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
-        do {
-            (void)function(functionArgs...);
-            endTime = std::chrono::high_resolution_clock::now();
-            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
-        } while (elapsedTime <= microsecondsToDelay);
-    }
-
-    
-    
     bool isNonAsciiChar (char c);
     std::string stripNonAsciiCharacters(const std::string &str);    
     std::string stripLineEndings(const std::string &str);
@@ -191,6 +147,51 @@ namespace GeneralUtilities
     std::string tEndl();
     std::string tParenthesis(const std::string &convert);
     std::string tParenthesis(const char *convert);
+
+        
+
+    template <typename Function, typename...FunctionArgs>
+    void delaySecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    {
+        auto microsecondsToDelay{howLong * MICROSECONDS_PER_SECOND};
+        auto startTime{std::chrono::high_resolution_clock::now()};
+        auto endTime{std::chrono::high_resolution_clock::now()};
+        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        do {
+            (void)function(functionArgs...);
+            endTime = std::chrono::high_resolution_clock::now();
+            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+        } while (elapsedTime <= microsecondsToDelay);
+    }
+
+    template <typename Function, typename...FunctionArgs>
+    void delayMillisecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    {
+        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
+        auto startTime{std::chrono::high_resolution_clock::now()};
+        auto endTime{std::chrono::high_resolution_clock::now()};
+        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        do {
+            (void)function(functionArgs...);
+            endTime = std::chrono::high_resolution_clock::now();
+            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+        } while (elapsedTime <= microsecondsToDelay);
+    }
+
+    template <typename Function, typename...FunctionArgs>
+    void delayMicrosecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    {
+        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
+        auto startTime{std::chrono::high_resolution_clock::now()};
+        auto endTime{std::chrono::high_resolution_clock::now()};
+        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        do {
+            (void)function(functionArgs...);
+            endTime = std::chrono::high_resolution_clock::now();
+            elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+        } while (elapsedTime <= microsecondsToDelay);
+    }
+
 
     template<typename Function>
     std::string stripFromStringIf(const std::string &stringToStrip, Function function)

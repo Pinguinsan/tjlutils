@@ -51,6 +51,25 @@ namespace MathUtilities
         return rng;
     }
 
+    
+    bool isEvenlyDivisibleBy(int numberToCheck, int divisor)
+    {
+        if ((numberToCheck == 0) || (divisor == 0)) {
+            return false;
+        }
+        return ((numberToCheck % divisor) == 0);
+    }
+
+    bool isEven(int numberToCheck)
+    {
+        return isEvenlyDivisibleBy(numberToCheck, 2);
+    }
+
+    bool isOdd(int numberToCheck) 
+    {
+        return !isEven(numberToCheck);
+    }
+
     int randomBetween(int lowLimit, int highLimit)
     {
         /*

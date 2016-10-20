@@ -22,7 +22,6 @@
 
 namespace GeneralUtilities
 {
-
     std::string toBinaryString(int number)
     {
         if (number == 0) {

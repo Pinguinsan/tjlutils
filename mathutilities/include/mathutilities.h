@@ -46,6 +46,10 @@ namespace MathUtilities
     const int constexpr ASCII_HIGH_LIMIT{126};
     const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};    
 
+    bool isEvenlyDivisibleBy(int numberToCheck, int divisor);
+    bool isEven(int numberToCheck);
+    bool isOdd(int numberToCheck);
+
     bool approximatelyEquals(double lhs, double rhs, double threshold);
     bool approximatelyEquals(float lhs, float rhs, double threshold);
     bool approximatelyEquals(float lhs, double rhs, double threshold);
