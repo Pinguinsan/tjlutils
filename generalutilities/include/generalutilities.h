@@ -106,7 +106,6 @@ namespace GeneralUtilities
     void delayNanoseconds(double howLong);
     std::pair<std::string, std::string> splitFileName(const std::string &fullPath);
     bool isDigit(char charToCheck);
-    int intExp(int base, int super);
     bool endsWith(const std::string &stringToCheck, const std::string &matchString);
     bool endsWith(const std::string &stringToCheck, char matchChar);
     bool endsWithNotIncludingWhitespace(const std::string &stringToCheck, const std::string &matchString);

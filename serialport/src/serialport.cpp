@@ -664,6 +664,9 @@ int SerialPort::writeBufferedBytes(unsigned char *buffer, int bufferSize)
 
 void SerialPort::closePort()
 {
+    if (!this->isOpen()) {
+        return;
+    }
     #if (defined(_WIN32) || defined(__CYGWIN__))
         CloseHandle(this->m_serialPort[this->m_portNumber]);
         this->m_isOpen = false;
