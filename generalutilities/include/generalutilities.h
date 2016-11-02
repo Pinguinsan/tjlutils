@@ -97,7 +97,7 @@ namespace GeneralUtilities
     std::string stripFromString(const std::string &stringToStrip, char whatToStrip);
     std::string stripAllFromString(const std::string &stringToStrip, const std::string &whatToStrip);
     std::string stripAllFromString(const std::string &stringToStrip, char whatToStrip);
-    std::string tWhitespace(unsigned int howMuch);
+    std::string tWhitespace(int howMuch);
     int charToInt(char charToConvert);
     char intToChar (int intToConvert);
     void delaySeconds(double howLong);
