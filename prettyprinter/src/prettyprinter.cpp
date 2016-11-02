@@ -2,6 +2,7 @@
 
 const char *PrettyPrinter::TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE{"\033["};
 const char *PrettyPrinter::TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL{"m"};
+const char *PrettyPrinter::DEFAULT_TERMINAL_COLOR{"\033[39m"};
 
 PrettyPrinter::PrettyPrinter() :
     m_terminalColor{TerminalColor::FG_DEFAULT},

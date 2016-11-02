@@ -75,6 +75,7 @@ public:
     void print(const T& toPrint, TerminalColor terminalColor, std::ostream &outputStream)
     {
         outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << terminalColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL << toPrint;
+        outputStream << DEFAULT_TERMINAL_COLOR;
     }
 
     template <typename T>
@@ -104,7 +105,7 @@ public:
     template <typename T>
     void println(const T& toPrint, TerminalColor terminalColor, std::ostream &outputStream)
     {
-        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << terminalColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL << toPrint << std::endl;
+        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << terminalColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL << toPrint << DEFAULT_TERMINAL_COLOR << std::endl;
     }
 
     void println()
@@ -117,6 +118,7 @@ private:
     std::ostream *m_outputStream;
     static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE;
     static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
+    static const char *DEFAULT_TERMINAL_COLOR;
 };
 
 #endif //TJUTILS_PRETTYPRINTER_H
