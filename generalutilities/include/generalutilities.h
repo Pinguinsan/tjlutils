@@ -123,8 +123,8 @@ namespace GeneralUtilities
     unsigned int hexStringToUInt(const std::string &str);
     unsigned char hexStringToUChar(const std::string &str);
 
-    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth);
-    std::string toFixedWidth(const char *inputString, unsigned int fixedWidth);
+    std::string toFixedWidth(const std::string &inputString, int fixedWidth);
+    std::string toFixedWidth(const char *inputString, int fixedWidth);
     
     std::string toBinaryString(int number);
     std::string toDecString(int number);
@@ -142,16 +142,17 @@ namespace GeneralUtilities
     std::string toDecString(bool number);
     std::string toHexString(bool number);
 
-    std::string stripTrailingWhitespace(const std::string &stringToStrip);
     std::string tEndl();
+    std::string stripTrailingWhitespace(const std::string &stringToStrip);
     std::string tParenthesis(const std::string &convert);
     std::string tParenthesis(const char *convert);
 
         
 
     template <typename Function, typename...FunctionArgs>
-    void delaySecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    void delaySecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
+        howLong = (howLong >= 0 ? howLong : -1*howLong);
         auto microsecondsToDelay{howLong * MICROSECONDS_PER_SECOND};
         auto startTime{std::chrono::high_resolution_clock::now()};
         auto endTime{std::chrono::high_resolution_clock::now()};
@@ -164,8 +165,9 @@ namespace GeneralUtilities
     }
 
     template <typename Function, typename...FunctionArgs>
-    void delayMillisecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    void delayMillisecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
+        howLong = (howLong >= 0 ? howLong : -1*howLong);
         auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
         auto startTime{std::chrono::high_resolution_clock::now()};
         auto endTime{std::chrono::high_resolution_clock::now()};
@@ -178,8 +180,9 @@ namespace GeneralUtilities
     }
 
     template <typename Function, typename...FunctionArgs>
-    void delayMicrosecondsWithCallback(unsigned int howLong, const Function &function, FunctionArgs... functionArgs)
+    void delayMicrosecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
+        howLong = (howLong >= 0 ? howLong : -1*howLong);
         auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
         auto startTime{std::chrono::high_resolution_clock::now()};
         auto endTime{std::chrono::high_resolution_clock::now()};

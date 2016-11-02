@@ -42,6 +42,7 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     rm -f "$ui/templateobjects.h"
     rm -f "$ui/serialport.h"
     rm -f "$ui/eventtimer.h"
+    rm -f "$ui/prettyprinter.h"
 
     if [[ -z "$cygwinCheck" ]]; then
         rm -f "$ul/libtjlutils.so"
@@ -92,6 +93,9 @@ else
 
     rm -f "$ui/eventtimer.h"
     ln -s "$ogt/eventtimer/include/eventtimer.h" "$ui/"
+
+    rm -f "$ui/prettyprinter.h"
+    ln -s "$ogt/prettyprinter/include/prettyprinter.h" "$ui/"
 
     rm -f "$ui/templateobjects.h"
     ln -s "$ogt/templateobjects/templateobjects.h" "$ui/"

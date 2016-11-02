@@ -3,6 +3,9 @@ set (CMAKE_CXX_STANDARD 14)
 project (libraryprojects)
 set (BUILD_SHARED_LIBRARIES)
 set(CMAKE_BUILD_TYPE Release)
+set(GCC_ADDITIONAL_COMPILE_FLAGS "-fsanitize=undefined -frecord-gcc-switches")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/crypto/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/pythoncrypto/include/"
@@ -12,6 +15,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/mathutilities/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/serialport/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/include/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/prettyprinter/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/common/")
 
@@ -26,6 +30,7 @@ set (DATETIME_SOURCES ${SOURCE_BASE}/datetime/src/datetime.cpp)
 set (MATHUTILITIES_SOURCES ${SOURCE_BASE}/mathutilities/src/mathutilities.cpp)
 set (SERIALPORT_SOURCES ${SOURCE_BASE}/serialport/src/serialport.cpp)
 set (EVENTTIMER_SOURCES ${SOURCE_BASE}/eventtimer/src/eventtimer.cpp)
+set (PRETTYPRINTER_SOURCES ${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp)
 
 add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${PYTHONCRYPTO_SOURCES}
@@ -35,7 +40,8 @@ add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${DATETIME_SOURCES}
                             ${MATHUTILITIES_SOURCES}
                             ${SERIALPORT_SOURCES}
-                            ${EVENTTIMER_SOURCES})
+                            ${EVENTTIMER_SOURCES}
+                            ${PRETTYPRINTER_SOURCES})
                         
 add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${PYTHONCRYPTO_SOURCES}
@@ -45,8 +51,7 @@ add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${DATETIME_SOURCES}
                                   ${MATHUTILITIES_SOURCES}
                                   ${SERIALPORT_SOURCES}
-                                  ${EVENTTIMER_SOURCES})
+                                  ${EVENTTIMER_SOURCES}
+                                  ${PRETTYPRINTER_SOURCES})
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)
-
-

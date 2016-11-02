@@ -23,6 +23,7 @@ INCLUDEPATH += systemcommand/include/ \
                serialport/include/ \
                eventtimer/include/ \
                datetime/include/ \
+               prettyprinter/include/ \
                common/
 
 SOURCES += systemcommand/src/systemcommand.cpp \
@@ -33,7 +34,8 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            mathutilities/src/mathutilities.cpp \
            datetime/src/datetime.cpp \
            serialport/src/serialport.cpp \
-           eventtimer/src/eventtimer.cpp
+           eventtimer/src/eventtimer.cpp \
+           prettyprinter/src/prettyprinter.cpp
 
 HEADERS += systemcommand/include/systemcommand.h \
            pythoncrypto/include/pythoncrypto.h \
@@ -45,6 +47,7 @@ HEADERS += systemcommand/include/systemcommand.h \
            datetime/include/datetime.h \
            serialport/include/serialport.h \
            eventtimer/include/eventtimer.h \
+           prettyprinter/include/prettyprinter \
            templateobjects/templateobjects.h \
            common/tjlutils.h            
 

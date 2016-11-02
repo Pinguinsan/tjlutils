@@ -293,19 +293,19 @@ namespace GeneralUtilities
         return stripAllFromString(stringToStrip, std::string(1, whatToStrip));
     }
 
-    std::string tWhitespace(unsigned int howMuch) 
+    std::string tWhitespace(int howMuch) 
     {
         std::string returnString{""};
-        for (unsigned int i = 0; i < howMuch; i++) {
+        for (int i = 0; i < howMuch; i++) {
             returnString += " ";
         }
         return returnString;
     }
 
-    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth)
+    std::string toFixedWidth(const std::string &inputString, int fixedWidth)
     {
         std::string copyString{inputString};
-        unsigned int copyLength{copyString.length()};
+        size_t copyLength{copyString.length()};
         if (copyLength < fixedWidth) {
             copyLength = (fixedWidth - copyLength);
             while (copyLength--) {
@@ -315,7 +315,7 @@ namespace GeneralUtilities
         return copyString;
     }
 
-    std::string toFixedWidth(const char *inputString, unsigned int fixedWidth)
+    std::string toFixedWidth(const char *inputString, int fixedWidth)
     {
         return toFixedWidth(static_cast<std::string>(inputString), fixedWidth);
     }

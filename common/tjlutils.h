@@ -36,7 +36,10 @@
 #include "fileutilities.h"
 #include "systemcommand.h"
 #include "pythoncrypto.h"
-#include "templateobjects.h"
 #include "crypto.h"
+#include "templateobjects.h"
+#include "serialport.h"
+#include "eventtimer.h"
+#include "prettyprinter.h"
 
 #endif //TJLUTILS_COMMON_H
