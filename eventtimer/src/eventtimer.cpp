@@ -20,7 +20,12 @@
 
 #include "eventtimer.h"
 
+const int EventTimer::INVALIDATE_CACHE_TIMEOUT{100};
+
 EventTimer::EventTimer() :
+    m_startTime{std::chrono::high_resolution_clock::now()},
+    m_endTime{std::chrono::high_resolution_clock::now()},
+    m_cacheStartTime{std::chrono::high_resolution_clock::now()},
     m_totalTime{0},
     m_hours{0},
     m_minutes{0},
@@ -44,7 +49,18 @@ void EventTimer::start()
     this->m_seconds = 0;
     this->m_milliseconds = 0;
     this->m_startTime = std::chrono::high_resolution_clock::now();
+    this->m_cacheStartTime = std::chrono::high_resolution_clock::now();
     this->m_isPaused = false;
+}
+
+bool EventTimer::cacheIsValid()
+{
+    return (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - this->m_cacheStartTime).count() < EventTimer::INVALIDATE_CACHE_TIMEOUT);
+}
+
+void EventTimer::validateCache()
+{
+    this->m_cacheStartTime = std::chrono::high_resolution_clock::now();
 }
 
 void EventTimer::pause()
@@ -57,23 +73,39 @@ void EventTimer::unpause()
     this->m_isPaused = false;
 }
 
-long long int EventTimer::hours() const
+long long int EventTimer::hours()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_hours;
 }
 
-long long int EventTimer::minutes() const
+long long int EventTimer::minutes()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_minutes;
 }
 
-long long int EventTimer::seconds() const
+long long int EventTimer::seconds()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_seconds;
 }
 
-long long int EventTimer::milliseconds() const
+long long int EventTimer::milliseconds()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_milliseconds;
 }
 
@@ -98,39 +130,61 @@ void EventTimer::update()
     }
 }
 
-long long int EventTimer::totalMicroseconds() const
+long long int EventTimer::totalMicroseconds()
 {
     using namespace GeneralUtilities;
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) * MICROSECONDS_PER_MILLISECOND);
 }
 
-long long int EventTimer::totalMilliseconds() const
+long long int EventTimer::totalMilliseconds()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_totalTime;
 }
 
-long long int EventTimer::totalSeconds() const
+long long int EventTimer::totalSeconds()
 {
     using namespace GeneralUtilities;
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_SECOND);
 }
 
-long long int EventTimer::totalMinutes() const
+long long int EventTimer::totalMinutes()
 {
     using namespace GeneralUtilities;
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_MINUTE);
 }
 
-long long int EventTimer::totalHours() const
+long long int EventTimer::totalHours()
 {
     using namespace GeneralUtilities;
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return static_cast<long long int>(static_cast<double>(this->m_totalTime) / MILLISECONDS_PER_HOUR);
     
 }
 
-long long int EventTimer::totalTime() const
+long long int EventTimer::totalTime()
 {
+    if  (!this->cacheIsValid()) {
+        this->validateCache();
+        this->update();
+    }
     return this->m_totalTime;
 }
-
-

@@ -37,21 +37,23 @@ public:
     void unpause();
     void update();
 
-    long long int totalMicroseconds() const;
-    long long int totalMilliseconds() const;
-    long long int totalSeconds() const;
-    long long int totalMinutes() const;
-    long long int totalHours() const;
-    long long int totalTime() const;
-    long long int hours() const;
-    long long int minutes() const;
-    long long int seconds() const;
-    long long int milliseconds() const;
+    long long int totalMicroseconds();
+    long long int totalMilliseconds();
+    long long int totalSeconds();
+    long long int totalMinutes();
+    long long int totalHours();
+    long long int totalTime();
+
+    long long int hours();
+    long long int minutes();
+    long long int seconds();
+    long long int milliseconds();
     bool isPaused() const;
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_cacheStartTime;
     std::chrono::milliseconds m_rawTime;
     long long int m_totalTime;
     long long int m_hours;
@@ -59,6 +61,11 @@ private:
     long long int m_seconds;
     long long int m_milliseconds;
     bool m_isPaused;
+
+    bool cacheIsValid();
+    void validateCache();
+
+    static const int INVALIDATE_CACHE_TIMEOUT;
 };
 
 #endif //TJLUTILS_EVENTTIMER_H
