@@ -3,8 +3,14 @@ set (CMAKE_CXX_STANDARD 14)
 project (libraryprojects)
 set (BUILD_SHARED_LIBRARIES)
 set(CMAKE_BUILD_TYPE Release)
-set(GCC_ADDITIONAL_COMPILE_FLAGS "-fsanitize=undefined -frecord-gcc-switches")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
+
+IF (CYGWIN OR WIN32)
+    set(GCC_ADDITIONAL_COMPILE_FLAGS "")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
+ELSE()
+    set(GCC_ADDITIONAL_COMPILE_FLAGS "-fsanitize=undefined -frecord-gcc-switches")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
+ENDIF()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/crypto/include/"
