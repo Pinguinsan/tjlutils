@@ -130,6 +130,7 @@ public:
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
     void setTimeout(long long int timeout);
+    void setRetryCount(int retryCount);
 
     std::string portName() const;
     int portNumber() const;
@@ -138,6 +139,7 @@ public:
     DataBits dataBits() const;
     Parity parity() const;
     long long int timeout() const;
+    int retryCount() const;
     bool isOpen() const;
 
     std::string baudRateToString() const;
@@ -178,6 +180,7 @@ public:
     static std::vector<const char *> availableParity();
 
     static const int DEFAULT_TIMEOUT;
+    static const int DEFAULT_RETRY_COUNT;
 
 private:
     #if (defined(_WIN32) || defined(__CYGWIN__))
@@ -197,6 +200,7 @@ private:
     DataBits m_dataBits;
     Parity m_parity;
     long long int m_timeout;
+    int m_retryCount;
     bool m_isOpen;
 
     static const int constexpr SERIAL_PORT_BUF_MAX{4025};

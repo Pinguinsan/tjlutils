@@ -4,12 +4,12 @@
 *    Copyright (c) 2016 Tyler Lewis                                    *
 ************************************************************************
 *    This is a header file for tjlutils:                               *
-*    https://github.serial/Pinguinsan/tjlutils                            *
+*    https://github.serial/Pinguinsan/tjlutils                         *
 *    This file may be distributed with the entire tjlutils library,    *
 *    but may also be distributed as a standalone file                  *
 *    The source code is released under the GNU LGPL                    *
 *    This file holds the implementation of a SerialPort class          *
-*    It is used to connect to RS232 serialpliant serial ports             *
+*    It is used to connect to RS232 compliant serial ports             *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
 *    Public license along with libraryprojects                         *
@@ -23,6 +23,7 @@ const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
 const int SerialPort::DEFAULT_TIMEOUT{20};
+const int SerialPort::DEFAULT_RETRY_COUNT{3};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
@@ -62,6 +63,7 @@ SerialPort::SerialPort(const std::string &name) :
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -77,6 +79,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate) :
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -92,6 +95,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -107,6 +111,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -122,6 +127,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_dataBits{dataBits},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -137,6 +143,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -152,6 +159,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_dataBits{dataBits},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -167,6 +175,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_dataBits{dataBits},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -182,6 +191,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits) :
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -197,6 +207,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -212,6 +223,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_dataBits{dataBits},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -227,6 +239,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, Parity parity
     m_dataBits{dataBits},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -242,6 +255,7 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits) :
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -257,6 +271,7 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits, Parity parity
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -272,6 +287,7 @@ SerialPort::SerialPort(const std::string &name, Parity parity) :
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
     m_timeout{DEFAULT_TIMEOUT},
+    m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -287,6 +303,7 @@ SerialPort::SerialPort(SerialPort &&other) :
     m_dataBits{std::move(other.m_dataBits)},
     m_parity{std::move(other.m_parity)},
     m_timeout{std::move(other.m_timeout)},
+    m_retryCount{std::move(other.m_retryCount)},
     m_isOpen{std::move(other.m_isOpen)}
 {
 
@@ -299,9 +316,7 @@ bool operator==(const SerialPort &lhs, const SerialPort &rhs)
 
 void SerialPort::openPort()
 {
-
 #if (defined(_WIN32) || defined(__CYGWIN__))
-
     if (!isAvailableSerialPort(this->m_portName)) {
         throw std::runtime_error("ERROR: " + this->m_portName + " is not a currently available serial port (is something else using it?)");
     }
@@ -662,7 +677,7 @@ std::string SerialPort::readString()
             i = 0;
             returnString += byteRead;
         } else {
-            if (i++ > 3) {
+            if (++i > this->m_retryCount) {
                 exitBool = true;
             }
         }
@@ -682,7 +697,7 @@ std::string SerialPort::readStringUntil(const std::string &terminator)
             i = 0;
             returnString += byteRead;
         } else {
-            if (i++ > 3) {
+            if (++i > this->m_retryCount) {
                 exitBool = true;
             }
         }
@@ -1054,11 +1069,25 @@ long long int SerialPort::timeout() const
     return this->m_timeout;
 }
 
+int SerialPort::retryCount() const
+{
+    return this->retryCount();
+}
+
 void SerialPort::setTimeout(long long int timeout) {
     if (timeout < 1) {
         throw std::runtime_error("ERROR: Serial timeout cannot be negative (" + std::to_string(timeout) + " < 0");
     } else {
         this->m_timeout = timeout;
+    }
+}
+
+void SerialPort::setRetryCount(int retryCount)
+{
+    if (retryCount < 1) {
+        throw std::runtime_error("ERROR: Serial retry count cannot be negative (" + std::to_string(retryCount) + " < 0");
+    } else {
+        this->m_retryCount = retryCount;
     }
 }
 
@@ -1476,29 +1505,3 @@ std::vector<std::string> SerialPort::generateSerialPortNames()
     }
     return returnVector;
 }
-
-/*
-String Stream::readString()
-{
-  String ret;
-  int c = timedRead();
-  while (c >= 0)
-  {
-    ret += (char)c;
-    c = timedRead();
-  }
-  return ret;
-}
-
-String Stream::readStringUntil(char terminator)
-{
-  String ret;
-  int c = timedRead();
-  while (c >= 0 && c != terminator)
-  {
-    ret += (char)c;
-    c = timedRead();
-  }
-  return ret;
-}
-*/
