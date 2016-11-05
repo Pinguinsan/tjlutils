@@ -26,6 +26,7 @@ ui="/usr/include"
 ul="/usr/lib"
 ogt="/opt/GitHub/tjlutils"
 olt="/opt/LibraryBuilds/tjlutils"
+ub="/usr/bin"
 
 if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninstall" || "$1" == "uninstall" ]]; then
     
@@ -46,6 +47,7 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
 
     if [[ -z "$cygwinCheck" ]]; then
         rm -f "$ul/libtjlutils.so"
+        rm -f "$ub/EnumerateSerial.exe"
     else
         rm -f "$ul/cygtjlutils.dll"
     fi
@@ -107,6 +109,9 @@ else
     if [[ -z "$cygwinCheck" ]]; then
         rm -f "$ul/libtjlutils.so"
         ln -s "$olt/libtjlutils.so" "$ul/"
+
+        rm -f "$ub/EnumerateSerial.exe"
+        ln -s "$ogt/serialport/cs-helper/EnumerateSerial.exe" "$ub/"
     else
         rm -f "$ul/cygtjlutils.dll"
         ln -s "$olt/cygtjlutils.dll" "$ul/"

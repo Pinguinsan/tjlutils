@@ -20,53 +20,53 @@
 
 #include "systemcommand.h"
 
-const int SystemCommand::_DEFAULT_MAX_OUTPUT = 2147483647;
+const int SystemCommand::m_DEFAULT_MAX_OUTPUT = 2147483647;
 
 SystemCommand::SystemCommand() : 
-    _command{""},
-    _maxOutput{_DEFAULT_MAX_OUTPUT},
-    _hasError{false},
-    _repeatCommand{false}
+    m_command{""},
+    m_maxOutput{m_DEFAULT_MAX_OUTPUT},
+    m_hasError{false},
+    m_repeatCommand{false}
 {
 
 }
 
 SystemCommand::SystemCommand(const std::string &command) : 
-    _command{command},
-    _maxOutput{_DEFAULT_MAX_OUTPUT},
-    _hasError{false},
-    _repeatCommand{false}
+    m_command{command},
+    m_maxOutput{m_DEFAULT_MAX_OUTPUT},
+    m_hasError{false},
+    m_repeatCommand{false}
 {
 
 }
 
 SystemCommand::SystemCommand(const std::string &command, int maxOutput) :
-    _command{command},
-    _maxOutput{maxOutput},
-    _hasError{false},
-    _repeatCommand{false}
+    m_command{command},
+    m_maxOutput{maxOutput},
+    m_hasError{false},
+    m_repeatCommand{false}
 {
 
 }
 
 SystemCommand &SystemCommand::operator+=(const std::string &rhs)
 {
-    this->_command += rhs;
+    this->m_command += rhs;
     return *this;
 }
 
 void SystemCommand::printCommand()
 {
-    std::cout << stripPipeFromCommand(this->_command) << std::endl;
+    std::cout << stripPipeFromCommand(this->m_command) << std::endl;
 }
 
 void SystemCommand::insertIntoCommand(int position, const std::string &stringToInsert)
 {
-    if (static_cast<unsigned int>(position) > this->_command.length()) {
+    if (static_cast<unsigned int>(position) > this->m_command.length()) {
         return;
     }
-    this->_command.insert(position, stringToInsert);
-	this->_repeatCommand = false;
+    this->m_command.insert(position, stringToInsert);
+    this->m_repeatCommand = false;
 }
 
 void SystemCommand::insertIntoCommand(int position, char charToInsert)
@@ -78,23 +78,23 @@ void SystemCommand::insertIntoCommand(int position, char charToInsert)
 
 int SystemCommand::maxOutput()
 {
-    return this->_maxOutput;
+    return this->m_maxOutput;
 }
 
 std::string SystemCommand::command()
 {
-    return stripPipeFromCommand(this->_command);
+    return stripPipeFromCommand(this->m_command);
 }
 
 bool SystemCommand::hasError()
 {
-    return this->_hasError;
+    return this->m_hasError;
 }
 
 void SystemCommand::appendToCommand(const std::string &stringToAppend)
 {
-    _command += stringToAppend;
-	this->_repeatCommand = false;
+    m_command += stringToAppend;
+    this->m_repeatCommand = false;
 }
 
 int SystemCommand::returnValue()
@@ -104,16 +104,16 @@ int SystemCommand::returnValue()
 
 void SystemCommand::setCommand(const std::string &command)
 {
-    this->_repeatCommand = false;
-    this->_command = command;
-    this->_hasError = false;
+    this->m_repeatCommand = false;
+    this->m_command = command;
+    this->m_hasError = false;
     this->_sizeOfOutput = 0;
     this->_outputAsVector.clear();
 }
 
 void SystemCommand::setMaxOutput(int maxOutput)
 {
-    this->_maxOutput = maxOutput;
+    this->m_maxOutput = maxOutput;
 }
 
 std::string SystemCommand::outputAsString()
@@ -160,8 +160,8 @@ std::string SystemCommand::stripPipeFromCommand(const std::string &command)
         returnString = stripAllFromString(_command, "2>&1");
         returnString = stripAllFromString(_command, ">");
     #else
-        returnString = stripAllFromString(_command, "2>&1");
-        returnString = stripAllFromString(_command, ">");
+        returnString = stripAllFromString(m_command, "2>&1");
+        returnString = stripAllFromString(m_command, ">");
     #endif
     return returnString;
 }
@@ -180,8 +180,8 @@ int SystemCommand::sizeOfOutput()
 
 void SystemCommand::verifyValidMaxOutput()
 {
-    if ((_maxOutput <= 8) || (_maxOutput > (std::numeric_limits<int>::max)())) {
-        _maxOutput = _DEFAULT_MAX_OUTPUT;
+    if ((m_maxOutput <= 8) || (m_maxOutput > (std::numeric_limits<int>::max)())) {
+        m_maxOutput = m_DEFAULT_MAX_OUTPUT;
     }
 }
 
@@ -214,13 +214,13 @@ int SystemCommand::pcloseHandler(FILE *fp)
 void SystemCommand::systemCommandLaunch(PipeStatus pipe)
 {
     using namespace GeneralUtilities;
-    this->_command = stripPipeFromCommand(this->_command);
-    if (this->_repeatCommand) {
-    	this->_hasError = false;
+    this->m_command = stripPipeFromCommand(this->m_command);
+    if (this->m_repeatCommand) {
+        this->m_hasError = false;
     	this->_sizeOfOutput = 0;
     	this->_outputAsVector.clear();
     } else {
-        this->_repeatCommand = true;
+        this->m_repeatCommand = true;
     }
 	verifyValidMaxOutput();
     /*
@@ -321,18 +321,18 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
     #else
     */
     if (pipe == PipeStatus::WITH_PIPE) {
-        this->_command += " 2>&1"; //Merges stderror with stdout
+        this->m_command += " 2>&1"; //Merges stderror with stdout
         FILE *fp;
         char path[PATH_MAX];
 
-        fp = popenHandler(this->_command.c_str(), "r");
+        fp = popenHandler(this->m_command.c_str(), "r");
         if (fp == NULL) {
-            std::cout << "ERROR: Failed to execute command " << GeneralUtilities::tQuoted(this->_command) << std::endl;
+            std::cout << "ERROR: Failed to execute command " << GeneralUtilities::tQuoted(this->m_command) << std::endl;
             this->_returnValue = -1;
             return;
         }
         int outputSize{ 0 };
-        while ((fgets(path, PATH_MAX, fp) != NULL) && (outputSize <= this->_maxOutput)) {
+        while ((fgets(path, PATH_MAX, fp) != NULL) && (outputSize <= this->m_maxOutput)) {
             std::string formattedPath{static_cast<std::string>(path)};
             addFormattedThing(this->_outputAsVector, formattedPath, [](const std::string &stringToStrip) -> std::string
             {
@@ -350,12 +350,12 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
         }
         this->_returnValue = pcloseHandler(fp);
     } else {
-        this->_command = stripPipeFromCommand(this->_command);
+        this->m_command = stripPipeFromCommand(this->m_command);
         #ifdef _WIN32
             this->_returnValue = system(this->_command.c_str());
         #else
-            this->_returnValue = system(this->_command.c_str())/256;
+            this->_returnValue = system(this->m_command.c_str())/256;
         #endif
     }
-    this->_hasError = (this->_returnValue != 0);
+    this->m_hasError = (this->_returnValue != 0);
 }

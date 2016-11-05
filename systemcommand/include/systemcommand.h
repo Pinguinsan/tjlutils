@@ -109,14 +109,14 @@ private:
         WITHOUT_PIPE
     };
     int _returnValue;
-    std::string _command;
-    int _maxOutput;
-    bool _hasError;
+    std::string m_command;
+    int m_maxOutput;
+    bool m_hasError;
     int _sizeOfOutput;
-    bool _repeatCommand;
+    bool m_repeatCommand;
     std::ifstream _readFromFile;
     std::vector<std::string> _outputAsVector;
-    const static int  _DEFAULT_MAX_OUTPUT;
+    const static int  m_DEFAULT_MAX_OUTPUT;
 
     void verifyValidMaxOutput();
     void stripShellControlCharactersFromCommand();
