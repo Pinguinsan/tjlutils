@@ -55,7 +55,6 @@ namespace MathUtilities
     bool approximatelyEquals(float lhs, double rhs, double threshold);
     bool approximatelyEquals(double lhs, float rhs, double threshold);
 
-    std::mt19937 randomlySeededMersenneTwister();
     int randomBetween(int lowLimit, int highLimit);
     char randomAsciiByte();
     int roundIntuitively(double numberToRound);
@@ -69,6 +68,18 @@ namespace MathUtilities
     int tAbs(int lhs, int rhs);
     int tMax(int lhs, int rhs);
     int tMin(int lhs, int rhs);
+    std::mt19937 randomlySeededMersenneTwister();
+
+    class Random 
+    {
+    public:
+        Random() = default;
+        Random(std::mt19937::result_type seed);
+        int drawNumber(int min, int max);
+
+    private:        
+        std::mt19937 m_randomEngine{std::random_device{}()};
+    };
 }
 
 #endif //TJLUTILS_MATHUTILITIES_H

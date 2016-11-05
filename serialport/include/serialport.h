@@ -39,6 +39,7 @@
 #include <set>
 #include <vector>
 #include <chrono>
+#include <memory>
 #include <algorithm>
 #include <systemcommand.h>
 #include <fileutilities.h>
@@ -104,6 +105,7 @@ public:
 
     void openPort();
     void closePort();
+    unsigned char readByte();
     std::string readString();
     std::string readStringUntil(const std::string &str);
     std::string readStringUntil(char identifier);
@@ -205,6 +207,8 @@ private:
     void writeCString(const char *str);
     int writeByte(unsigned char byteToSend);
     int writeBufferedBytes(unsigned char *buffer, int bufferSize);
+    unsigned char timedRead();
+    unsigned char rawRead();
 
     static int parseDataBits(DataBits dataBits);
     static int parseStopBits(StopBits stopBits);

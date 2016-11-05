@@ -19,10 +19,57 @@
 
 #include "mathutilities.h"
 
-static bool srandSeeded{false};
 
 namespace MathUtilities
 {
+
+    static std::unique_ptr<MathUtilities::Random> randomDevice;
+    Random::Random(std::mt19937::result_type seed) :
+        m_randomEngine{seed}
+    {
+
+    }
+        
+    int Random::drawNumber(int min, int max)
+    {
+        return std::uniform_int_distribution<int>{min, max}(this->m_randomEngine);
+    }
+
+    int randomBetween(int lowLimit, int highLimit)
+    {
+        if (!MathUtilities::randomDevice) {
+            randomDevice = std::make_unique<MathUtilities::Random>();
+        }
+        return randomDevice->drawNumber(lowLimit, highLimit);
+        
+        /*
+        std::mt19937 rng{randomlySeededMersenneTwister()};
+        std::uniform_int_distribution<int> dist(lowLimit, highLimit);
+        int returnValue{lowLimit - 1};
+        do {
+            returnValue = dist(rng);
+        } while ((returnValue > highLimit) || (returnValue < lowLimit));
+        return returnValue;
+        if (!srandSeeded) {
+            srand(time(NULL));
+            srandSeeded = true;
+        }
+        const int divisor{(RAND_MAX/highLimit) + 1};
+        int returnValue{lowLimit - 1};
+        do {
+            returnValue = (rand() / divisor);
+        } while ((returnValue > highLimit) || (returnValue < lowLimit));
+        return returnValue;
+        */
+    }
+
+    std::mt19937 randomlySeededMersenneTwister()
+    {
+        std::mt19937 rng(std::random_device{}());
+        rng.discard(MathUtilities::MERSENNE_TWISTER_DISCARD_THRESHOLD);
+        return rng;
+    }
+
 
     bool approximatelyEquals(double lhs, double rhs, double threshold)
     {
@@ -44,14 +91,6 @@ namespace MathUtilities
         return approximatelyEquals(lhs, static_cast<double>(rhs), threshold);
     }
 
-    std::mt19937 randomlySeededMersenneTwister()
-    {
-        std::mt19937 rng(std::random_device{}());
-        rng.discard(MathUtilities::MERSENNE_TWISTER_DISCARD_THRESHOLD);
-        return rng;
-    }
-
-    
     bool isEvenlyDivisibleBy(int numberToCheck, int divisor)
     {
         if ((numberToCheck == 0) || (divisor == 0)) {
@@ -68,29 +107,6 @@ namespace MathUtilities
     bool isOdd(int numberToCheck) 
     {
         return !isEven(numberToCheck);
-    }
-
-    int randomBetween(int lowLimit, int highLimit)
-    {
-        /*
-        std::mt19937 rng{randomlySeededMersenneTwister()};
-        std::uniform_int_distribution<int> dist(lowLimit, highLimit);
-        int returnValue{lowLimit - 1};
-        do {
-            returnValue = dist(rng);
-        } while ((returnValue > highLimit) || (returnValue < lowLimit));
-        return returnValue;
-        */
-        if (!srandSeeded) {
-            srand(time(NULL));
-            srandSeeded = true;
-        }
-        const int divisor{(RAND_MAX/highLimit) + 1};
-        int returnValue{lowLimit - 1};
-        do {
-            returnValue = (rand() / divisor);
-        } while ((returnValue > highLimit) || (returnValue < lowLimit));
-        return returnValue;
     }
 
     char randomAsciiByte()

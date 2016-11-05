@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <ostream>
+#include <vector>
+#include <mathutilities.h>
 
 enum TerminalColor {
     FG_BLACK         = 30,
@@ -41,6 +43,8 @@ public:
     TerminalColor color() const;
     std::ostream *outputStream();
 
+    static TerminalColor randomColor();
+    
     template<typename T>
     void operator<<(const T &toPrint)
     {
@@ -119,6 +123,8 @@ private:
     static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE;
     static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
     static const char *DEFAULT_TERMINAL_COLOR;
+
+    static const std::vector<TerminalColor> s_TERMINAL_COLORS_CONTAINER;
 };
 
 #endif //TJUTILS_PRETTYPRINTER_H

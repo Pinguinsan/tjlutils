@@ -598,39 +598,96 @@ std::pair<int, int> SerialPort::parseParity(Parity parity)
 #endif
 }
 
-std::string SerialPort::readString()
+unsigned char SerialPort::readByte()
+{
+    return this->timedRead();
+}
+
+unsigned char SerialPort::rawRead()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
-    /* added the void pointer cast, otherwise gcc will serialplain about */
-    /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
-    unsigned char *buffer{static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX))};
+    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUF_MAX]};
+    unsigned char charToReturn{0};
     long int returnedBytes{0};
-    ReadFile(this->m_serialPort[this->m_portNumber], buffer, SERIAL_PORT_BUF_MAX, (LPDWORD)((void *)&returnedBytes), NULL);
-    return static_cast<std::string>(reinterpret_cast<const char *>(buffer));
+    ReadFile(this->m_serialPort[this->m_portNumber], buffer.get(), 1, (LPDWORD)((void *)&returnedBytes), NULL);
+    if (returnedBytes == 1) {
+        charToReturn = buffer.get()[0];
+    }
+    return charToReturn;
 #else
-    unsigned char *buffer{static_cast<unsigned char *>(malloc(SERIAL_PORT_BUF_MAX))};
-    long int returnedBytes{read(this->m_serialPort[this->m_portNumber], buffer, SERIAL_PORT_BUF_MAX)};
+    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUF_MAX]};
+    unsigned char charToReturn{0};
+    long int returnedBytes{read(this->m_serialPort[this->m_portNumber], buffer.get(), 1)};
+    if (returnedBytes == 1) {
+        charToReturn = buffer.get()[0];
+    }
     if(returnedBytes < 0) {
         if(errno == EAGAIN)  {
-            return "";
+            return charToReturn;
         }
     }
-    return static_cast<std::string>(reinterpret_cast<const char *>(buffer));
+    if (std::isprint(charToReturn)) {
+        return charToReturn;
+    } else {
+        return 0;
+    }
 #endif
 }
 
-std::string SerialPort::readStringUntil(const std::string &str)
+unsigned char SerialPort::timedRead()
+{
+    unsigned char byteRead{0};
+    auto startTime{std::chrono::high_resolution_clock::now()};
+    auto endTime{std::chrono::high_resolution_clock::now()};
+    do {
+        byteRead = this->rawRead();
+        if (std::isprint(byteRead)) {
+            return byteRead;
+        } 
+        endTime = std::chrono::high_resolution_clock::now();
+    } while(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() < this->m_timeout);
+    return 0;
+}
+
+
+std::string SerialPort::readString()
 {
     std::string returnString{""};
-    std::chrono::time_point<std::chrono::high_resolution_clock> startTime{std::chrono::high_resolution_clock::now()};
-    std::chrono::time_point<std::chrono::high_resolution_clock> endTime{std::chrono::high_resolution_clock::now()};
-    long long int elapsedTime{0};
+    unsigned char byteRead{0};
+    int i{0};
+    bool exitBool{false};
     do {
-        returnString += readString();
-        endTime = std::chrono::high_resolution_clock::now();
-        elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-    } while ((elapsedTime < this->m_timeout) && (returnString.find(str) == std::string::npos));
-    return returnString.substr(0, returnString.find(str)+1);
+        unsigned char byteRead = this->timedRead();
+        if (std::isprint(byteRead)) {
+            i = 0;
+            returnString += byteRead;
+        } else {
+            if (i++ > 3) {
+                exitBool = true;
+            }
+        }
+    } while (!exitBool);
+    return returnString;
+}
+
+std::string SerialPort::readStringUntil(const std::string &terminator)
+{
+    std::string returnString{""};
+    unsigned char byteRead{0};
+    int i{0};
+    bool exitBool{false};
+    do {
+        unsigned char byteRead = this->timedRead();
+        if (std::isprint(byteRead)) {
+            i = 0;
+            returnString += byteRead;
+        } else {
+            if (i++ > 3) {
+                exitBool = true;
+            }
+        }
+    } while (!exitBool && !GeneralUtilities::endsWith(returnString, terminator));
+    return returnString;
 }
 
 int SerialPort::writeByte(unsigned char byteToSend)
