@@ -146,7 +146,7 @@ BackgroundColor PrettyPrinter::randomBackgroundColor()
 
 void PrettyPrinter::resetStreamToDefault(std::ostream *oStream)
 {
-    *oStream << PrettyPrinter::DEFAULT_TERMINAL_BACKGROUND_COLOR << PrettyPrinter::DEFAULT_TERMINAL_FOREGROUND_COLOR;
+    *oStream << PrettyPrinter::DEFAULT_TERMINAL_FOREGROUND_COLOR << PrettyPrinter::DEFAULT_TERMINAL_BACKGROUND_COLOR;
 }
 
 void PrettyPrinter::resetBackgroundColor()
