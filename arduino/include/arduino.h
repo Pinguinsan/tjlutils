@@ -10,11 +10,12 @@
 #include "generalutilities.h"
 #include "eventtimer.h"
 
+enum class ArduinoType { UNO, NANO, MEGA };
 enum IOType { DIGITAL_INPUT, DIGITAL_OUTPUT, ANALOG_INPUT, ANALOG_OUTPUT, DIGITAL_INPUT_PULLUP, UNSPECIFIED };
 enum class CanMaskType { POSITIVE, NEGATIVE, ALL };
 enum IOStatus { OPERATION_SUCCESS, OPERATION_FAILURE };
 enum IOState { PIN_NUMBER, STATE, RETURN_CODE };
-enum ArduinoType { RETURN_STATE, OPERATION_RESULT };
+enum ArduinoTypeEnum { RETURN_STATE, OPERATION_RESULT };
 enum IOReportEnum { IO_PIN_NUMBER, IO_TYPE, IO_STATE };
 enum CanIOStatus { MESSAGE_ID, BYTE_0, BYTE_1, BYTE_2, BYTE_3, BYTE_4, BYTE_5, BYTE_6, BYTE_7 , CAN_IO_OPERATION_RESULT};
 enum CanEnabledStatus { CAN_RETURN_STATE, CAN_OPERATION_RESULT };
@@ -50,6 +51,7 @@ class IOReport;
 
 class Arduino
 {
+    friend class ArduinoFactory;
 
 public:
     virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
@@ -70,8 +72,6 @@ public:
 
     virtual std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
     static std::pair<IOStatus, int> getAnalogToDigitalThreshold(std::shared_ptr<SerialPort> serialPort);
-    virtual void setAnalogToDigitalThreshold(int state) = 0;
-    virtual int analogToDigitalThreshold() = 0;
 
     virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
     virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
@@ -87,22 +87,6 @@ public:
     virtual void flushRXTX(int serialPortIndex);
     virtual void flushTXRX(int serialPortIndex);
 
-    virtual void writeRawString(const std::string &str) = 0;
-    virtual std::string readRawString() = 0;
-    virtual void flushRX() = 0;
-    virtual void flushTX() = 0;
-    virtual void flushRXTX() = 0;
-    virtual void flushTXRX() = 0;
-    static bool isBluetooth(int serialPortIndex);
-    static bool isBluetooth(const std::string &name);
-    static bool isBluetooth(std::shared_ptr<SerialPort> serialPort);
-    virtual bool isBluetooth() const = 0;
-    static std::string parseIOType(IOType ioType);
-    static IOType parseIOTypeFromString(const std::string &ioType);
-    virtual bool setPinAlias(int pinNumber, const std::string &newAlias)  = 0;
-    virtual bool setPinAlias(const GPIO &gpio, const std::string &newAlias) = 0;
-    virtual bool setPinAlias(std::shared_ptr<GPIO> gpio, const std::string &newAlias) = 0;
-
     virtual bool parseToDigitalState(const std::string &state) const;
     virtual double parseToAnalogState(const std::string &state) const;
     virtual int parseToAnalogStateRaw(const std::string &state) const;
@@ -110,85 +94,104 @@ public:
     virtual bool isValidAnalogStateIdentifier(const std::string &state) const;
     virtual bool isValidAnalogRawStateIdentifier(const std::string &state) const;
 
-    virtual std::pair<IOStatus, bool> digitalRead(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, bool> digitalWrite(const std::string &pinAlias, bool state) = 0;
-    virtual std::pair<IOStatus, double> analogRead(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, int> analogReadRaw(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, double> analogWrite(const std::string &pinAlias, double state) = 0;
-    virtual std::pair<IOStatus, int> analogWriteRaw(const std::string &pinAlias, int state) = 0;
-    virtual std::pair<IOStatus, bool> softDigitalRead(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, double> softAnalogRead(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(const std::string &pinAlias) = 0;
-    virtual std::pair<IOStatus, IOType> pinMode(const std::string &pinAlias, IOType ioType) = 0;
-    virtual std::pair<IOStatus, IOType> currentPinMode(const std::string &pinAlias) = 0;
-    virtual std::shared_ptr<SerialPort> serialPort() const = 0;
+    std::pair<IOStatus, bool> digitalRead(const std::string &pinAlias);
+    std::pair<IOStatus, bool> digitalWrite(const std::string &pinAlias, bool state);
+    std::pair<IOStatus, double> analogRead(const std::string &pinAlias);
+    std::pair<IOStatus, int> analogReadRaw(const std::string &pinAlias);
+    std::pair<IOStatus, double> analogWrite(const std::string &pinAlias, double state);
+    std::pair<IOStatus, int> analogWriteRaw(const std::string &pinAlias, int state);
+    std::pair<IOStatus, bool> softDigitalRead(const std::string &pinAlias);
+    std::pair<IOStatus, double> softAnalogRead(const std::string &pinAlias);
+    std::pair<IOStatus, int> softAnalogReadRaw(const std::string &pinAlias);
+    std::pair<IOStatus, IOType> pinMode(const std::string &pinAlias, IOType ioType);
+    std::pair<IOStatus, IOType> currentPinMode(const std::string &pinAlias);
 
-    virtual std::pair<IOStatus, bool> digitalRead(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, bool> digitalWrite(const GPIO &gpio, bool state) = 0;
-    virtual std::pair<IOStatus, double> analogRead(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, int> analogReadRaw(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, double> analogWrite(const GPIO &gpio, double state) = 0;
-    virtual std::pair<IOStatus, int> analogWriteRaw(const GPIO &gpio, int state) = 0;
-    virtual std::pair<IOStatus, bool> softDigitalRead(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, double> softAnalogRead(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(const GPIO &gpio) = 0;
-    virtual std::pair<IOStatus, IOType> pinMode(GPIO &gpio, IOType ioType) = 0;
-    virtual std::pair<IOStatus, IOType> currentPinMode(const GPIO &gpio) = 0;
+    std::pair<IOStatus, bool> digitalRead(const GPIO &gpio);
+    std::pair<IOStatus, bool> digitalWrite(const GPIO &gpio, bool state);
+    std::pair<IOStatus, double> analogRead(const GPIO &gpio);
+    std::pair<IOStatus, int> analogReadRaw(const GPIO &gpio);
+    std::pair<IOStatus, double> analogWrite(const GPIO &gpio, double state);
+    std::pair<IOStatus, int> analogWriteRaw(const GPIO &gpio, int state);
+    std::pair<IOStatus, bool> softDigitalRead(const GPIO &gpio);
+    std::pair<IOStatus, double> softAnalogRead(const GPIO &gpio);
+    std::pair<IOStatus, int> softAnalogReadRaw(const GPIO &gpio);
+    std::pair<IOStatus, IOType> pinMode(GPIO &gpio, IOType ioType);
+    std::pair<IOStatus, IOType> currentPinMode(const GPIO &gpio);
+    void writeRawString(const std::string &str);
+    std::string readRawString();
+    void flushRX();
+    void flushTX();
+    void flushRXTX();
+    void flushTXRX();
 
-    virtual std::pair<IOStatus, bool> digitalRead(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, bool> digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state) = 0;
-    virtual std::pair<IOStatus, double> analogRead(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, int> analogReadRaw(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, double> analogWrite(std::shared_ptr<GPIO> gpioPtr, double state) = 0;
-    virtual std::pair<IOStatus, int> analogWriteRaw(std::shared_ptr<GPIO> gpioPtr, int state) = 0;
-    virtual std::pair<IOStatus, bool> softDigitalRead(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, double> softAnalogRead(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<IOStatus, IOType> pinMode(std::shared_ptr<GPIO> gpioPtr, IOType ioType) = 0;
-    virtual std::pair<IOStatus, IOType> currentPinMode(std::shared_ptr<GPIO> gpioPtr) = 0;
-    virtual std::pair<bool, bool> canCapability() = 0;
-    virtual std::string firmwareVersion() = 0;
-    virtual void setFirmwareVersion(const std::string &firmwareVersion) = 0;
-    virtual void setCanCapability(const std::pair<bool, bool> &capability) = 0;
-    virtual void assignIOTypes(std::shared_ptr<GlobalLogger>) = 0;
+    std::pair<IOStatus, bool> digitalRead(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, bool> digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state);
+    std::pair<IOStatus, double> analogRead(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, int> analogReadRaw(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, double> analogWrite(std::shared_ptr<GPIO> gpioPtr, double state);
+    std::pair<IOStatus, int> analogWriteRaw(std::shared_ptr<GPIO> gpioPtr, int state);
+    std::pair<IOStatus, bool> softDigitalRead(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, double> softAnalogRead(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, int> softAnalogReadRaw(std::shared_ptr<GPIO> gpioPtr);
+    std::pair<IOStatus, IOType> pinMode(std::shared_ptr<GPIO> gpioPtr, IOType ioType);
+    std::pair<IOStatus, IOType> currentPinMode(std::shared_ptr<GPIO> gpioPtr);
+
+    std::string firmwareVersion();
+    std::pair<bool, bool> canCapability();
+    std::shared_ptr<SerialPort> serialPort() const;
+    bool isValidAnalogPinIdentifier(const std::string &state) const;
+    void eraseCanPin();
+    bool isBluetooth() const;
+
+    std::shared_ptr<GPIO> gpioPinByPinAlias(const std::string &pinAlias) const;
+    std::shared_ptr<GPIO> gpioPinByPinNumber(int pinNumber) const;
+    std::string gpioAliasByPinNumber(int number) const;
+    void assignIOTypes(std::shared_ptr<GlobalLogger> globalLogger = nullptr);
+
+    bool isValidDigitalOutputPin(int pinNumber) const;
+    bool isValidDigitalInputPin(int pinNumber) const;
+    bool isValidAnalogOutputPin(int pinNumber) const;
+    bool isValidAnalogInputPin(int pinNumber) const;
+
+    int parseAnalogPin(const std::string &pinAlias) const;
+    std::string analogPinFromNumber(int pinNumber) const;
+    static int staticParseAnalogPin(const std::string &pinAlias);
+    static std::string staticAnalogPinFromNumber(int pinNumber);
+
+    void setFirmwareVersion(const std::string &firmwareVersion);
+    void setCanCapability(const std::pair<bool, bool> &capability);
+    void setAnalogToDigitalThreshold(int state);
+    int analogToDigitalThreshold();
+    bool setPinAlias(int pinNumber, const std::string &newAlias);
+    bool setPinAlias(const GPIO &gpio, const std::string &newAlias);
+    bool setPinAlias(std::shared_ptr<GPIO> gpio, const std::string &newAlias);
+
+    bool confirmValidAlias(const std::pair<int, std::string> &alias) const;
+    bool confirmValidIOType(const std::pair<int, std::string> &io) const;
+    bool confirmValidStates(const std::pair<int, std::string> &alias) const;
+
+    std::set<int> AVAILABLE_ANALOG_PINS() const;
+    std::set<int> AVAILABLE_PWM_PINS() const;
+    std::set<int> AVAILABLE_PINS() const;
+    int NUMBER_OF_DIGITAL_PINS() const;
+
     static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
     static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
     static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
     static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-
     static unsigned int SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-
     static std::pair<IOStatus, std::string> getArduinoType(std::shared_ptr<SerialPort> serialPort);
     static std::pair<IOStatus, std::string> getFirmwareVersion(std::shared_ptr<SerialPort> serialPort);
     static std::pair<IOStatus, bool> getCanCapability(std::shared_ptr<SerialPort> serialPort);
-
-    virtual std::shared_ptr<GPIO> gpioPinByPinAlias(const std::string &pinAlias) const = 0;
-    virtual std::shared_ptr<GPIO> gpioPinByPinNumber(int pinNumber) const = 0;
-    virtual std::string gpioAliasByPinNumber(int pinNumber) const = 0;
-
-    virtual bool isValidDigitalOutputPin(int pinNumber) const = 0;
-    virtual bool isValidDigitalInputPin(int pinNumber) const = 0;
-    virtual bool isValidAnalogOutputPin(int pinNumber) const = 0;
-    virtual bool isValidAnalogInputPin(int pinNumber) const = 0;
-
-    virtual std::set<int> AVAILABLE_ANALOG_PINS() const = 0;
-    virtual std::set<int> AVAILABLE_PWM_PINS() const = 0;
-    virtual std::set<int> AVAILABLE_PINS() const = 0;
-    virtual int NUMBER_OF_DIGITAL_PINS() const = 0;
-    virtual const char *ARDUINO_TYPE_IDENTIFIER_FUNC() const = 0;
-
-    virtual bool confirmValidAlias(const std::pair<int, std::string> &alias) const = 0;
-    virtual bool confirmValidIOType(const std::pair<int, std::string> &io) const = 0;
-    virtual bool confirmValidStates(const std::pair<int, std::string> &alias) const = 0;
-
-    virtual int parseAnalogPin(const std::string &pinAlias) const = 0;
-    virtual std::string analogPinFromNumber(int pinNumber) const = 0;
-
     static double analogToVoltage(int state);
     static int voltageToAnalog(double state);
-    virtual bool isValidAnalogPinIdentifier(const std::string &state) const = 0;
-
+    static std::string parseIOType(IOType ioType);
+    static IOType parseIOTypeFromString(const std::string &ioType);
     static double bluetoothSendDelayMultiplier;
+
+    static bool isBluetooth(int serialPortIndex);
+    static bool isBluetooth(const std::string &name);
+    static bool isBluetooth(std::shared_ptr<SerialPort> serialPort);
 
     static const char *HEARTBEAT_HEADER;
     static const char *IO_REPORT_HEADER;
@@ -339,11 +342,34 @@ public:
 
     std::pair<IOStatus, CanMessage> canListen(int screenIndex, double delay = Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
 private:
+
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion, bool canCapability);
+
+    std::map<std::string, std::shared_ptr<GPIO>> m_gpioPinsAlias;
+    std::map<int, std::string> m_gpioPinIterationAliasMap;
+    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
+    int m_serialPortIndex;
+    std::string m_firmwareVersion;
+    std::pair<bool, bool> m_canCapability;
+    std::string m_canPinAlias;
+    std::set<int> m_availablePins;
+    std::set<int> m_availablePwmPins;
+    std::set<int> m_availableAnalogPins;
+    int m_numberOfDigitalPins;
+    int m_analogToDigitalThreshold;
+
     static std::vector<ProtectedSerialPort> s_serialPorts;
     static unsigned  int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT;
 
-
+    void initializeIO();
+    void setArduinoType(ArduinoType arduinoType);
 };
+
+
+
 
 class IOReport
 {
