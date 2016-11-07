@@ -1,4 +1,4 @@
-#include "arduino/arduinofactory.h"
+#include "arduinofactory.h"
 
 std::shared_ptr<Arduino> ArduinoFactory::makeArduino(std::shared_ptr<SerialPort> serialPort)
 {
