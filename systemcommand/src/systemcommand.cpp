@@ -351,10 +351,10 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
         this->m_returnValue = pcloseHandler(fp);
     } else {
         this->m_command = stripPipeFromCommand(this->m_command);
-        #ifdef _WIN32
+        #if defined(_WIN32) || defined(__CYGWIN__)
             this->m_returnValue = system(this->m_command.c_str());
         #else
-            this->_returnValue = system(this->m_command.c_str())/256;
+            this->m_returnValue = system(this->m_command.c_str())/256;
         #endif
     }
     this->m_hasError = (this->m_returnValue != 0);

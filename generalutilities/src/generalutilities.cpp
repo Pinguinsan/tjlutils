@@ -306,7 +306,7 @@ namespace GeneralUtilities
     {
         std::string copyString{inputString};
         size_t copyLength{copyString.length()};
-        if (copyLength < fixedWidth) {
+        if (static_cast<int>(copyLength) < fixedWidth) {
             copyLength = (fixedWidth - copyLength);
             while (copyLength--) {
                 copyString = "0" + copyString;

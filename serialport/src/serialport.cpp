@@ -668,7 +668,6 @@ unsigned char SerialPort::timedRead()
 std::string SerialPort::readString()
 {
     std::string returnString{""};
-    unsigned char byteRead{0};
     int i{0};
     bool exitBool{false};
     do {
@@ -688,7 +687,6 @@ std::string SerialPort::readString()
 std::string SerialPort::readStringUntil(const std::string &terminator)
 {
     std::string returnString{""};
-    unsigned char byteRead{0};
     int i{0};
     bool exitBool{false};
     do {
