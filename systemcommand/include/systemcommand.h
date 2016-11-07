@@ -108,14 +108,14 @@ private:
         WITH_PIPE,
         WITHOUT_PIPE
     };
-    int _returnValue;
+    int m_returnValue;
     std::string m_command;
     int m_maxOutput;
     bool m_hasError;
-    int _sizeOfOutput;
+    int m_sizeOfOutput;
     bool m_repeatCommand;
     std::ifstream _readFromFile;
-    std::vector<std::string> _outputAsVector;
+    std::vector<std::string> m_outputAsVector;
     const static int  m_DEFAULT_MAX_OUTPUT;
 
     void verifyValidMaxOutput();

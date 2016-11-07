@@ -99,7 +99,7 @@ void SystemCommand::appendToCommand(const std::string &stringToAppend)
 
 int SystemCommand::returnValue()
 {
-    return this->_returnValue;
+    return this->m_returnValue;
 }
 
 void SystemCommand::setCommand(const std::string &command)
@@ -107,8 +107,8 @@ void SystemCommand::setCommand(const std::string &command)
     this->m_repeatCommand = false;
     this->m_command = command;
     this->m_hasError = false;
-    this->_sizeOfOutput = 0;
-    this->_outputAsVector.clear();
+    this->m_sizeOfOutput = 0;
+    this->m_outputAsVector.clear();
 }
 
 void SystemCommand::setMaxOutput(int maxOutput)
@@ -119,7 +119,7 @@ void SystemCommand::setMaxOutput(int maxOutput)
 std::string SystemCommand::outputAsString()
 {
     std::string returnString = "";
-    for (std::vector<std::string>::const_iterator iter = _outputAsVector.begin(); iter != _outputAsVector.end(); iter++) {
+    for (std::vector<std::string>::const_iterator iter = m_outputAsVector.begin(); iter != m_outputAsVector.end(); iter++) {
         returnString += (*iter);
     }
     return returnString;
@@ -133,7 +133,7 @@ void SystemCommand::stripShellControlCharactersFromCommand()
 
 std::vector<std::string> SystemCommand::outputAsVector()
 {
-    return this->_outputAsVector;
+    return this->m_outputAsVector;
 }
 
 void SystemCommand::execute()
@@ -144,7 +144,7 @@ void SystemCommand::execute()
 std::vector<std::string> SystemCommand::executeAndWaitForOutputAsVector()
 {
     this->systemCommandLaunch(PipeStatus::WITH_PIPE);
-    return this->_outputAsVector;
+    return this->m_outputAsVector;
 }
 
 void SystemCommand::executeWithoutPipe()
@@ -175,7 +175,7 @@ std::string SystemCommand::executeAndWaitForOutputAsString()
 
 int SystemCommand::sizeOfOutput()
 {
-    return this->_sizeOfOutput;
+    return this->m_sizeOfOutput;
 }
 
 void SystemCommand::verifyValidMaxOutput()
@@ -217,8 +217,8 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
     this->m_command = stripPipeFromCommand(this->m_command);
     if (this->m_repeatCommand) {
         this->m_hasError = false;
-    	this->_sizeOfOutput = 0;
-    	this->_outputAsVector.clear();
+        this->m_sizeOfOutput = 0;
+        this->m_outputAsVector.clear();
     } else {
         this->m_repeatCommand = true;
     }
@@ -328,13 +328,13 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
         fp = popenHandler(this->m_command.c_str(), "r");
         if (fp == NULL) {
             std::cout << "ERROR: Failed to execute command " << GeneralUtilities::tQuoted(this->m_command) << std::endl;
-            this->_returnValue = -1;
+            this->m_returnValue = -1;
             return;
         }
         int outputSize{ 0 };
         while ((fgets(path, PATH_MAX, fp) != NULL) && (outputSize <= this->m_maxOutput)) {
             std::string formattedPath{static_cast<std::string>(path)};
-            addFormattedThing(this->_outputAsVector, formattedPath, [](const std::string &stringToStrip) -> std::string
+            addFormattedThing(this->m_outputAsVector, formattedPath, [](const std::string &stringToStrip) -> std::string
             {
                 std::string returnString{ stringToStrip };
                 std::vector<std::string> newLines{ "\r\n", "\n\r", "\n" };
@@ -346,16 +346,16 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
                 }
                 return returnString;
             });
-            outputSize += sizeof(*(std::end(this->_outputAsVector)-1));
+            outputSize += sizeof(*(std::end(this->m_outputAsVector)-1));
         }
-        this->_returnValue = pcloseHandler(fp);
+        this->m_returnValue = pcloseHandler(fp);
     } else {
         this->m_command = stripPipeFromCommand(this->m_command);
         #ifdef _WIN32
-            this->_returnValue = system(this->_command.c_str());
+            this->m_returnValue = system(this->m_command.c_str());
         #else
             this->_returnValue = system(this->m_command.c_str())/256;
         #endif
     }
-    this->m_hasError = (this->_returnValue != 0);
+    this->m_hasError = (this->m_returnValue != 0);
 }
