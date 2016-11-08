@@ -225,8 +225,6 @@ std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serial
     std::string arduinoType{""};
     for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
         try {
-            serialPort->writeString(static_cast<std::string>(Arduino::CAN_LIVE_UPDATE_HEADER) + ":0}");
-            delayMilliseconds(Arduino::isBluetooth(serialPort->portName()) ? Arduino::BLUETOOTH_SERIAL_SEND_DELAY*3 : Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
             std::pair<IOStatus, std::string> retrieveArduinoType{Arduino::getArduinoType(serialPort)};
             if (retrieveArduinoType.first == IOStatus::OPERATION_SUCCESS) {
                 arduinoType = static_cast<std::string>(retrieveArduinoType.second);

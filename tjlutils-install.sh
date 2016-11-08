@@ -64,8 +64,8 @@ elif [[ "$1" == "-h" || "$1" == "--h" || "$1" == "-help" || "$1" == "--help" || 
 
 else
     
-    rm -rf "$olt"
-    mkdir "$olt"
+    #rm -rf "$olt"
+    #mkdir "$olt"
     cd "$olt" || exit 1
     cmake "$ogt" || exit 1
     make || exit 1
@@ -108,9 +108,9 @@ else
     rm -f "$ui/arduino.h"
     rm -f "$ui/canmessage.h"
     rm -f "$ui/candatapacket.h"
-    ln -s "$ogt/arduino/include/arduino.h"
-    ln -s "$ogt/arduino/include/canmessage.h"
-    ln -s "$ogt/arduino/include/candatapacket.h"
+    ln -s "$ogt/arduino/include/arduino.h" "$ui/"
+    ln -s "$ogt/arduino/include/canmessage.h" "$ui/"
+    ln -s "$ogt/arduino/include/candatapacket.h" "$ui/"
 
     rm -f "$ui/tjlutils.h"
     ln -s "$ogt/common/tjlutils.h" "$ui/"
