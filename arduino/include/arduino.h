@@ -46,9 +46,7 @@ class CanReport;
 
 class Arduino
 {
-
 public:
-    //static std::shared_ptr<Arduino> makeArduino();
     static std::shared_ptr<Arduino> makeArduino(std::shared_ptr<SerialPort> serialPort);
 
     std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
@@ -629,6 +627,5 @@ public:
 private:
     std::vector<std::string> m_serialResults;
 };
-
 
 #endif //TJLUTILS_ARDUINO_H
