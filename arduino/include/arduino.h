@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <memory>
+#include <map>
 #include <mutex>
 #include <algorithm>
 
@@ -50,7 +51,7 @@ public:
     //static std::shared_ptr<Arduino> makeArduino();
     static std::shared_ptr<Arduino> makeArduino(std::shared_ptr<SerialPort> serialPort);
 
-    virtual std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
+    std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
     static std::pair<IOStatus, int> getAnalogToDigitalThreshold(std::shared_ptr<SerialPort> serialPort);
 
 
@@ -60,51 +61,50 @@ public:
     static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
     static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
 
-    virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
+    std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
+    std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
+    std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
+    std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
+    std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
+    std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
+    std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
+    std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
 
     void initializeIO();
-    void setArduinoType(ArduinoType arduinoType);
     void assignPinsAndIdentifiers();
     int parseAnalogPin(const std::string &pinAlias) const;
     std::string analogPinFromNumber(int pinNumber) const;
 
 
 
-    virtual IOReport ioReportRequest(int serialPortIndex);
-    virtual SerialReport serialReportRequest(int serialPortIndex, const std::string &delimiter = "");
-    virtual CanReport canReportRequest(int serialPortIndex);
-    virtual void writeRawString(const std::string &str, int serialPortIndex);
-    virtual std::string readRawString(int serialPortIndex);
-    virtual void flushRX(int serialPortIndex);
-    virtual void flushTX(int serialPortIndex);
-    virtual void flushRXTX(int serialPortIndex);
-    virtual void flushTXRX(int serialPortIndex);
-    virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
+    IOReport ioReportRequest(int serialPortIndex);
+    SerialReport serialReportRequest(int serialPortIndex, const std::string &delimiter = "");
+    CanReport canReportRequest(int serialPortIndex);
+    void writeRawString(const std::string &str, int serialPortIndex);
+    std::string readRawString(int serialPortIndex);
+    void flushRX(int serialPortIndex);
+    void flushTX(int serialPortIndex);
+    void flushRXTX(int serialPortIndex);
+    void flushTXRX(int serialPortIndex);
+    std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
+    std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
+    std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
 
 
-    virtual bool parseToDigitalState(const std::string &state) const;
-    virtual double parseToAnalogState(const std::string &state) const;
-    virtual int parseToAnalogStateRaw(const std::string &state) const;
-    virtual bool isValidDigitalStateIdentifier(const std::string &state) const;
-    virtual bool isValidAnalogStateIdentifier(const std::string &state) const;
-    virtual bool isValidAnalogRawStateIdentifier(const std::string &state) const;
+    bool parseToDigitalState(const std::string &state) const;
+    double parseToAnalogState(const std::string &state) const;
+    int parseToAnalogStateRaw(const std::string &state) const;
+    bool isValidDigitalStateIdentifier(const std::string &state) const;
+    bool isValidAnalogStateIdentifier(const std::string &state) const;
+    bool isValidAnalogRawStateIdentifier(const std::string &state) const;
 
     std::pair<IOStatus, bool> digitalRead(const std::string &pinAlias);
     std::pair<IOStatus, bool> digitalWrite(const std::string &pinAlias, bool state);
@@ -136,6 +136,10 @@ public:
     void flushRXTX();
     void flushTXRX();
     std::string serialPortName() const;
+    
+    void assignAliasesFromMap(const std::map<int, std::string> aliasesMap);
+    void assignIOTypesFromMap(const std::map<int, std::string> ioTypesMap);
+    void assignInitialStatesFromMap(const std::map<int, std::string> initialStatesMap);
 
     std::pair<IOStatus, bool> digitalRead(std::shared_ptr<GPIO> gpioPtr);
     std::pair<IOStatus, bool> digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state);
@@ -428,6 +432,13 @@ private:
     static const char *CHANGE_A_TO_D_THRESHOLD_HEADER;
     static const char *CURRENT_A_TO_D_THRESHOLD_HEADER;
     static const char *BLUETOOTH_SERIAL_IDENTIFIER;
+    static const char *GENERIC_FAILED_STRING;
+    static const char *GENERIC_SUCCESS_STRING;
+    static const char *USING_ALIAS_STRING;
+    static const char *USING_IO_TYPE_STRING;
+    static const char *USING_INITIAL_STATE_STRING;
+    static const char *FOR_PIN_NUMBER_STRING;
+    static const char *ELIPSES_STRING;
     static const std::vector<const char *> VALID_DIGITAL_STATE_IDENTIFIERS;
     static const std::vector<char> VALID_ANALOG_STATE_IDENTIFIERS;
     static const std::vector<const char *> DIGITAL_STATE_HIGH_IDENTIFIERS;

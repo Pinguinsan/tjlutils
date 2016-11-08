@@ -151,15 +151,20 @@ const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_GPIO_TAIL_STRING{" passed to sof
 const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_RAW_GPIO_TAIL_STRING{" passed to softAnalogReadRaw(const GPIO &)"};
 const char *Arduino::PASSED_TO_PIN_MODE_GPIO_TAIL_STRING{" passed to pinMode(const GPIO &, IOType)"};
 const char *Arduino::PASSED_TO_CURRENT_PIN_MODE_GPIO_TAIL_STRING{" passed to currentPinMode(const GPIO &)"};
-
 const char *Arduino::UNO_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoUno::analogPin(const std::string&)"};
 const char *Arduino::UNO_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoUno::analogPinFromNumber(int)"};
-
 const char *Arduino::NANO_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoNano::analogPin(const std::string&)"};
 const char *Arduino::NANO_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoNano::analogPinFromNumber(int)"};
-
 const char *Arduino::MEGA_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoMega::analogPin(const std::string&)"};
 const char *Arduino::MEGA_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoMega::analogPinFromNumber(int)"};
+
+const char *Arduino::GENERIC_FAILED_STRING{"failed"};
+const char *Arduino::GENERIC_SUCCESS_STRING{"success"};
+const char *Arduino::USING_ALIAS_STRING{"Using alias "};
+const char *Arduino::USING_IO_TYPE_STRING{"Using io type "};
+const char *Arduino::USING_INITIAL_STATE_STRING{"Using initial state "};
+const char *Arduino::FOR_PIN_NUMBER_STRING{" for pin number "};
+const char *Arduino::ELIPSES_STRING{"..."};
 
 const unsigned int Arduino::IO_STATE_RETURN_SIZE{3};
 const unsigned int Arduino::ARDUINO_TYPE_RETURN_SIZE{2};
@@ -324,46 +329,6 @@ std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serial
     }
 }
 
-
-void Arduino::setArduinoType(ArduinoType arduinoType)
-{
-    /*
-    this->m_gpioPinsAlias.clear();
-    this->m_gpioPinIterationAliasMap.clear();
-    this->m_gpioPins.clear();
-    if (arduinoType == ArduinoType::UNO) {
-        this->m_identifier = ArduinoUno::IDENTIFIER;
-        this->m_longName = ArduinoUno::LONG_NAME;
-        std::pair<IOStatus, std::string> firmware{Arduino::getFirmwareVersion(Arduino::serialPortAtIndex(this->m_serialPortIndex))};
-        if (firmware.first
-        this->m_firmwareVersion = );
-        this->m_canCapability = Arduino::getCanCapability()
-    } else if (arduinoType == ArduinoType::NANO) {
-
-    } else if (arduinoType == ArduinoType::MEGA) {
-
-    }
-    initializeIO();
-    assignIOTypes();
-
-    std::map<std::string, std::shared_ptr<GPIO>> m_gpioPinsAlias;
-    std::map<int, std::string> m_gpioPinIterationAliasMap;
-    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
-    int m_serialPortIndex;
-    std::string m_identifier;
-    std::string m_longName;
-    std::string m_firmwareVersion;
-    std::pair<bool, bool> m_canCapability;
-    std::string m_canPinAlias;
-    std::set<int> m_availablePins;
-    std::set<int> m_availablePwmPins;
-    std::set<int> m_availableAnalogPins;
-    int m_numberOfDigitalPins;
-    int m_analogToDigitalThreshold;
-    */
-}
-
-
 Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort) :
     m_arduinoType{arduinoType},
     m_serialPortIndex{Arduino::addSerialPort(serialPort)},
@@ -453,6 +418,75 @@ void Arduino::assignPinsAndIdentifiers()
         this->eraseCanPin();
     }
     assignIOTypes();
+}
+
+void Arduino::assignAliasesFromMap(const std::map<int, std::string> aliasesMap)
+{
+    using namespace GeneralUtilities;
+    for (auto &it : aliasesMap) {
+        if (confirmValidAlias(it)) {
+            std::cout << USING_ALIAS_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first << std::endl;
+        }
+        if (this->m_gpioPinsAlias.find(std::to_string(it.first)) != this->m_gpioPinsAlias.end()) {
+            auto iter = this->m_gpioPinsAlias.find(std::to_string(it.first));
+            std::swap(this->m_gpioPinsAlias[std::to_string(it.first)], iter->second);
+            this->m_gpioPinsAlias.erase(iter);
+            this->m_gpioPinIterationAliasMap.find(it.first)->second = it.second;
+        }
+    }
+}
+
+void Arduino::assignIOTypesFromMap(const std::map<int, std::string> ioTypesMap)
+{
+    using namespace GeneralUtilities;
+    for (auto &it : ioTypesMap) {
+        if (confirmValidIOType(it)) {
+            std::cout << USING_IO_TYPE_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first << std::endl;
+        }
+        auto found{this->m_gpioPins.find(it.first)};
+        if (found != this->m_gpioPins.end()) {
+            if (found->second->ioType() == IOType::UNSPECIFIED) {
+                found->second->setIOType(parseIOTypeFromString(it.second));
+            }
+        }
+    }
+}
+
+void Arduino::assignInitialStatesFromMap(const std::map<int, std::string> initialStatesMap)
+{
+    using namespace GeneralUtilities;
+    for (auto &it : initialStatesMap) {
+        std::string logString{toString(USING_INITIAL_STATE_STRING) + tQuoted(it.second) + toString(FOR_PIN_NUMBER_STRING) + toString(it.first) + toString(ELIPSES_STRING)};
+        try {
+            if (confirmValidStates(it)) {
+                auto found{this->m_gpioPins.find(it.first)};
+                if (found != this->m_gpioPins.end()) {
+                    if (found->second->ioType() == IOType::DIGITAL_OUTPUT) {
+                        std::pair<IOStatus, bool>  result{this->digitalWrite(found->second, parseToDigitalState(it.second))};
+                        if (result.first == IOStatus::OPERATION_FAILURE) {
+                            logString.append(GENERIC_FAILED_STRING);
+                        } else {
+                            logString.append(GENERIC_SUCCESS_STRING);
+                        }
+                    } else if (found->second->ioType() == IOType::ANALOG_OUTPUT) {
+                        std::pair<IOStatus, int> result{this->analogWriteRaw(found->second, parseToAnalogStateRaw(it.second))};
+                        if (result.first == IOStatus::OPERATION_FAILURE) {
+                            logString.append(GENERIC_FAILED_STRING);
+                        } else {
+                            logString.append(GENERIC_SUCCESS_STRING);
+                        }
+                    }
+                }
+                std::cout << logString << std::endl;
+            } else {
+                //TODO:Failure message
+            }
+        } catch (std::exception &e) {
+            logString.append(GENERIC_FAILED_STRING);
+            std::cout << logString << std::endl;
+            (void)e;
+        }
+    }
 }
 
 std::string Arduino::serialPortName() const
