@@ -31,7 +31,8 @@ const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"2", "1"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"8", "7", "6", "5"};
-const char *SerialPort::s_SERIAL_PORT_HELPER_NAME{"C:/Users/Public/Public\\ Programs/EnumerateSerial.exe"};
+const char *SerialPort::s_SERIAL_PORT_HELPER_LONG_NAME{"\"C:/Users/Public/Public Programs/EnumerateSerial.exe\""};
+const char *SerialPort::s_SERIAL_PORT_HELPER_SHORT_NAME{"EnumerateSerial.exe"};
 #if defined(_WIN32) || defined(__CYGWIN__)
     const std::vector<const char *> SerialPort::s_AVAILABLE_PORT_NAMES_BASE{"\\\\.\\COM"};
     const std::string SerialPort::DTR_RTS_ON_IDENTIFIER{"dtr=on rts=on"};
@@ -1459,10 +1460,14 @@ std::vector<std::string> SerialPort::availableSerialPorts()
     }
     */
     SystemCommand systemCommand;
-    systemCommand.setCommand(static_cast<std::string>(SerialPort::s_SERIAL_PORT_HELPER_NAME));
+    systemCommand.setCommand(static_cast<std::string>(SerialPort::s_SERIAL_PORT_HELPER_LONG_NAME));
     systemCommand.execute();
     if (systemCommand.hasError()) {
-        return returnVector;
+        systemCommand.setCommand(static_cast<std::string>(SerialPort::s_SERIAL_PORT_HELPER_SHORT_NAME));
+        systemCommand.execute();
+        if (systemCommand.hasError()) {
+            return returnVector;
+        }
     }
     returnVector = systemCommand.outputAsVector();
     std::set<std::string> uniques;

@@ -224,7 +224,8 @@ private:
     static const std::vector<const char *> s_AVAILABLE_STOP_BITS;
     static const std::vector<const char *> s_AVAILABLE_DATA_BITS;
     static const std::vector<const char *> s_AVAILABLE_BAUD_RATE;
-    static const char *s_SERIAL_PORT_HELPER_NAME;
+    static const char *s_SERIAL_PORT_HELPER_LONG_NAME;
+    static const char *s_SERIAL_PORT_HELPER_SHORT_NAME;
 };
 
 #endif //TJLUTILS_SERIALPORT_H

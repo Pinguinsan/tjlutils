@@ -262,3 +262,13 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
     }
     this->m_hasError = (this->m_returnValue != 0);
 }
+
+
+/*
+STARTUPINFO si = { sizeof(STARTUPINFO) };
+si.cb = sizeof(si);
+si.dwFlags = STARTF_USESHOWWINDOW;
+si.wShowWindow = SW_HIDE;
+PROCESS_INFORMATION pi;
+CreateProcess(L"C:\\Users\\Public\\Public Documents\\EnumerateSerial.exe", NULL , NULL, NULL, FALSE, CREATE_NO_WINDOW , NULL, NULL, &si, &pi);
+*/
