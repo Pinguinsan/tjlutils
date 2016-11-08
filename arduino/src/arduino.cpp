@@ -452,6 +452,7 @@ void Arduino::assignPinsAndIdentifiers()
     if (this->m_canCapability.second) {
         this->eraseCanPin();
     }
+    assignIOTypes();
 }
 
 std::string Arduino::serialPortName() const
