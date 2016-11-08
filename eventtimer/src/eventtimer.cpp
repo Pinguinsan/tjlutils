@@ -68,6 +68,11 @@ void EventTimer::pause()
     this->m_isPaused = true;
 }
 
+void EventTimer::stop()
+{
+    this->m_isPaused = true;
+}
+
 void EventTimer::unpause()
 {
     this->m_isPaused = false;

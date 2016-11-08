@@ -34,6 +34,7 @@ public:
     void start();
     void restart();
     void pause();
+    void stop();
     void unpause();
     void update();
 
