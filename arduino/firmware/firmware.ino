@@ -113,6 +113,8 @@ void firmwareVersionRequest();
 void canBusEnabledRequest();
 void heartbeatRequest();
 void ioReportRequest();
+void storeSystemStateRequest();
+void loadSystemStateRequest();
 
 bool isValidAnalogPinIdentifier(const std::string &str);
 bool isValidPinIdentifier(const std::string &str);
@@ -376,6 +378,10 @@ void handleSerialString(const std::string &str)
         canBusEnabledRequest();
     } else if (startsWith(str, FIRMWARE_VERSION_HEADER)) {
         firmwareVersionRequest();
+    } else if (startsWith(str, STORE_SYSTEM_STATE_HEADER)) {
+        storeSystemStateRequest();
+    } else if (startsWith(str, LOAD_SYSTEM_STATE_HEADER)) {
+        loadSystemStateRequest();
     } else if (startsWith(str, HEARTBEAT_HEADER)) {
         heartbeatRequest();
 #if defined(__HAVE_CAN_BUS__)
@@ -459,6 +465,15 @@ void handleSerialString(const std::string &str)
     }
 }
 
+void storeSystemStateRequest()
+{
+    printSingleResult(STORE_SYSTEM_STATE_HEADER, OPERATION_SUCCESS); 
+}
+
+void loadSystemStateRequest()
+{
+    printSingleResult(LOAD_SYSTEM_STATE_HEADER, OPERATION_SUCCESS);
+}
 
 void changeAToDThresholdRequest(const std::string &str)
 {

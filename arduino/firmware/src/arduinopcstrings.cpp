@@ -97,6 +97,8 @@ namespace ArduinoPCStrings
     const char *PIN_TYPE_HEADER{"{ptype"};
     const char *PIN_TYPE_CHANGE_HEADER{"{ptchange"};
     const char *ARDUINO_TYPE_HEADER{"{ardtype"};
+    const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
+    const char *LOAD_SYSTEM_STATE_HEADER{"{loadstate"};
     
     const char *IO_REPORT_HEADER{"{ioreport"};
     const char *IO_REPORT_END_HEADER{"{ioreportend"};
@@ -115,7 +117,7 @@ namespace ArduinoPCStrings
     const char *HEARTBEAT_HEADER{"{heartbeat"};
     const char *CAN_BUS_ENABLED_STRING{"1"};
     const char *CAN_BUS_DISABLED_STRING{"0"};
-    const char *FIRMWARE_VERSION{"0.40"};
+    const char *FIRMWARE_VERSION{"0.50"};
     const char *EMPTY_STRING{""};
     const char *OPERATION_FAILURE_STRING{"-1"};
     const char *OPERATION_SUCCESS_STRING{"1"};
