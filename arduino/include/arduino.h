@@ -435,7 +435,7 @@ private:
     static const char *GENERIC_FAILED_STRING;
     static const char *GENERIC_SUCCESS_STRING;
     static const char *USING_ALIAS_STRING;
-    static const char *USING_IO_TYPE_STRING;
+    static const char *SETTING_IO_TYPE_STRING;
     static const char *USING_INITIAL_STATE_STRING;
     static const char *FOR_PIN_NUMBER_STRING;
     static const char *ELIPSES_STRING;

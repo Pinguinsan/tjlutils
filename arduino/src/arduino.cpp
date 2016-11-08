@@ -161,7 +161,7 @@ const char *Arduino::MEGA_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoMega
 const char *Arduino::GENERIC_FAILED_STRING{"failed"};
 const char *Arduino::GENERIC_SUCCESS_STRING{"success"};
 const char *Arduino::USING_ALIAS_STRING{"Using alias "};
-const char *Arduino::USING_IO_TYPE_STRING{"Using io type "};
+const char *Arduino::SETTING_IO_TYPE_STRING{"Setting IO type "};
 const char *Arduino::USING_INITIAL_STATE_STRING{"Using initial state "};
 const char *Arduino::FOR_PIN_NUMBER_STRING{" for pin number "};
 const char *Arduino::ELIPSES_STRING{"..."};
@@ -441,12 +441,17 @@ void Arduino::assignIOTypesFromMap(const std::map<int, std::string> ioTypesMap)
     using namespace GeneralUtilities;
     for (auto &it : ioTypesMap) {
         if (confirmValidIOType(it)) {
-            std::cout << USING_IO_TYPE_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first << std::endl;
-        }
-        auto found{this->m_gpioPins.find(it.first)};
-        if (found != this->m_gpioPins.end()) {
-            if (found->second->ioType() == IOType::UNSPECIFIED) {
+            auto found{this->m_gpioPins.find(it.first)};
+            if (found != this->m_gpioPins.end()) {
                 found->second->setIOType(parseIOTypeFromString(it.second));
+                std::string stringToLog{toString(SETTING_IO_TYPE_STRING) + tQuoted(it.second) + toString(FOR_PIN_NUMBER_STRING) + toString(it.first) + toString(ELIPSES_STRING)};
+                std::pair<IOStatus, IOType> result{this->pinMode(found->second, found->second->ioType())};
+                if (result.first == IOStatus::OPERATION_FAILURE) {
+                    stringToLog.append(GENERIC_FAILED_STRING);
+                } else {
+                    stringToLog.append(GENERIC_SUCCESS_STRING);
+                }
+                std::cout << stringToLog << std::endl;
             }
         }
     }
