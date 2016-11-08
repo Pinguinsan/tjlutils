@@ -114,7 +114,6 @@ private:
     bool m_hasError;
     int m_sizeOfOutput;
     bool m_repeatCommand;
-    std::ifstream _readFromFile;
     std::vector<std::string> m_outputAsVector;
     const static int  m_DEFAULT_MAX_OUTPUT;
 
