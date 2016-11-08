@@ -319,7 +319,7 @@ std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serial
     } else if (arduinoType == ArduinoNano::IDENTIFIER) {
         //return std::make_shared<Arduino>(ArduinoType::NANO, serialPort, firmwareVersion.second, can.second);
         return std::shared_ptr<Arduino>(new Arduino(ArduinoType::NANO, serialPort, firmwareVersion.second, can.second));
-    } else if (arduinoType == ArduinoNano::IDENTIFIER) {
+    } else if (arduinoType == ArduinoMega::IDENTIFIER) {
         //return std::make_shared<Arduino>(ArduinoType::MEGA, serialPort, firmwareVersion.second, can.second);
         return std::shared_ptr<Arduino>(new Arduino(ArduinoType::MEGA, serialPort, firmwareVersion.second, can.second));
     } else {
