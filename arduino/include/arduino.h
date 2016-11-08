@@ -174,6 +174,44 @@ public:
     static std::shared_ptr<std::mutex> ioMutexAtIndex(unsigned int ioMutexIndex);
     int addSerialPort(std::shared_ptr<SerialPort> serialPort);
 
+
+    static const unsigned int CAN_READ_BLANK_RETURN_SIZE;
+    static const unsigned int REMOVE_CAN_MASKS_RETURN_SIZE;
+    static const unsigned int IO_STATE_RETURN_SIZE;
+    static const unsigned int ARDUINO_TYPE_RETURN_SIZE;
+    static const unsigned int PIN_TYPE_RETURN_SIZE;
+    static const unsigned int IO_REPORT_RETURN_SIZE;
+    static const unsigned int CAN_ID_WIDTH;
+    static const unsigned int CAN_BYTE_WIDTH;
+    static const int OPERATION_FAILURE;
+    static const int OPERATION_SUCCESS;
+    static const int INVALID_PIN;
+    static const int STATE_FAILURE;
+    static const int ANALOG_MAX;
+    static const int CAN_BUS_PIN;
+    static const unsigned int RAW_CAN_MESSAGE_SIZE;
+    static const unsigned char CAN_MESSAGE_LENGTH;
+    static const unsigned char CAN_FRAME;
+    static const double VOLTAGE_MAX;
+    static const int IO_TRY_COUNT;
+    static const unsigned int CAN_READ_RETURN_SIZE;
+    static const unsigned int CAN_WRITE_RETURN_SIZE;
+    static const unsigned int CAN_BUS_ENABLED_RETURN_SIZE;
+    static const unsigned int CAN_AUTO_UPDATE_RETURN_SIZE;
+    static const unsigned int A_TO_D_THRESHOLD_RETURN_SIZE;
+    static const unsigned int CAN_INIT_RETURN_SIZE;
+    static const unsigned int ADD_CAN_MASK_RETURN_SIZE;
+    static const unsigned int REMOVE_CAN_MASK_RETURN_SIZE;
+    static const unsigned int RETURN_SIZE_HIGH_LIMIT;
+    static const double BOOTLOADER_BOOT_TIME;
+    static const double SERIAL_TIMEOUT;
+    static const int BLUETOOTH_RETRY_COUNT;
+    static const double BLUETOOTH_SERIAL_SEND_DELAY;
+    static const double DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER;
+    static const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT;
+    static const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT;
+    static const double ANALOG_TO_VOLTAGE_SCALE_FACTOR;
+
 private:
     Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort);
     Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability);
@@ -392,44 +430,6 @@ private:
     static const std::vector<char> VALID_ANALOG_STATE_IDENTIFIERS;
     static const std::vector<const char *> DIGITAL_STATE_HIGH_IDENTIFIERS;
     static const std::vector<const char *> DIGITAL_STATE_LOW_IDENTIFIERS;
-
-    static const unsigned int CAN_READ_BLANK_RETURN_SIZE;
-    static const unsigned int REMOVE_CAN_MASKS_RETURN_SIZE;
-    static const unsigned int IO_STATE_RETURN_SIZE;
-    static const unsigned int ARDUINO_TYPE_RETURN_SIZE;
-    static const unsigned int PIN_TYPE_RETURN_SIZE;
-    static const unsigned int IO_REPORT_RETURN_SIZE;
-    static const unsigned int CAN_ID_WIDTH;
-    static const unsigned int CAN_BYTE_WIDTH;
-    static const int OPERATION_FAILURE;
-    static const int OPERATION_SUCCESS;
-    static const int INVALID_PIN;
-    static const int STATE_FAILURE;
-    static const int ANALOG_MAX;
-    static const int CAN_BUS_PIN;
-    static const unsigned int RAW_CAN_MESSAGE_SIZE;
-    static const unsigned char CAN_MESSAGE_LENGTH;
-    static const unsigned char CAN_FRAME;
-    static const double VOLTAGE_MAX;
-    static const int IO_TRY_COUNT;
-    static const unsigned int CAN_READ_RETURN_SIZE;
-    static const unsigned int CAN_WRITE_RETURN_SIZE;
-    static const unsigned int CAN_BUS_ENABLED_RETURN_SIZE;
-    static const unsigned int CAN_AUTO_UPDATE_RETURN_SIZE;
-    static const unsigned int A_TO_D_THRESHOLD_RETURN_SIZE;
-    static const unsigned int CAN_INIT_RETURN_SIZE;
-    static const unsigned int ADD_CAN_MASK_RETURN_SIZE;
-    static const unsigned int REMOVE_CAN_MASK_RETURN_SIZE;
-    static const unsigned int RETURN_SIZE_HIGH_LIMIT;
-    static const double BOOTLOADER_BOOT_TIME;
-    static const double SERIAL_TIMEOUT;
-    static const int BLUETOOTH_RETRY_COUNT;
-    static const double BLUETOOTH_SERIAL_SEND_DELAY;
-    static const double DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER;
-    static const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT;
-    static const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT;
-    static const double ANALOG_TO_VOLTAGE_SCALE_FACTOR;
-
 };
 
 
