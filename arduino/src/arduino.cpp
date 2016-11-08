@@ -433,6 +433,25 @@ void Arduino::assignPinsAndIdentifiers()
         this->m_identifier = ArduinoMega::IDENTIFIER;
         this->m_longName = ArduinoMega::LONG_NAME;
     }
+    for (auto &it : this->m_availablePins) {
+        this->m_gpioPins.emplace(it, std::make_shared<GPIO>(it, IOType::UNSPECIFIED));
+    }
+
+    for (auto &it : this->m_gpioPins) {
+        if (it.first > this->m_numberOfDigitalPins) {
+            if (it.first == CAN_BUS_PIN) {
+                this->m_canPinAlias = std::to_string(it.first);
+            }
+            this->m_gpioPinsAlias.emplace(analogPinFromNumber(it.first), it.second);
+            this->m_gpioPinIterationAliasMap.emplace(it.first, analogPinFromNumber(it.first));
+        } else {
+            this->m_gpioPinsAlias.emplace(std::to_string(it.first), it.second);
+            this->m_gpioPinIterationAliasMap.emplace(it.first, std::to_string(it.first));
+        }
+    }
+    if (this->m_canCapability.second) {
+        this->eraseCanPin();
+    }
 }
 
 std::string Arduino::serialPortName() const
