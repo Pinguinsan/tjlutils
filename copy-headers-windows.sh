@@ -7,7 +7,9 @@ buildDir="/opt/LibraryBuilds/tjlutils/Debug/debug"
 sysDir="/cygdrive/c/Windows/SysWOW64/"
 binDir="/cygdrive/c/Users/Public/Public Programs/"
 
-mkdir $binDir
+if ! [[ -d "$binDir" ]]; then
+    mkdir "$binDir"
+fi
 
 rm -f "$minDir/systemcommand.h"
 rm -f "$minDir/pythoncrypto.h"
