@@ -425,7 +425,8 @@ void Arduino::assignAliasesFromMap(const std::map<int, std::string> aliasesMap)
     using namespace GeneralUtilities;
     for (auto &it : aliasesMap) {
         if (confirmValidAlias(it)) {
-            std::cout << USING_ALIAS_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first << std::endl;
+            std::cout << USING_ALIAS_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first;
+            std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
         }
         if (this->m_gpioPinsAlias.find(std::to_string(it.first)) != this->m_gpioPinsAlias.end()) {
             auto iter = this->m_gpioPinsAlias.find(std::to_string(it.first));
@@ -451,7 +452,8 @@ void Arduino::assignIOTypesFromMap(const std::map<int, std::string> ioTypesMap)
                 } else {
                     stringToLog.append(GENERIC_SUCCESS_STRING);
                 }
-                std::cout << stringToLog << std::endl;
+                std::cout << stringToLog;
+                std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
             }
         }
     }
@@ -482,13 +484,15 @@ void Arduino::assignInitialStatesFromMap(const std::map<int, std::string> initia
                         }
                     }
                 }
-                std::cout << logString << std::endl;
+                std::cout << logString;
+                std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
             } else {
                 //TODO:Failure message
             }
         } catch (std::exception &e) {
             logString.append(GENERIC_FAILED_STRING);
-            std::cout << logString << std::endl;
+            std::cout << logString;
+            std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
             (void)e;
         }
     }
