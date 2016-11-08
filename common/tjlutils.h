@@ -41,5 +41,8 @@
 #include "serialport.h"
 #include "eventtimer.h"
 #include "prettyprinter.h"
+#include "arduino.h"
+#include "candatapacket.h"
+#include "canmessage.h"
 
 #endif //TJLUTILS_COMMON_H

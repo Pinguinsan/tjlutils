@@ -5,6 +5,7 @@ const int CanMessage::CAN_ID_WIDTH{3};
 const unsigned int CanMessage::CAN_MESSAGE_SIZE{9};
 const unsigned char CanMessage::CAN_FRAME{0};
 const unsigned char CanMessage::CAN_MESSAGE_LENGTH{8};
+const char *CanMessage::NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING{"ERROR: Invalid index passed to nthDataPacket(int index) :"};
 
 CanMessage::CanMessage(uint32_t id, uint8_t frame, uint8_t length, const CanDataPacket &dataPacket) :
     m_id{id},
@@ -61,7 +62,6 @@ uint8_t CanMessage::length() const
 
 unsigned char CanMessage::nthDataPacketByte(int index)
 {
-    using namespace ArduinoPCStrings;
     if ((index > 8) || (index < 0)) {
         throw std::runtime_error(NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING + std::to_string(index));
     }
@@ -132,7 +132,6 @@ uint8_t CanMessage::parseCanByte(const std::string &str)
 
 CanMessage CanMessage::parseCanMessage(const std::string &str)
 {
-    using namespace ArduinoPCStrings;
     using namespace GeneralUtilities;
     std::vector<std::string> rawMsg{parseToVector(str, ':')};
     if (rawMsg.size() != CanMessage::CAN_MESSAGE_SIZE) {

@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <algorithm>
+
 #include "serialport.h"
 #include "generalutilities.h"
 #include "eventtimer.h"
@@ -22,17 +23,17 @@ enum CanEnabledStatus { CAN_RETURN_STATE, CAN_OPERATION_RESULT };
 enum ADThresholdReq { AD_RETURN_STATE, AD_OPERATION_RESULT };
 enum CanMask { CAN_MASK_RETURN_STATE, CAN_MASK_OPERATION_RESULT };
 
-class GPIO;
-class CanMessage;
-class CanReport;
-class SerialReport;
-class IOReport;
-
 #include "canmessage.h"
-#include "candatapacket.h"
 
-#include "gpio.h"
-#include "protectedserialport.h"
+class CanMessage;
+class ArduinoUno;
+class ArduinoNano;
+class ArduinoMega;
+class ProtectedSerialPort;
+class GPIO;
+class IOReport;
+class SerialReport;
+class CanReport;
 
 #ifndef HIGH
 #define HIGH 0x1
@@ -42,41 +43,16 @@ class IOReport;
 #define LOW 0x0
 #endif
 
-#ifndef HIGH
-    #define HIGH true
-#endif
-#ifndef LOW
-    #define LOW false
-#endif
-
 class Arduino
 {
-    friend class ArduinoFactory;
 
 public:
-    virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
+    //static std::shared_ptr<Arduino> makeArduino();
+    static std::shared_ptr<Arduino> makeArduino(std::shared_ptr<SerialPort> serialPort);
 
     virtual std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
     static std::pair<IOStatus, int> getAnalogToDigitalThreshold(std::shared_ptr<SerialPort> serialPort);
 
-    virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
     virtual IOReport ioReportRequest(int serialPortIndex);
     virtual SerialReport serialReportRequest(int serialPortIndex, const std::string &delimiter = "");
     virtual CanReport canReportRequest(int serialPortIndex);
@@ -146,17 +122,12 @@ public:
     std::shared_ptr<GPIO> gpioPinByPinAlias(const std::string &pinAlias) const;
     std::shared_ptr<GPIO> gpioPinByPinNumber(int pinNumber) const;
     std::string gpioAliasByPinNumber(int number) const;
-    void assignIOTypes(std::shared_ptr<GlobalLogger> globalLogger = nullptr);
+    void assignIOTypes();
 
     bool isValidDigitalOutputPin(int pinNumber) const;
     bool isValidDigitalInputPin(int pinNumber) const;
     bool isValidAnalogOutputPin(int pinNumber) const;
     bool isValidAnalogInputPin(int pinNumber) const;
-
-    int parseAnalogPin(const std::string &pinAlias) const;
-    std::string analogPinFromNumber(int pinNumber) const;
-    static int staticParseAnalogPin(const std::string &pinAlias);
-    static std::string staticAnalogPinFromNumber(int pinNumber);
 
     void setFirmwareVersion(const std::string &firmwareVersion);
     void setCanCapability(const std::pair<bool, bool> &capability);
@@ -174,11 +145,13 @@ public:
     std::set<int> AVAILABLE_PWM_PINS() const;
     std::set<int> AVAILABLE_PINS() const;
     int NUMBER_OF_DIGITAL_PINS() const;
+    ArduinoType arduinoType() const;
+    std::string identifier() const;
+    std::string longName() const;
+    int numberOfSerialPorts() const;
 
-    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static int staticParseAnalogPin(ArduinoType arduinoType, const std::string &pinAlias);
+    static std::string staticAnalogPinFromNumber(ArduinoType arduinoType, int pinNumber);
     static unsigned int SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
     static std::pair<IOStatus, std::string> getArduinoType(std::shared_ptr<SerialPort> serialPort);
     static std::pair<IOStatus, std::string> getFirmwareVersion(std::shared_ptr<SerialPort> serialPort);
@@ -192,6 +165,73 @@ public:
     static bool isBluetooth(int serialPortIndex);
     static bool isBluetooth(const std::string &name);
     static bool isBluetooth(std::shared_ptr<SerialPort> serialPort);
+
+    static const BaudRate FIRMWARE_BAUD;
+    static const DataBits FIRMWARE_DATA_BITS;
+    static const StopBits FIRMWARE_STOP_BITS;
+    static const Parity FIRMWARE_PARITY;
+    static std::shared_ptr<SerialPort> serialPortAtIndex(unsigned int serialPortIndex);
+    static std::shared_ptr<std::mutex> ioMutexAtIndex(unsigned int ioMutexIndex);
+    int addSerialPort(std::shared_ptr<SerialPort> serialPort);
+
+private:
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion, bool canCapability);    
+
+    std::map<std::string, std::shared_ptr<GPIO>> m_gpioPinsAlias;
+    std::map<int, std::string> m_gpioPinIterationAliasMap;
+    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
+    ArduinoType m_arduinoType;
+    int m_serialPortIndex;
+    std::string m_identifier;
+    std::string m_longName;
+    std::string m_firmwareVersion;
+    std::pair<bool, bool> m_canCapability;
+    std::string m_canPinAlias;
+    std::set<int> m_availablePins;
+    std::set<int> m_availablePwmPins;
+    std::set<int> m_availableAnalogPins;
+    int m_numberOfDigitalPins;
+    int m_analogToDigitalThreshold;
+
+    static std::vector<ProtectedSerialPort> s_serialPorts;
+    static unsigned  int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT;
+
+    std::pair<IOStatus, CanMessage> canListen(int screenIndex, double delay = Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
+    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+
+    virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
+    virtual std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
+    virtual std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
+    virtual std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
+    virtual std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    virtual std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
+
+    virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
+    virtual std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
+    virtual std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
+
+    void initializeIO();
+    void setArduinoType(ArduinoType arduinoType);
+    void assignPinsAndIdentifiers();
+    int parseAnalogPin(const std::string &pinAlias) const;
+    std::string analogPinFromNumber(int pinNumber) const;
+
 
     static const char *HEARTBEAT_HEADER;
     static const char *IO_REPORT_HEADER;
@@ -207,8 +247,6 @@ public:
     static const char *PIN_TYPE_CHANGE_HEADER;
     static const char *ARDUINO_TYPE_HEADER;
     static const char *CAN_BUS_ENABLED_HEADER;
-    static const unsigned int CAN_READ_BLANK_RETURN_SIZE;
-    static const unsigned int REMOVE_CAN_MASKS_RETURN_SIZE;
     static const char *FIRMWARE_VERSION_HEADER;
     static const char *DIGITAL_INPUT_IDENTIFIER;
     static const char *DIGITAL_OUTPUT_IDENTIFIER;
@@ -284,9 +322,79 @@ public:
     static const char *MEGA_A13_EQUIVALENT_STRING;
     static const char *MEGA_A14_EQUIVALENT_STRING;
     static const char *MEGA_A15_EQUIVALENT_STRING;
+    static const char *UNO_INVALID_ANALOG_STRING_TAIL_STRING;
+    static const char *UNO_INVALID_ANALOG_INT_TAIL_STRING;
+    static const char *NANO_INVALID_ANALOG_STRING_TAIL_STRING;
+    static const char *NANO_INVALID_ANALOG_INT_TAIL_STRING;
+    static const char *MEGA_INVALID_ANALOG_STRING_TAIL_STRING;
+    static const char *MEGA_INVALID_ANALOG_INT_TAIL_STRING;
 
+    static const char *INVALID_ANALOG_PIN_BASE_STRING;
+    static const char *UNSPECIFIED_IO_TYPE_TO_PARSE_IO_TYPE_STRING;
+    static const char *INVALID_IO_TYPE_BASE_STRING;
+    static const char *INVALID_IO_TYPE_TAIL_STRING;
+    static const char *INVALID_STATE_TO_PARSE_TO_DIGITAL_STATE_STRING;
+    static const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_STRING;
+    static const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_RAW_STRING;
+    static const char *FIRMWARE_VERSION_UNKNOWN_STRING;
+    static const char *FIRMWARE_VERSION_BASE_STRING;
+    static const char *SERIAL_PORT_INVALID_INDEX_STRING;
+    static const char *IO_MUTEX_INVALID_INDEX_STRING;
+    static const char *IO_REPORT_INVALID_DATA_STRING;
+    static const char *CAN_REPORT_INVALID_DATA_STRING;
+    static const char *CAN_EMPTY_READ_SUCCESS_STRING;
+
+    static const char *INVALID_PIN_ALIAS_STRING;
+    static const char *INVALID_PIN_NUMBER_STRING;
+    static const char *PASSED_TO_DIGITAL_READ_STRING_TAIL_STRING;
+    static const char *PASSED_TO_DIGITAL_WRITE_STRING_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_READ_STRING_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_READ_RAW_STRING_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_WRITE_STRING_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_WRITE_RAW_STRING_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_DIGITAL_READ_STRING_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_ANALOG_READ_STRING_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_ANALOG_READ_RAW_STRING_TAIL_STRING;
+    static const char *PASSED_TO_PIN_MODE_STRING_TAIL_STRING;
+    static const char *PASSED_TO_CURRENT_PIN_MODE_STRING_TAIL_STRING;
+    static const char *PASSED_TO_DIGITAL_READ_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_DIGITAL_WRITE_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_READ_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_READ_RAW_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_WRITE_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_ANALOG_WRITE_RAW_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_DIGITAL_READ_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_ANALOG_READ_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_SOFT_ANALOG_READ_RAW_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_PIN_MODE_GPIO_TAIL_STRING;
+    static const char *PASSED_TO_CURRENT_PIN_MODE_GPIO_TAIL_STRING;
+    static const char *INVALID_GPIO_PIN_STRING;
+    static const char *NULL_GPIO_PTR_TO_DIGITAL_READ_STRING;
+    static const char *NULL_GPIO_PTR_TO_DIGITAL_WRITE_STRING;
+    static const char *NULL_GPIO_PTR_TO_ANALOG_READ_STRING;
+    static const char *NULL_GPIO_PTR_TO_ANALOG_READ_RAW_STRING;
+    static const char *NULL_GPIO_PTR_TO_ANALOG_WRITE_STRING;
+    static const char *NULL_GPIO_PTR_TO_ANALOG_WRITE_RAW_STRING;
+    static const char *NULL_GPIO_PTR_TO_SOFT_DIGITAL_READ_STRING;
+    static const char *NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_STRING;
+    static const char *NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_RAW_STRING;
+    static const char *NULL_GPIO_PTR_TO_PIN_MODE_STRING;
+    static const char *NULL_GPIO_PTR_TO_CURRENT_PIN_MODE_STRING;
+    static const char *CAN_INIT_HEADER;
+    static const char *CAN_READ_HEADER;
+    static const char *CAN_WRITE_HEADER;
+    static const char *CAN_LIVE_UPDATE_HEADER;
+    static const char *CAN_CLEAR_MESSAGE_HEADER;
+    static const char *CHANGE_A_TO_D_THRESHOLD_HEADER;
+    static const char *CURRENT_A_TO_D_THRESHOLD_HEADER;
+    static const char *BLUETOOTH_SERIAL_IDENTIFIER;
     static const std::vector<const char *> VALID_DIGITAL_STATE_IDENTIFIERS;
     static const std::vector<char> VALID_ANALOG_STATE_IDENTIFIERS;
+    static const std::vector<const char *> DIGITAL_STATE_HIGH_IDENTIFIERS;
+    static const std::vector<const char *> DIGITAL_STATE_LOW_IDENTIFIERS;
+
+    static const unsigned int CAN_READ_BLANK_RETURN_SIZE;
+    static const unsigned int REMOVE_CAN_MASKS_RETURN_SIZE;
     static const unsigned int IO_STATE_RETURN_SIZE;
     static const unsigned int ARDUINO_TYPE_RETURN_SIZE;
     static const unsigned int PIN_TYPE_RETURN_SIZE;
@@ -304,13 +412,6 @@ public:
     static const unsigned char CAN_FRAME;
     static const double VOLTAGE_MAX;
     static const int IO_TRY_COUNT;
-    static const char *CAN_INIT_HEADER;
-    static const char *CAN_READ_HEADER;
-    static const char *CAN_WRITE_HEADER;
-    static const char *CAN_LIVE_UPDATE_HEADER;
-    static const char *CAN_CLEAR_MESSAGE_HEADER;
-    static const char *CHANGE_A_TO_D_THRESHOLD_HEADER;
-    static const char *CURRENT_A_TO_D_THRESHOLD_HEADER;
     static const unsigned int CAN_READ_RETURN_SIZE;
     static const unsigned int CAN_WRITE_RETURN_SIZE;
     static const unsigned int CAN_BUS_ENABLED_RETURN_SIZE;
@@ -328,47 +429,138 @@ public:
     static const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT;
     static const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT;
     static const double ANALOG_TO_VOLTAGE_SCALE_FACTOR;
-    static const std::vector<const char *> DIGITAL_STATE_HIGH_IDENTIFIERS;
-    static const std::vector<const char *> DIGITAL_STATE_LOW_IDENTIFIERS;
 
-    static const BaudRate FIRMWARE_BAUD;
-    static const DataBits FIRMWARE_DATA_BITS;
-    static const StopBits FIRMWARE_STOP_BITS;
-    static const Parity FIRMWARE_PARITY;
-    int numberOfSerialPorts() const;
-    static std::shared_ptr<SerialPort> serialPortAtIndex(unsigned int serialPortIndex);
-    static std::shared_ptr<std::mutex> ioMutexAtIndex(unsigned int ioMutexIndex);
-    int addSerialPort(std::shared_ptr<SerialPort> serialPort);
-
-    std::pair<IOStatus, CanMessage> canListen(int screenIndex, double delay = Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
-private:
-
-    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort);
-    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability);
-    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion);
-    Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion, bool canCapability);
-
-    std::map<std::string, std::shared_ptr<GPIO>> m_gpioPinsAlias;
-    std::map<int, std::string> m_gpioPinIterationAliasMap;
-    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
-    int m_serialPortIndex;
-    std::string m_firmwareVersion;
-    std::pair<bool, bool> m_canCapability;
-    std::string m_canPinAlias;
-    std::set<int> m_availablePins;
-    std::set<int> m_availablePwmPins;
-    std::set<int> m_availableAnalogPins;
-    int m_numberOfDigitalPins;
-    int m_analogToDigitalThreshold;
-
-    static std::vector<ProtectedSerialPort> s_serialPorts;
-    static unsigned  int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT;
-
-    void initializeIO();
-    void setArduinoType(ArduinoType arduinoType);
 };
 
 
+class ArduinoUno
+{
+public:
+    ArduinoUno() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+std::set<int> ArduinoUno::s_availableAnalogPins{14, 15, 16, 17, 18, 19};
+std::set<int> ArduinoUno::s_availablePwmPins{3, 5, 6, 9, 10, 11};
+std::set<int> ArduinoUno::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+const char *ArduinoUno::IDENTIFIER{"arduino_uno"};
+const char *ArduinoUno::LONG_NAME{"Arduino Uno"};
+int ArduinoUno::s_numberOfDigitalPins{13};
+
+class ArduinoNano
+{
+public:
+    ArduinoNano() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+std::set<int> ArduinoNano::s_availableAnalogPins{14, 15, 16, 17, 18, 19, 20, 21};
+std::set<int> ArduinoNano::s_availablePwmPins{3, 5, 6, 9, 10, 11};
+std::set<int> ArduinoNano::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
+const char *ArduinoNano::IDENTIFIER{"arduino_nano"};
+const char *ArduinoNano::LONG_NAME{"Arduino Nano"};
+int ArduinoNano::s_numberOfDigitalPins{13};
+
+class ArduinoMega
+{
+public:
+    ArduinoMega() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+std::set<int> ArduinoMega::s_availableAnalogPins{54, 55, 56, 57, 58, 59, 60, 61,
+                                                 62, 63, 64, 65, 66, 67, 68, 69};
+std::set<int> ArduinoMega::s_availablePwmPins{3, 5, 6, 9, 10, 11, 44, 45, 46};
+std::set<int> ArduinoMega::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                           13, 14, 15, 16, 17, 18, 19, 20, 21,
+                                           22, 23, 24, 25, 26, 27, 28, 29, 30,
+                                           31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                           40, 41, 42, 43, 44, 45, 46, 47, 48,
+                                           49, 50, 51, 52, 53, 54, 55, 56, 57,
+                                           58, 59, 60, 61, 62, 63, 64, 65, 66,
+                                           67, 68, 69};
+const char *ArduinoMega::IDENTIFIER{"arduino_mega"};
+const char *ArduinoMega::LONG_NAME{"Arduino Mega"};
+int ArduinoMega::s_numberOfDigitalPins{53};
+
+class GPIO
+{
+public:
+    GPIO(int pinNumber, IOType ioType) :
+        m_pinNumber{pinNumber},
+        m_ioType{ioType}
+    {
+
+    }
+
+    int pinNumber() const
+    {
+        return this->m_pinNumber;
+    }
+
+    IOType ioType() const
+    {
+        return this->m_ioType;
+    }
+
+    void setIOType(IOType ioType)
+    {
+        this->m_ioType = ioType;
+    }
+
+    friend bool operator==(const GPIO &lhs, const GPIO &rhs)
+    {
+        return (lhs.pinNumber() == rhs.pinNumber());
+    }
+
+private:
+    int m_pinNumber;
+    IOType m_ioType;
+};
+
+class ProtectedSerialPort
+{
+public:
+    ProtectedSerialPort(std::shared_ptr<SerialPort> serialPort) :
+        m_serialPort{serialPort},
+        m_ioMutex{std::make_shared<std::mutex>()}
+    {
+
+    }
+
+    ~ProtectedSerialPort() {  }
+    std::shared_ptr<SerialPort> serialPort() const
+    {
+        return this->m_serialPort;
+    }
+
+    std::shared_ptr<std::mutex> ioMutex() const
+    {
+        return this->m_ioMutex;
+    }
+
+private:
+    std::shared_ptr<SerialPort> m_serialPort;
+    std::shared_ptr<std::mutex> m_ioMutex;
+};
 
 
 class IOReport
@@ -408,7 +600,7 @@ public:
     {
         return this->m_analogInputResults;
     }
-    
+
     std::vector<std::pair<int, int>> analogOutputResults() const
     {
         return this->m_analogOutputResults;

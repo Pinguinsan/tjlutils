@@ -44,6 +44,9 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     rm -f "$ui/serialport.h"
     rm -f "$ui/eventtimer.h"
     rm -f "$ui/prettyprinter.h"
+    rm -f "$ui/arduino.h"
+    rm -f "$ui/canmessage.h"
+    rm -f "$ui/candatapacket.h"
 
     if [[ -z "$cygwinCheck" ]]; then
         rm -f "$ul/libtjlutils.so"
@@ -101,6 +104,13 @@ else
 
     rm -f "$ui/templateobjects.h"
     ln -s "$ogt/templateobjects/templateobjects.h" "$ui/"
+
+    rm -f "$ui/arduino.h"
+    rm -f "$ui/canmessage.h"
+    rm -f "$ui/candatapacket.h"
+    ln -s "$ogt/arduino/include/arduino.h"
+    ln -s "$ogt/arduino/include/canmessage.h"
+    ln -s "$ogt/arduino/include/candatapacket.h"
 
     rm -f "$ui/tjlutils.h"
     ln -s "$ogt/common/tjlutils.h" "$ui/"

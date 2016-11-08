@@ -3,6 +3,7 @@
 
 #include "candatapacket.h"
 #include "generalutilities.h"
+
 #include <string>
 
 class CanMessage
@@ -31,7 +32,6 @@ public:
     static const unsigned char CAN_FRAME;
     static const unsigned char CAN_MESSAGE_LENGTH;
 
-
     unsigned char nthDataPacketByte(int index);
     std::string toPrettyString() const;
 private:
@@ -39,6 +39,8 @@ private:
     uint8_t m_frame;
     uint8_t m_length;
     CanDataPacket m_dataPacket;
+
+    static const char *NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING;
 };
 
 #endif //TJLUTILS_CANMESSAGE_H
