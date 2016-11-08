@@ -435,6 +435,11 @@ void Arduino::assignPinsAndIdentifiers()
     }
 }
 
+std::string Arduino::serialPortName() const
+{
+    return this->serialPort()->portName();
+}
+
 ArduinoType Arduino::arduinoType() const
 {
     return this->m_arduinoType;
@@ -2874,3 +2879,32 @@ std::string Arduino::staticAnalogPinFromNumber(ArduinoType arduinoType, int pinN
         throw std::runtime_error("");
     }
 }
+
+std::set<int> ArduinoUno::s_availableAnalogPins{14, 15, 16, 17, 18, 19};
+std::set<int> ArduinoUno::s_availablePwmPins{3, 5, 6, 9, 10, 11};
+std::set<int> ArduinoUno::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+const char *ArduinoUno::IDENTIFIER{"arduino_uno"};
+const char *ArduinoUno::LONG_NAME{"Arduino Uno"};
+int ArduinoUno::s_numberOfDigitalPins{13};
+
+std::set<int> ArduinoNano::s_availableAnalogPins{14, 15, 16, 17, 18, 19, 20, 21};
+std::set<int> ArduinoNano::s_availablePwmPins{3, 5, 6, 9, 10, 11};
+std::set<int> ArduinoNano::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
+const char *ArduinoNano::IDENTIFIER{"arduino_nano"};
+const char *ArduinoNano::LONG_NAME{"Arduino Nano"};
+int ArduinoNano::s_numberOfDigitalPins{13};
+
+std::set<int> ArduinoMega::s_availableAnalogPins{54, 55, 56, 57, 58, 59, 60, 61,
+                                                 62, 63, 64, 65, 66, 67, 68, 69};
+std::set<int> ArduinoMega::s_availablePwmPins{3, 5, 6, 9, 10, 11, 44, 45, 46};
+std::set<int> ArduinoMega::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                           13, 14, 15, 16, 17, 18, 19, 20, 21,
+                                           22, 23, 24, 25, 26, 27, 28, 29, 30,
+                                           31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                           40, 41, 42, 43, 44, 45, 46, 47, 48,
+                                           49, 50, 51, 52, 53, 54, 55, 56, 57,
+                                           58, 59, 60, 61, 62, 63, 64, 65, 66,
+                                           67, 68, 69};
+const char *ArduinoMega::IDENTIFIER{"arduino_mega"};
+const char *ArduinoMega::LONG_NAME{"Arduino Mega"};
+int ArduinoMega::s_numberOfDigitalPins{53};

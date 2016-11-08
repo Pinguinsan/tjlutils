@@ -53,6 +53,38 @@ public:
     virtual std::pair<IOStatus, std::string> getArduinoType(int serialPortIndex);
     static std::pair<IOStatus, int> getAnalogToDigitalThreshold(std::shared_ptr<SerialPort> serialPort);
 
+
+    std::pair<IOStatus, CanMessage> canListen(int screenIndex, double delay = Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
+    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
+
+    virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
+    virtual std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
+    virtual std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
+    virtual std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
+    virtual std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
+    virtual std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    virtual std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
+    virtual std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
+
+    void initializeIO();
+    void setArduinoType(ArduinoType arduinoType);
+    void assignPinsAndIdentifiers();
+    int parseAnalogPin(const std::string &pinAlias) const;
+    std::string analogPinFromNumber(int pinNumber) const;
+
+
+
     virtual IOReport ioReportRequest(int serialPortIndex);
     virtual SerialReport serialReportRequest(int serialPortIndex, const std::string &delimiter = "");
     virtual CanReport canReportRequest(int serialPortIndex);
@@ -62,6 +94,10 @@ public:
     virtual void flushTX(int serialPortIndex);
     virtual void flushRXTX(int serialPortIndex);
     virtual void flushTXRX(int serialPortIndex);
+    virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
+    virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
+    virtual std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
+
 
     virtual bool parseToDigitalState(const std::string &state) const;
     virtual double parseToAnalogState(const std::string &state) const;
@@ -99,6 +135,7 @@ public:
     void flushTX();
     void flushRXTX();
     void flushTXRX();
+    std::string serialPortName() const;
 
     std::pair<IOStatus, bool> digitalRead(std::shared_ptr<GPIO> gpioPtr);
     std::pair<IOStatus, bool> digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state);
@@ -174,7 +211,6 @@ public:
     static std::shared_ptr<std::mutex> ioMutexAtIndex(unsigned int ioMutexIndex);
     int addSerialPort(std::shared_ptr<SerialPort> serialPort);
 
-
     static const unsigned int CAN_READ_BLANK_RETURN_SIZE;
     static const unsigned int REMOVE_CAN_MASKS_RETURN_SIZE;
     static const unsigned int IO_STATE_RETURN_SIZE;
@@ -236,40 +272,6 @@ private:
 
     static std::vector<ProtectedSerialPort> s_serialPorts;
     static unsigned  int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT;
-
-    std::pair<IOStatus, CanMessage> canListen(int screenIndex, double delay = Arduino::BLUETOOTH_SERIAL_SEND_DELAY);
-    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-    static std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay = static_cast<double>(Arduino::BLUETOOTH_SERIAL_SEND_DELAY));
-
-    virtual std::pair<IOStatus, bool> digitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> analogWrite(int pinNumber, double state, int serialPortIndex);
-    virtual std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> softDigitalRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, double> softAnalogRead(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType, int serialPortIndex);
-    virtual std::pair<IOStatus, IOType> currentPinMode(int pinNumber, int serialPortIndex);
-    virtual std::pair<IOStatus, int> changeAnalogToDigitalThreshold(int threshold, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, uint32_t> removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex);
-
-    virtual std::pair<IOStatus, bool> canAutoUpdate(bool state, int serialPortIndex);
-    virtual std::pair<IOStatus, bool> initializeCanBus(int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canRead(int serialPortIndex);
-    virtual std::pair<IOStatus, CanMessage> canWrite(const CanMessage &message, int serialPortIndex);
-
-    void initializeIO();
-    void setArduinoType(ArduinoType arduinoType);
-    void assignPinsAndIdentifiers();
-    int parseAnalogPin(const std::string &pinAlias) const;
-    std::string analogPinFromNumber(int pinNumber) const;
-
 
     static const char *HEARTBEAT_HEADER;
     static const char *IO_REPORT_HEADER;
@@ -432,7 +434,6 @@ private:
     static const std::vector<const char *> DIGITAL_STATE_LOW_IDENTIFIERS;
 };
 
-
 class ArduinoUno
 {
 public:
@@ -445,13 +446,6 @@ public:
     static const char *LONG_NAME;
     static int s_numberOfDigitalPins;
 };
-
-std::set<int> ArduinoUno::s_availableAnalogPins{14, 15, 16, 17, 18, 19};
-std::set<int> ArduinoUno::s_availablePwmPins{3, 5, 6, 9, 10, 11};
-std::set<int> ArduinoUno::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-const char *ArduinoUno::IDENTIFIER{"arduino_uno"};
-const char *ArduinoUno::LONG_NAME{"Arduino Uno"};
-int ArduinoUno::s_numberOfDigitalPins{13};
 
 class ArduinoNano
 {
@@ -466,13 +460,6 @@ public:
     static int s_numberOfDigitalPins;
 };
 
-std::set<int> ArduinoNano::s_availableAnalogPins{14, 15, 16, 17, 18, 19, 20, 21};
-std::set<int> ArduinoNano::s_availablePwmPins{3, 5, 6, 9, 10, 11};
-std::set<int> ArduinoNano::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
-const char *ArduinoNano::IDENTIFIER{"arduino_nano"};
-const char *ArduinoNano::LONG_NAME{"Arduino Nano"};
-int ArduinoNano::s_numberOfDigitalPins{13};
-
 class ArduinoMega
 {
 public:
@@ -485,21 +472,6 @@ public:
     static const char *LONG_NAME;
     static int s_numberOfDigitalPins;
 };
-
-std::set<int> ArduinoMega::s_availableAnalogPins{54, 55, 56, 57, 58, 59, 60, 61,
-                                                 62, 63, 64, 65, 66, 67, 68, 69};
-std::set<int> ArduinoMega::s_availablePwmPins{3, 5, 6, 9, 10, 11, 44, 45, 46};
-std::set<int> ArduinoMega::s_availablePins{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                           13, 14, 15, 16, 17, 18, 19, 20, 21,
-                                           22, 23, 24, 25, 26, 27, 28, 29, 30,
-                                           31, 32, 33, 34, 35, 36, 37, 38, 39,
-                                           40, 41, 42, 43, 44, 45, 46, 47, 48,
-                                           49, 50, 51, 52, 53, 54, 55, 56, 57,
-                                           58, 59, 60, 61, 62, 63, 64, 65, 66,
-                                           67, 68, 69};
-const char *ArduinoMega::IDENTIFIER{"arduino_mega"};
-const char *ArduinoMega::LONG_NAME{"Arduino Mega"};
-int ArduinoMega::s_numberOfDigitalPins{53};
 
 class GPIO
 {
