@@ -1508,3 +1508,23 @@ std::vector<std::string> SerialPort::generateSerialPortNames()
     }
     return returnVector;
 }
+
+bool SerialPort::isValidSerialPortName(const std::string &serialPortName)
+{
+    #if defined(_WIN32) || defined(__CYGWIN__)
+        for (int i = 0; i < 256; i++) {
+        if (serialPortName == ("COM" + std::to_string(i))) {
+            return true;
+        }
+        return false; 
+    #else
+        for (auto &it : SerialPort::s_AVAILABLE_PORT_NAMES_BASE) {
+            for (int i = 0; i < 256; i++) {
+                if (serialPortName == (it + std::to_string(i))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    #endif
+}

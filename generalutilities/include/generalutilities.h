@@ -145,9 +145,7 @@ namespace GeneralUtilities
     std::string tEndl();
     std::string stripTrailingWhitespace(const std::string &stringToStrip);
     std::string tParenthesis(const std::string &convert);
-    std::string tParenthesis(const char *convert);
-
-        
+    std::string tParenthesis(const char *convert);     
 
     template <typename Function, typename...FunctionArgs>
     void delaySecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
@@ -240,7 +238,6 @@ namespace GeneralUtilities
         }
     }
     
-    /*Converting objects to strings*/
     template<typename T>
     std::string toString(const T &convert) 
     {
@@ -534,6 +531,20 @@ namespace GeneralUtilities
         static_assert(std::is_same<typename std::decay<decltype(*(std::begin(container)))>::type,  typename std::decay<T>::type>::value, "The object to add must dereference to the same type as the container contents");
         container.push_back(function(thingToAdd));
     }
+
+    template <typename T, typename Base>
+    std::string toFixedWidth(const T &toPrint, int fixedWidth, Base base = 0)
+    {
+        std::string copyString{toString(toPrint)};
+        size_t copyLength{copyString.length()};
+        if (static_cast<int>(copyLength) < fixedWidth) {
+            copyLength = (fixedWidth - copyLength);
+            while (copyLength--) {
+                copyString = toString(base) + copyString;
+            }
+        }
+        return copyString;
+    }   
 
 
 }

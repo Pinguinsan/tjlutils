@@ -99,6 +99,8 @@ namespace ArduinoPCStrings
     const char *ARDUINO_TYPE_HEADER{"{ardtype"};
     const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
     const char *LOAD_SYSTEM_STATE_HEADER{"{loadstate"};
+    const char *STORE_SYSTEM_STATE_END_HEADER{"{storestateend"};
+    const char *LOAD_SYSTEM_STATE_END_HEADER{"{loadstateend"};
     
     const char *IO_REPORT_HEADER{"{ioreport"};
     const char *IO_REPORT_END_HEADER{"{ioreportend"};

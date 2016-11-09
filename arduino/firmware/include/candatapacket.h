@@ -1,9 +1,9 @@
 #ifndef ARDUINOPC_CANDATAPACKET_H
 #define ARDUINOPC_CANDATAPACKET_H
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 #include "arduinopcstrings.h"
 #include "firmwareutilities.h"
 

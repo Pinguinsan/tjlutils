@@ -1,7 +1,6 @@
 #include "../include/gpio.h"
-#include "../include/digitalwritefast.h"
 
-const int GPIO::ANALOG_MAX{1024};
+const int GPIO::ANALOG_MAX{1023};
 int GPIO::s_analogToDigitalThreshold{510};
 
 GPIO::GPIO(int pinNumber, IOType ioType) :
@@ -11,6 +10,45 @@ GPIO::GPIO(int pinNumber, IOType ioType) :
     m_analogState{0}
 {
     setIOType(this->m_ioType);
+}
+
+int GPIO::getIOAgnosticState()
+{
+    if ((this->m_ioType == IOType::DIGITAL_INPUT) || (this->m_ioType == IOType::DIGITAL_INPUT_PULLUP)) {
+        return this->g_digitalRead();
+    } else if (this->m_ioType == IOType::DIGITAL_OUTPUT) {
+        return this->g_softDigitalRead();
+    } else if (this->m_ioType == IOType::ANALOG_INPUT) {
+        return this->g_analogRead();
+    } else if (this->m_ioType == IOType::ANALOG_OUTPUT) {
+        return this->g_softAnalogRead();
+    } else {
+        return 0;
+    }
+}
+
+std::vector<unsigned char> GPIO::getEEPROMWritableState()
+{
+    return GPIO::toEEPROMWritableState(this->getIOAgnosticState());
+}
+
+std::vector<unsigned char> GPIO::toEEPROMWritableState(int longState)
+{
+    std::vector<unsigned char> result;
+    result.reserve(5);
+    int copyInt{longState};
+    while (copyInt > 0) {
+        if (copyInt > 254) {
+            result.insert(result.begin(), 255);
+        } else {
+            result.insert(result.begin(), static_cast<unsigned char>(copyInt));
+        }
+        copyInt -= 255;
+    }
+    while (result.size() != 5) {
+        result.insert(result.begin(), 0);
+    }
+    return result;
 }
 
 void GPIO::setAnalogToDigitalThreshold(int threshold)
@@ -41,17 +79,15 @@ void GPIO::setIOType(IOType ioType)
 {
     this->m_ioType = ioType;
     if (this->m_ioType == IOType::DIGITAL_OUTPUT) {
-        pinModeFast(this->m_pinNumber, OUTPUT);
-        //digitalWriteFast(this->m_pinNumber, this->m_logicState);
+        pinMode(this->m_pinNumber, OUTPUT);
     } else if (this->m_ioType == IOType::ANALOG_OUTPUT) {
-        pinModeFast(this->m_pinNumber, OUTPUT);
-        //digitalWriteFast(this->m_pinNumber, this->m_logicState);
+        pinMode(this->m_pinNumber, OUTPUT);
     } else if (this->m_ioType == IOType::DIGITAL_INPUT) {
-        pinModeFast(this->m_pinNumber, INPUT);
+        pinMode(this->m_pinNumber, INPUT);
     } else if (this->m_ioType == IOType::ANALOG_INPUT) {
-        pinModeFast(this->m_pinNumber, INPUT);
+        pinMode(this->m_pinNumber, INPUT);
     } else if (this->m_ioType == IOType::DIGITAL_INPUT_PULLUP) {
-        pinModeFast(this->m_pinNumber, INPUT_PULLUP);
+        pinMode(this->m_pinNumber, INPUT_PULLUP);
     }
     this->m_analogState = 0;
     this->m_logicState = false;
@@ -62,7 +98,7 @@ bool GPIO::g_digitalRead()
     if ((this->m_ioType != IOType::DIGITAL_INPUT) && (this->m_ioType != IOType::DIGITAL_INPUT_PULLUP)) {
         setIOType(IOType::DIGITAL_INPUT);
     }
-    return (this->m_logicState = digitalReadFast(this->m_pinNumber));
+    return (this->m_logicState = digitalRead(this->m_pinNumber));
 }
 
 bool GPIO::g_softDigitalRead()
@@ -99,7 +135,7 @@ void GPIO::g_digitalWrite(bool logicState)
     if (this->m_ioType != IOType::DIGITAL_OUTPUT) {
         setIOType(IOType::DIGITAL_OUTPUT);
     }
-    digitalWriteFast(this->m_pinNumber, logicState);
+    digitalWrite(this->m_pinNumber, logicState);
     this->m_logicState = logicState;
 } 
 

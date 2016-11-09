@@ -178,6 +178,7 @@ public:
     static std::vector<const char *> availableStopBits();
     static std::vector<const char *> availableDataBits();
     static std::vector<const char *> availableParity();
+    static bool isValidSerialPortName(const std::string &serialPortName);
 
     static const int DEFAULT_TIMEOUT;
     static const int DEFAULT_RETRY_COUNT;

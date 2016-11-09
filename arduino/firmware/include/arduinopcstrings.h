@@ -65,6 +65,8 @@ namespace ArduinoPCStrings
     extern const char *CURRENT_A_TO_D_THRESHOLD_HEADER;
     extern const char *STORE_SYSTEM_STATE_HEADER;
     extern const char *LOAD_SYSTEM_STATE_HEADER;
+    extern const char *STORE_SYSTEM_STATE_END_HEADER;
+    extern const char *LOAD_SYSTEM_STATE_END_HEADER;
 
     extern const char *HEARTBEAT_HEADER;
     extern const char *IO_REPORT_HEADER;

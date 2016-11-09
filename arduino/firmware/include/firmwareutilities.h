@@ -11,14 +11,12 @@
 #include <system_configuration.h>
 #include <unwind-cxx.h>
 #include <utility.h>
-#include <serstream>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include <iterator>
-#include <iomanip>
-#include <iostream>
+
 #include <Arduino.h>
 
 namespace FirmwareUtilities

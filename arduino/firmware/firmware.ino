@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "include/arduinoinit.h"
 #include "include/gpio.h"
 #include "include/shortwatchdog.h"
@@ -12,15 +13,17 @@
  * https://github.com/maniacbug/StandardCplusplus
  */
 #include <StandardCplusplus.h>
+#include <system_configuration.h>
+#include <unwind-cxx.h>
+#include <utility.h>
 #include <serstream>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
 #include <set>
-#include <sstream>
-#include <iomanip>
-#include <iostream>
-#include <algorithm>
 
 #if defined(__HAVE_CAN_BUS__)
     #include "include/mcp_can.h"
@@ -32,7 +35,6 @@ using namespace ArduinoPCStrings;
 using namespace FirmwareUtilities;
 
 namespace std { ohserialstream cout(Serial); }
-static const int STDOUT_PRECISION{2};
 static const int ID_WIDTH{3};
 static const int MESSAGE_WIDTH{2};
 static const int MAXIMUM_SERIAL_READ_SIZE{175};
@@ -48,12 +50,12 @@ static const int PIN_PLACEHOLDER{1};
 static const bool SOFT{true};
 void printString(const std::string &str) { std::cout << str; }
 void printStringWithNewline(const std::string &str) { std::cout << str << std::endl; }
-void printResult(const std::string &header, const std::string &pinNumber, bool state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
-void printResult(const std::string &header, int pinNumber, bool state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
-void printResult(const std::string &header, const std::string &pinNumber, int state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
-void printResult(const std::string &header, int pinNumber, int state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
-void printResult(const std::string &header, const std::string &pinNumber, const std::string &state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
-void printResult(const std::string &header, int pinNumber, const std::string &state, int resultCode) { std::cout << std::setprecision(STDOUT_PRECISION) << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, const std::string &pinNumber, bool state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, int pinNumber, bool state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, const std::string &pinNumber, int state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, int pinNumber, int state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, const std::string &pinNumber, const std::string &state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
+void printResult(const std::string &header, int pinNumber, const std::string &state, int resultCode) { std::cout << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; }
 void printSingleResult(const std::string &header, int resultCode) { std::cout << header << ':' << resultCode << '}'; }
 void printTypeResult(const std::string &header, const std::string &type, int resultCode) { std::cout << header << ':' << type << ':' << resultCode << '}'; }
 void printTypeResult(const std::string &header, int type, int resultCode) { std::cout << header << ':' << type << ':' << resultCode << '}'; }
@@ -92,6 +94,14 @@ void printWatchdogResult(const std::string &header, const ShortWatchdog &shortWa
     std::cout << ':' << resultCode << '}';
 }
 
+enum EEPROMWriteOffset { PIN = 0,
+                         IO_TYPE = 1,
+                         STATE0 = 2,
+                         STATE1 = 3,
+                         STATE2 = 4,
+                         STATE3 = 5,
+                         STATE4 = 6 };
+
 void handleSerialString(const std::string &str);
 void handleSerialString(const char *str);
 void digitalReadRequest(const std::string &str, bool soft = false);
@@ -115,6 +125,8 @@ void heartbeatRequest();
 void ioReportRequest();
 void storeSystemStateRequest();
 void loadSystemStateRequest();
+IOType getEEPROMIOTypeFromIndex(unsigned char index);
+unsigned char getEEPROMIOTypeFromEnumClass(IOType ioType);
 
 bool isValidAnalogPinIdentifier(const std::string &str);
 bool isValidPinIdentifier(const std::string &str);
@@ -139,7 +151,7 @@ std::pair<int, std::string> parsePin(const std::string &str);
 void populateGpioMap();
 static std::map<int, GPIO*> gpioPins;
 static std::set<ShortWatchdog> shortWatchdogs;
-std::string getPinType(IOType type);
+std::string getIOTypeString(IOType type);
 std::string analogPinFromNumber(int number);
 GPIO *gpioPinByPinNumber(int pinNumber);
 void serialInit(long long int baud, int timeout);
@@ -467,12 +479,111 @@ void handleSerialString(const std::string &str)
 
 void storeSystemStateRequest()
 {
-    printSingleResult(STORE_SYSTEM_STATE_HEADER, OPERATION_SUCCESS); 
+    int eepromAddress{0};
+    unsigned char readPin{0};
+    unsigned char readIOType{0};
+    int readState{0};
+    std::cout << STORE_SYSTEM_STATE_HEADER << '}';
+    for (auto &it : gpioPins) {
+        std::string stringToLog{"{"};
+        readPin = EEPROM.read(eepromAddress + EEPROMWriteOffset::PIN);
+        readIOType = EEPROM.read(eepromAddress+1);
+        int currentState{it.second->getIOAgnosticState()};
+        std::vector<unsigned char> rawState{GPIO::toEEPROMWritableState(currentState)};
+        
+        stringToLog += toString(it.first) + ':';
+        stringToLog += getIOTypeString(it.second->ioType()) + ':';
+        
+        for (int i = EEPROMWriteOffset::STATE0; i < EEPROMWriteOffset::STATE4 + 1; i++) {
+            readState += static_cast<int>(EEPROM.read(eepromAddress + i));
+        }
+        if (readPin != static_cast<unsigned char>(it.first)) {
+            EEPROM.write(eepromAddress + EEPROMWriteOffset::PIN, static_cast<unsigned char>(it.first));
+        }
+        if (readIOType != getEEPROMIOTypeFromEnumClass(it.second->ioType())) {
+            EEPROM.write(eepromAddress + EEPROMWriteOffset::IO_TYPE, getEEPROMIOTypeFromEnumClass(it.second->ioType()));
+        }
+        if (currentState != readState) {
+            for (int i = EEPROMWriteOffset::STATE0; i < EEPROMWriteOffset::STATE4 + 1; i++) {
+                EEPROM.write(eepromAddress + i, rawState.at(i-2));
+                stringToLog += toString(static_cast<int>(rawState.at(i-2)));
+                if ((i + 1) != EEPROMWriteOffset::STATE4) {
+                    stringToLog += ':';
+                } else {
+                    stringToLog += '}';
+                }
+            }
+        }
+        std::cout << stringToLog << ';';
+    }
+    std::cout << STORE_SYSTEM_STATE_END_HEADER;
 }
 
 void loadSystemStateRequest()
 {
-    printSingleResult(LOAD_SYSTEM_STATE_HEADER, OPERATION_SUCCESS);
+    int eepromAddress{0};
+    unsigned char readPin{0};
+    unsigned char readIOType{0};
+    int readState{0};
+    std::cout << LOAD_SYSTEM_STATE_HEADER << '}';
+    for (auto &it : gpioPins) {
+        std::string stringToLog{"{"};
+        readPin = EEPROM.read(eepromAddress + EEPROMWriteOffset::PIN);
+        readIOType = EEPROM.read(eepromAddress+1);
+        int currentState{it.second->getIOAgnosticState()};
+        std::vector<unsigned char> rawState{GPIO::toEEPROMWritableState(currentState)};
+        
+        for (int i = EEPROMWriteOffset::STATE0; i < EEPROMWriteOffset::STATE4 + 1; i++) {
+            readState += static_cast<int>(EEPROM.read(eepromAddress + i));
+        }
+
+        if (readPin != static_cast<unsigned char>(it.first)) {
+            std::cout << "{" << static_cast<int>(readPin) << "!=" << it.first << ":" << OPERATION_FAILURE << ':' << OPERATION_FAILURE << "};";
+            continue;
+        } else {
+            stringToLog += toString(static_cast<int>(readPin)) + ':';
+        }
+
+        IOType oldIOType{it.second->ioType()};
+        IOType newIOType{getEEPROMIOTypeFromIndex(readIOType)};
+        if (newIOType != oldIOType) {
+            if (!checkValidIOChangeRequest(newIOType, it.first)) {
+                std::cout << "{" << static_cast<int>(readPin) << ":!" << getIOTypeString(newIOType) << '!:' << OPERATION_FAILURE << "};";
+                continue;
+            } else {
+                it.second->setIOType(newIOType);
+                stringToLog += getIOTypeString(oldIOType) + "->" + getIOTypeString(newIOType);
+            }
+        } else {
+            stringToLog += getIOTypeString(oldIOType);
+        }
+
+        if (newIOType == IOType::DIGITAL_OUTPUT) {
+            readState = (readState == 0 ? 0 : 1);
+            if (readState != currentState) {
+                it.second->g_digitalWrite(readState);
+                stringToLog += toString(currentState) + "->" + toString(readState);
+            } else {
+                stringToLog += toString(currentState);
+            }
+        } else if (newIOType == IOType::ANALOG_OUTPUT) {
+            if (readState != currentState) {
+                it.second->g_analogWrite(readState);
+                stringToLog += toString(currentState) + "->" + toString(readState);
+            } else {
+                stringToLog += toString(currentState);
+            }
+        } else {
+            if (readState != currentState) {
+                stringToLog += toString(currentState) + "<->" + toString(readState);
+            } else {
+                stringToLog += toString(currentState);
+            }
+        }
+        stringToLog += '}';
+        std::cout << stringToLog << ';';
+    }
+    std::cout << LOAD_SYSTEM_STATE_END_HEADER;
 }
 
 void changeAToDThresholdRequest(const std::string &str)
@@ -523,7 +634,7 @@ void ioReportRequest()
         } else if (gpioPin->ioType() == IOType::ANALOG_OUTPUT) {
             state = gpioPin->g_softAnalogRead();
         }
-        std::cout << '{' << gpioPin->pinNumber() << ':' << getPinType(gpioPin->ioType()) << ':' << state << "};";
+        std::cout << '{' << gpioPin->pinNumber() << ':' << getIOTypeString(gpioPin->ioType()) << ':' << state << "};";
     }
 
     std::cout << IO_REPORT_END_HEADER << '}';
@@ -633,7 +744,7 @@ void pinTypeRequest(const std::string &str)
         printResult(PIN_TYPE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    printResult(PIN_TYPE_HEADER, pinNumber.second, getPinType(gpioPinByPinNumber(pinNumber.first)->ioType()), OPERATION_SUCCESS);
+    printResult(PIN_TYPE_HEADER, pinNumber.second, getIOTypeString(gpioPinByPinNumber(pinNumber.first)->ioType()), OPERATION_SUCCESS);
 }
 
 void pinTypeChangeRequest(const std::string &str)
@@ -709,7 +820,6 @@ void removeShortWatchdogRequest(const std::string &str)
 
 std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str)
 {
-    using namespace FirmwareUtilities;
     if (str.length() == 0) {
         return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
     }
@@ -829,12 +939,6 @@ void canBusEnabledRequest()
             return false;
         }
         int i{0};
-        while (AVAILABLE_ANALOG_PINS[i] > 0) {
-            if (pinNumber == AVAILABLE_ANALOG_PINS[i++]) {
-                return true;
-            }
-        }
-        i = 0;
         while (AVAILABLE_PINS[i] > 0) {
             if (pinNumber == AVAILABLE_PINS[i++]) {
                 return true;
@@ -849,12 +953,6 @@ void canBusEnabledRequest()
             return false;
         }
         int i{0};
-        while (AVAILABLE_ANALOG_PINS[i] > 0) {
-            if (pinNumber == AVAILABLE_ANALOG_PINS[i++]) {
-                return true;
-            }
-        }
-        i = 0;
         while (AVAILABLE_PINS[i] > 0) {
             if (pinNumber == AVAILABLE_PINS[i++]) {
                 return true;
@@ -866,12 +964,6 @@ void canBusEnabledRequest()
     bool isValidDigitalOutputPin(int pinNumber)
     {
         int i{0};
-        while (AVAILABLE_ANALOG_PINS[i] > 0) {
-            if (pinNumber == AVAILABLE_ANALOG_PINS[i++]) {
-                return true;
-            }
-        }
-        i = 0;
         while (AVAILABLE_PINS[i] > 0) {
             if (pinNumber == AVAILABLE_PINS[i++]) {
                 return true;
@@ -883,12 +975,6 @@ void canBusEnabledRequest()
     bool isValidDigitalInputPin(int pinNumber)
     {
         int i{0};
-        while (AVAILABLE_ANALOG_PINS[i] > 0) {
-            if (pinNumber == AVAILABLE_ANALOG_PINS[i++]) {
-                return true;
-            }
-        }
-        i = 0;
         while (AVAILABLE_PINS[i] > 0) {
             if (pinNumber == AVAILABLE_PINS[i++]) {
                 return true;
@@ -940,7 +1026,7 @@ bool checkValidIOChangeRequest(IOType ioType, int pinNumber)
     return true;
 }
 
-std::string getPinType(IOType ioType)
+std::string getIOTypeString(IOType ioType)
 {
     if (ioType == IOType::DIGITAL_INPUT) {
         return DIGITAL_INPUT_IDENTIFIER;
@@ -1103,6 +1189,39 @@ GPIO *gpioPinByPinNumber(int pinNumber)
     }
 }
 
+IOType getEEPROMIOTypeFromIndex(unsigned char index)
+{
+    if (index == 0) {
+        return IOType::DIGITAL_INPUT;
+    } else if (index == 1) {
+        return IOType::DIGITAL_OUTPUT;
+    } else if (index == 2) {
+        return IOType::ANALOG_INPUT;
+    } else if (index == 3) {
+        return IOType::ANALOG_OUTPUT;
+    } else if (index == 4) {
+        return IOType::DIGITAL_INPUT_PULLUP;
+    } else {
+        return IOType::UNSPECIFIED;
+    }
+}
+
+unsigned char getEEPROMIOTypeFromEnumClass(IOType ioType)
+{
+    if (ioType == IOType::DIGITAL_INPUT) {
+        return 0;
+    } else if (ioType == IOType::DIGITAL_OUTPUT) {
+        return 1;
+    } else if (ioType == IOType::ANALOG_INPUT) {
+        return 2;
+    } else if (ioType == IOType::ANALOG_OUTPUT) {
+        return 3;
+    } else if (ioType == IOType::DIGITAL_INPUT_PULLUP) {
+        return 4;
+    } else {
+        return 5;
+    }
+}
 
 #if defined(ARDUINO_AVR_UNO)
 

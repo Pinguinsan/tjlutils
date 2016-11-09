@@ -719,7 +719,7 @@ public:
         if (lhs.m_dataPacket.size() != rhs.m_dataPacket.size()) {
             return false;
         }
-        for (int i = 0; i < lhs.m_dataPacket.size(); i++) {
+        for (unsigned int i = 0; i < lhs.m_dataPacket.size(); i++) {
             if (lhs.m_dataPacket.at(i) != rhs.m_dataPacket.at(i)) {
                 return false;
             }
@@ -885,7 +885,7 @@ public:
         if (lhs.m_dataPacket.dataPacket().size() != lhs.m_dataPacket.dataPacket().size()) {
             return false;
         }
-        for (int i = 0; i < lhs.m_dataPacket.dataPacket().size(); i++) {
+        for (unsigned int i = 0; i < lhs.m_dataPacket.dataPacket().size(); i++) {
             if (lhs.m_dataPacket.dataPacket().at(i) != rhs.m_dataPacket.dataPacket().at(i)) {
                 return false;
             }
