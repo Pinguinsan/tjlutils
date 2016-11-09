@@ -250,6 +250,14 @@ public:
     static const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT;
     static const double ANALOG_TO_VOLTAGE_SCALE_FACTOR;
 
+    static const char *GENERIC_FAILED_STRING;
+    static const char *GENERIC_SUCCESS_STRING;
+    static const char *USING_ALIAS_STRING;
+    static const char *SETTING_IO_TYPE_STRING;
+    static const char *USING_INITIAL_STATE_STRING;
+    static const char *FOR_PIN_NUMBER_STRING;
+    static const char *ELIPSES_STRING;
+
 private:
     Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort);
     Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability);
@@ -430,13 +438,6 @@ private:
     static const char *CHANGE_A_TO_D_THRESHOLD_HEADER;
     static const char *CURRENT_A_TO_D_THRESHOLD_HEADER;
     static const char *BLUETOOTH_SERIAL_IDENTIFIER;
-    static const char *GENERIC_FAILED_STRING;
-    static const char *GENERIC_SUCCESS_STRING;
-    static const char *USING_ALIAS_STRING;
-    static const char *SETTING_IO_TYPE_STRING;
-    static const char *USING_INITIAL_STATE_STRING;
-    static const char *FOR_PIN_NUMBER_STRING;
-    static const char *ELIPSES_STRING;
     static const std::vector<const char *> VALID_DIGITAL_STATE_IDENTIFIERS;
     static const std::vector<char> VALID_ANALOG_STATE_IDENTIFIERS;
     static const std::vector<const char *> DIGITAL_STATE_HIGH_IDENTIFIERS;
