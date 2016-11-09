@@ -219,6 +219,13 @@ std::vector<ProtectedSerialPort> Arduino::s_serialPorts;
 unsigned int Arduino::s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{3};
 double Arduino::bluetoothSendDelayMultiplier{Arduino::DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
 
+const int CanMessage::CAN_BYTE_WIDTH{2};
+const int CanMessage::CAN_ID_WIDTH{3};
+const unsigned int CanMessage::CAN_MESSAGE_SIZE{9};
+const unsigned char CanMessage::CAN_FRAME{0};
+const unsigned char CanMessage::CAN_MESSAGE_LENGTH{8};
+const char *CanMessage::NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING{"ERROR: Invalid index passed to nthDataPacket(int index) :"};
+
 std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serialPort)
 {
     using namespace GeneralUtilities;

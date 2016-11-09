@@ -38,9 +38,7 @@ set (MATHUTILITIES_SOURCES ${SOURCE_BASE}/mathutilities/src/mathutilities.cpp)
 set (SERIALPORT_SOURCES ${SOURCE_BASE}/serialport/src/serialport.cpp)
 set (EVENTTIMER_SOURCES ${SOURCE_BASE}/eventtimer/src/eventtimer.cpp)
 set (PRETTYPRINTER_SOURCES ${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp)
-set (ARDUINO_SOURCES ${SOURCE_BASE}/arduino/src/arduino.cpp
-                     ${SOURCE_BASE}/arduino/src/candatapacket.cpp
-                     ${SOURCE_BASE}/arduino/src/canmessage.cpp)
+set (ARDUINO_SOURCES ${SOURCE_BASE}/arduino/src/arduino.cpp)
 
 add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${PYTHONCRYPTO_SOURCES}

@@ -37,8 +37,6 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            serialport/src/serialport.cpp \
            eventtimer/src/eventtimer.cpp \
            arduino/src/arduino.cpp \
-           arduino/src/canmessage.cpp \
-           arduino/src/candatapacket.cpp \
            prettyprinter/src/prettyprinter.cpp
 
 HEADERS += systemcommand/include/systemcommand.h \
@@ -53,8 +51,6 @@ HEADERS += systemcommand/include/systemcommand.h \
            eventtimer/include/eventtimer.h \
            prettyprinter/include/prettyprinter \
            arduino/include/arduino.h \
-           arduino/include/canmessage.h \
-           arduino/include/candatapacket.h \
            templateobjects/templateobjects.h \
            common/tjlutils.h            
 

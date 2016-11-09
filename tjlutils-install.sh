@@ -109,8 +109,6 @@ else
     rm -f "$ui/canmessage.h"
     rm -f "$ui/candatapacket.h"
     ln -s "$ogt/arduino/include/arduino.h" "$ui/"
-    ln -s "$ogt/arduino/include/canmessage.h" "$ui/"
-    ln -s "$ogt/arduino/include/candatapacket.h" "$ui/"
 
     rm -f "$ui/tjlutils.h"
     ln -s "$ogt/common/tjlutils.h" "$ui/"

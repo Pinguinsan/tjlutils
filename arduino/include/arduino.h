@@ -24,8 +24,6 @@ enum CanEnabledStatus { CAN_RETURN_STATE, CAN_OPERATION_RESULT };
 enum ADThresholdReq { AD_RETURN_STATE, AD_OPERATION_RESULT };
 enum CanMask { CAN_MASK_RETURN_STATE, CAN_MASK_OPERATION_RESULT };
 
-#include "canmessage.h"
-
 class CanMessage;
 class ArduinoUno;
 class ArduinoNano;
@@ -627,6 +625,290 @@ public:
 
 private:
     std::vector<std::string> m_serialResults;
+};
+
+
+class CanDataPacket
+{
+public:
+    CanDataPacket() :
+        m_dataPacket{std::vector<unsigned char>{0, 0, 0, 0, 0, 0, 0, 0}}
+    {
+
+    }
+
+    CanDataPacket(unsigned char first, unsigned char second, 
+                                unsigned char third, unsigned char fourth, 
+                                unsigned char fifth, unsigned char sixth, 
+                                unsigned char seventh, unsigned char eighth) :
+        m_dataPacket{std::vector<unsigned char>{first, second, third, fourth, 
+                                                fifth, sixth, seventh, eighth}}
+    {
+
+    }                                            
+
+    CanDataPacket(const std::vector<unsigned char> &dataPacket) :
+        m_dataPacket(dataPacket)
+    {
+
+    }
+
+    CanDataPacket(const CanDataPacket &dataPacket) :
+        m_dataPacket{dataPacket.m_dataPacket}
+    {
+
+    }
+
+    void setDataPacket(const std::vector<unsigned char> &dataPacket)
+    {
+        this->m_dataPacket = dataPacket;
+    }
+
+    void setDataPacket(unsigned char first, unsigned char second, 
+                                    unsigned char third, unsigned char fourth, 
+                                    unsigned char fifth, unsigned char sixth, 
+                                    unsigned char seventh, unsigned char eighth)
+    {
+        this->m_dataPacket = std::vector<unsigned char>{first, second, third, fourth,
+                                                        fifth, sixth, seventh, eighth};
+    }                         
+
+    bool setNthByte(int index, unsigned char nth)
+    {
+        if ((index >= 0) && (index < 8)) {
+            this->m_dataPacket.at(index) = nth;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    unsigned char nthByte(int index)
+    {
+        return this->m_dataPacket.at(index);
+    }
+
+    void toBasicArray(unsigned char copyArray[8]) const
+    {
+        int i = 0;
+        for (auto &it : this->m_dataPacket) {
+            copyArray[i++] = it;
+        }
+    }
+
+    std::vector<unsigned char> dataPacket() const
+    {
+        return m_dataPacket;
+    }
+
+    CanDataPacket combineDataPackets(const CanDataPacket &first, const CanDataPacket &second)
+    {
+        std::vector<unsigned char> constructorArg;
+        std::vector<unsigned char> firstCopy = first.dataPacket();
+        std::vector<unsigned char> secondCopy = second.dataPacket();
+        std::vector<unsigned char>::const_iterator firstIter = firstCopy.begin();
+        std::vector<unsigned char>::const_iterator secondIter = secondCopy.begin();
+        while (firstIter != firstCopy.end()) {
+            constructorArg.push_back((*firstIter++) | (*secondIter++));
+        }
+        return CanDataPacket(constructorArg);
+    }
+
+    friend bool operator==(const CanDataPacket &lhs, const CanDataPacket &rhs)
+    {
+        if (lhs.m_dataPacket.size() != rhs.m_dataPacket.size()) {
+            return false;
+        }
+        for (int i = 0; i < lhs.m_dataPacket.size(); i++) {
+            if (lhs.m_dataPacket.at(i) != rhs.m_dataPacket.at(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+private:
+    std::vector<unsigned char> m_dataPacket;
+
+};
+
+class CanMessage
+{
+public:
+    CanMessage(uint32_t id, uint8_t frame, uint8_t length, const CanDataPacket &dataPacket) :
+        m_id{id},
+        m_frame{frame},
+        m_length{length},
+        m_dataPacket{dataPacket}
+    {
+
+    }
+
+    CanMessage() :
+        m_id{0},
+        m_frame{0},
+        m_length{0},
+        m_dataPacket{CanDataPacket{0, 0, 0, 0, 0, 0, 0, 0}}
+    {
+
+    }
+
+    void setID(uint32_t id)
+    {
+        this->m_id = id;
+    }
+
+    void setFrame(uint8_t frame)
+    {
+        this->m_frame = frame;
+    }
+
+    void setLength(uint8_t length)
+    {
+        this->m_length = length;
+    }
+
+    void setDataPacket(const CanDataPacket &dataPacket)
+    {
+        this->m_dataPacket = dataPacket;
+    }
+
+    uint32_t id() const
+    {
+        return this->m_id;
+    }
+
+    uint8_t frame() const
+    {
+        return this->m_frame;
+    }
+
+    uint8_t length() const
+    {
+        return this->m_length;
+    }
+
+    unsigned char nthDataPacketByte(int index)
+    {
+        if ((index > 8) || (index < 0)) {
+            throw std::runtime_error(NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING + std::to_string(index));
+        }
+        return this->m_dataPacket.nthByte(index);
+    }
+
+    bool setDataPacketNthByte(int index, unsigned char nth)
+    {
+        return this->m_dataPacket.setNthByte(index, nth);
+    }
+
+    CanDataPacket dataPacket() const
+    {
+        return this->m_dataPacket;
+    }
+
+    std::string toString() const
+    {
+        using namespace GeneralUtilities;
+        if ((this->m_id == 0) &&
+            (this->m_frame == 0) &&
+            (this->m_length == 0) &&
+            (this->m_dataPacket == CanDataPacket{0, 0, 0, 0, 0, 0, 0, 0})) {
+            return "";
+        }
+        std::string returnString{"0x" + toFixedWidth(toHexString(this->m_id), CAN_ID_WIDTH) + ":"};
+        unsigned int i{0};
+        for (auto &it : this->m_dataPacket.dataPacket()) {
+            returnString += "0x" + toFixedWidth(toHexString(it), CAN_BYTE_WIDTH);
+            if (i++ != (this->m_dataPacket.dataPacket().size()-1)) {
+                returnString += ":";
+            }
+        }
+        return returnString;
+    }
+
+    std::string toPrettyString() const
+    {
+        using namespace GeneralUtilities;
+        if ((this->m_id == 0) &&
+            (this->m_frame == 0) &&
+            (this->m_length == 0) &&
+            (this->m_dataPacket == CanDataPacket{0, 0, 0, 0, 0, 0, 0, 0})) {
+            return "";
+        }
+        std::string returnString{"0x" + toFixedWidth(toHexString(this->m_id), CAN_ID_WIDTH) + " : "};
+        unsigned int i{0};
+        for (auto &it : this->m_dataPacket.dataPacket()) {
+            returnString += "0x" + toFixedWidth(toHexString(it), CAN_BYTE_WIDTH);
+            if (i++ != (this->m_dataPacket.dataPacket().size()-1)) {
+                returnString += " : ";
+            }
+        }
+        return returnString;
+    }
+
+    static uint32_t parseCanID(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        return hexStringToUInt(str);
+    }
+
+    static uint8_t parseCanByte(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        return hexStringToUChar(str);
+    }
+
+    static CanMessage parseCanMessage(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        std::vector<std::string> rawMsg{parseToVector(str, ':')};
+        if (rawMsg.size() != CAN_MESSAGE_SIZE) {
+            return CanMessage{};
+        }
+        CanMessage returnMessage;
+        int i{0};
+        returnMessage.setFrame(CAN_FRAME);
+        returnMessage.setLength(CAN_MESSAGE_LENGTH);
+        for (auto &it : rawMsg) {
+            if (i++ == 0) {
+                returnMessage.setID(parseCanID(it));
+            } else {
+                returnMessage.setDataPacketNthByte(i-2, parseCanByte(it));
+            }
+        }
+        return returnMessage;
+    }
+
+    friend bool operator==(const CanMessage &lhs, const CanMessage &rhs)
+    {
+        if (lhs.m_dataPacket.dataPacket().size() != lhs.m_dataPacket.dataPacket().size()) {
+            return false;
+        }
+        for (int i = 0; i < lhs.m_dataPacket.dataPacket().size(); i++) {
+            if (lhs.m_dataPacket.dataPacket().at(i) != rhs.m_dataPacket.dataPacket().at(i)) {
+                return false;
+            }
+        }
+        return ((lhs.m_id == rhs.m_id) &&
+                (lhs.m_frame == rhs.m_frame) &&
+                (lhs.m_length == rhs.m_length));
+    }
+
+    static const int CAN_BYTE_WIDTH;
+    static const int CAN_ID_WIDTH;
+    static const unsigned int CAN_MESSAGE_SIZE;
+    static const unsigned char CAN_FRAME;
+    static const unsigned char CAN_MESSAGE_LENGTH;
+
+
+private:
+    uint32_t m_id;
+    uint8_t m_frame;
+    uint8_t m_length;
+    CanDataPacket m_dataPacket;
+
+    static const char *NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING;
 };
 
 #endif //TJLUTILS_ARDUINO_H
