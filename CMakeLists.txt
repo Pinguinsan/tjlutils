@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.1)
 set (CMAKE_CXX_STANDARD 14)
 project (libraryprojects)
 set (BUILD_SHARED_LIBRARIES)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 IF (CYGWIN OR WIN32)
     set(GCC_ADDITIONAL_COMPILE_FLAGS "")
