@@ -590,8 +590,6 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
         serialPort->openPort();
         delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
     }
-    long long int tempTimeout{serialPort->timeout()};
-    serialPort->setTimeout(Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT);
     serialPort->writeString(stringToSend);
 #if defined(__USE_SERIAL_WRITE_DELAY__)
     delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
@@ -602,7 +600,6 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
     *returnString = serialPort->readStringUntil('}');
-    serialPort->setTimeout(tempTimeout);
     if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);
