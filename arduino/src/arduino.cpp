@@ -2338,7 +2338,6 @@ std::shared_ptr<GPIO> Arduino::gpioPinByPinAlias(const std::string &pinAlias) co
 
 std::shared_ptr<GPIO> Arduino::gpioPinByPinNumber(int pinNumber) const
 {
-
     if (this->m_gpioPins.find(pinNumber) != this->m_gpioPins.end()) {
         return (this->m_gpioPins.find(pinNumber)->second);
     } else {
@@ -2357,7 +2356,6 @@ std::string Arduino::gpioAliasByPinNumber(int number) const
 
 std::pair<IOStatus, bool> Arduino::digitalRead(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return digitalRead(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2367,7 +2365,6 @@ std::pair<IOStatus, bool> Arduino::digitalRead(const std::string &pinAlias)
 
 std::pair<IOStatus, bool> Arduino::digitalWrite(const std::string &pinAlias, bool state)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return digitalWrite(this->m_gpioPinsAlias.find(pinAlias)->first, state);
     } else {
@@ -2377,7 +2374,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(const std::string &pinAlias, boo
 
 std::pair<IOStatus, double> Arduino::analogRead(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return analogRead(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2387,7 +2383,6 @@ std::pair<IOStatus, double> Arduino::analogRead(const std::string &pinAlias)
 
 std::pair<IOStatus, int> Arduino::analogReadRaw(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return analogReadRaw(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2397,7 +2392,6 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(const std::string &pinAlias)
 
 std::pair<IOStatus, double> Arduino::analogWrite(const std::string &pinAlias, double state)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return analogWrite(this->m_gpioPinsAlias.find(pinAlias)->first, state);
     } else {
@@ -2407,7 +2401,6 @@ std::pair<IOStatus, double> Arduino::analogWrite(const std::string &pinAlias, do
 
 std::pair<IOStatus, int> Arduino::analogWriteRaw(const std::string &pinAlias, int state)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return analogWriteRaw(this->m_gpioPinsAlias.find(pinAlias)->first, state);
     } else {
@@ -2417,7 +2410,6 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(const std::string &pinAlias, in
 
 std::pair<IOStatus, bool> Arduino::softDigitalRead(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return softDigitalRead(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2427,7 +2419,6 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(const std::string &pinAlias)
 
 std::pair<IOStatus, double> Arduino::softAnalogRead(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return softAnalogRead(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2437,7 +2428,6 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(const std::string &pinAlias)
 
 std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return softAnalogReadRaw(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2447,7 +2437,6 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const std::string &pinAlias)
 
 std::pair<IOStatus, IOType> Arduino::pinMode(const std::string &pinAlias, IOType ioType)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return pinMode(this->m_gpioPinsAlias.find(pinAlias)->first, ioType);
     } else {
@@ -2457,7 +2446,6 @@ std::pair<IOStatus, IOType> Arduino::pinMode(const std::string &pinAlias, IOType
 
 std::pair<IOStatus, IOType> Arduino::currentPinMode(const std::string &pinAlias)
 {
-
     if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
         return currentPinMode(this->m_gpioPinsAlias.find(pinAlias)->first);
     } else {
@@ -2467,7 +2455,6 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(const std::string &pinAlias)
 
 std::pair<IOStatus, bool> Arduino::digitalRead(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::digitalRead(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2477,7 +2464,6 @@ std::pair<IOStatus, bool> Arduino::digitalRead(const GPIO &gpio)
 
 std::pair<IOStatus, bool> Arduino::digitalWrite(const GPIO &gpio, bool state)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::digitalWrite(gpio.pinNumber(), state, this->m_serialPortIndex);
     } else {
@@ -2487,7 +2473,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(const GPIO &gpio, bool state)
 
 std::pair<IOStatus, double> Arduino::analogRead(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::analogRead(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2497,7 +2482,6 @@ std::pair<IOStatus, double> Arduino::analogRead(const GPIO &gpio)
 
 std::pair<IOStatus, int> Arduino::analogReadRaw(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::analogReadRaw(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2507,7 +2491,6 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(const GPIO &gpio)
 
 std::pair<IOStatus, double> Arduino::analogWrite(const GPIO &gpio, double state)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::analogWrite(gpio.pinNumber(), state, this->m_serialPortIndex);
     } else {
@@ -2517,7 +2500,6 @@ std::pair<IOStatus, double> Arduino::analogWrite(const GPIO &gpio, double state)
 
 std::pair<IOStatus, int> Arduino::analogWriteRaw(const GPIO &gpio, int state)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::analogWriteRaw(gpio.pinNumber(), state, this->m_serialPortIndex);
     } else {
@@ -2527,7 +2509,6 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(const GPIO &gpio, int state)
 
 std::pair<IOStatus, bool> Arduino::softDigitalRead(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::softDigitalRead(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2537,7 +2518,6 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(const GPIO &gpio)
 
 std::pair<IOStatus, double> Arduino::softAnalogRead(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::softAnalogRead(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2547,7 +2527,6 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(const GPIO &gpio)
 
 std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::softAnalogReadRaw(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2557,7 +2536,6 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const GPIO &gpio)
 
 std::pair<IOStatus, IOType> Arduino::pinMode(GPIO &gpio, IOType ioType)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         std::pair<IOStatus, IOType> result{Arduino::pinMode(gpio.pinNumber(), ioType, this->m_serialPortIndex)};
         if (result.first == IOStatus::OPERATION_SUCCESS) {
@@ -2571,7 +2549,6 @@ std::pair<IOStatus, IOType> Arduino::pinMode(GPIO &gpio, IOType ioType)
 
 std::pair<IOStatus, IOType> Arduino::currentPinMode(const GPIO &gpio)
 {
-
     if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
         return Arduino::currentPinMode(gpio.pinNumber(), this->m_serialPortIndex);
     } else {
@@ -2581,7 +2558,6 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(const GPIO &gpio)
 
 std::pair<IOStatus, bool> Arduino::digitalRead(std::shared_ptr<GPIO> gpioPtr)
 {
-
     if (gpioPtr) {
         return digitalRead(*gpioPtr);
     } else {
@@ -2591,7 +2567,6 @@ std::pair<IOStatus, bool> Arduino::digitalRead(std::shared_ptr<GPIO> gpioPtr)
 
 std::pair<IOStatus, bool> Arduino::digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state)
 {
-
     if (gpioPtr) {
         return digitalWrite(*gpioPtr, state);
     } else {
@@ -2601,7 +2576,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(std::shared_ptr<GPIO> gpioPtr, b
 
 std::pair<IOStatus, double> Arduino::analogRead(std::shared_ptr<GPIO> gpioPtr)
 {
-
     if (gpioPtr) {
         return analogRead(*gpioPtr);
     } else {
@@ -2611,7 +2585,6 @@ std::pair<IOStatus, double> Arduino::analogRead(std::shared_ptr<GPIO> gpioPtr)
 
 std::pair<IOStatus, int> Arduino::analogReadRaw(std::shared_ptr<GPIO> gpioPtr)
 {
-
     if (gpioPtr) {
         return analogReadRaw(*gpioPtr);
     } else {
@@ -2621,7 +2594,6 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(std::shared_ptr<GPIO> gpioPtr)
 
 std::pair<IOStatus, double> Arduino::analogWrite(std::shared_ptr<GPIO> gpioPtr, double state)
 {
-
     if (gpioPtr) {
         return analogWrite(*gpioPtr, state);
     } else {
@@ -2661,7 +2633,6 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(std::shared_ptr<GPIO> gpioPt
 
 std::pair<IOStatus, int> Arduino::softAnalogReadRaw(std::shared_ptr<GPIO> gpioPtr)
 {
-
     if (gpioPtr) {
         return softAnalogReadRaw(*gpioPtr);
     } else {
@@ -2671,7 +2642,6 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(std::shared_ptr<GPIO> gpioPt
 
 std::pair<IOStatus, IOType> Arduino::pinMode(std::shared_ptr<GPIO> gpioPtr, IOType ioType)
 {
-
     if (gpioPtr) {
         return pinMode(*gpioPtr, ioType);
     } else {
@@ -2681,7 +2651,6 @@ std::pair<IOStatus, IOType> Arduino::pinMode(std::shared_ptr<GPIO> gpioPtr, IOTy
 
 std::pair<IOStatus, IOType> Arduino::currentPinMode(std::shared_ptr<GPIO> gpioPtr)
 {
-
     if (gpioPtr) {
         return currentPinMode(*gpioPtr);
     } else {
