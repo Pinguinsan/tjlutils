@@ -518,7 +518,7 @@ void storeSystemStateRequest()
         std::cout << stringToLog << ';';
         eepromAddress += EEPROM_ADVANCE;
     }
-    std::cout << STORE_SYSTEM_STATE_END_HEADER;
+    std::cout << STORE_SYSTEM_STATE_END_HEADER << '}';
 }
 
 void loadSystemStateRequest()
@@ -586,7 +586,7 @@ void loadSystemStateRequest()
         std::cout << stringToLog << ';';
         eepromAddress += EEPROM_ADVANCE;
     }
-    std::cout << LOAD_SYSTEM_STATE_END_HEADER;
+    std::cout << LOAD_SYSTEM_STATE_END_HEADER << '}';
 }
 
 void changeAToDThresholdRequest(const std::string &str)
