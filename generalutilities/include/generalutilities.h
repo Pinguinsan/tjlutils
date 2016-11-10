@@ -112,8 +112,10 @@ namespace GeneralUtilities
     bool endsWithNotIncludingWhitespace(const std::string &stringToCheck, char matchChar);
     bool startsWith(const std::string &stringToCheck, const std::string &matchString);
     bool startsWith(const std::string &stringToCheck, char matchChar);
+    bool startsWith(const std::string &str, const char *compare);
     bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, const std::string &matchString);
     bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, char matchChar);
+    bool startsWithNotIncludingWhitespace(const std::string &str, const char *compare);
     void logString(const std::string &stringToLog);
     void logString(const std::string &stringToLog, std::string fileName);
     std::string toString(const std::string &convert);

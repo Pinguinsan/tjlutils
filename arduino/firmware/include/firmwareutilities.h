@@ -53,6 +53,7 @@ namespace FirmwareUtilities
     std::string tQuoted(char convert);
     bool startsWith(const std::string &str, const std::string &compare);
     bool startsWith(const std::string &str, char compare);
+    bool startsWith(const std::string &str, const char *compare);
     bool endsWith(const std::string &str, const std::string &compare);
     bool endsWith(const std::string &str, char compare);
     std::vector<std::string> parseToVector(const std::string &thingToParse, char delimiter);

@@ -188,18 +188,17 @@ namespace FirmwareUtilities
 
     bool startsWith(const std::string &str, const std::string &compare)
     {
-        if (str.length() < compare.length()) {
-            return false;
-        }
-        return (str.substr(0, compare.length()) == compare);
+        return (str.find(compare) == 0);
+    }
+
+    bool startsWith(const std::string &str, const char *compare)
+    {
+        return startsWith(str, static_cast<std::string>(compare));
     }
 
     bool startsWith(const std::string &str, char compare)
     {
-        if (str.length() == 0) {
-            return false;
-        }
-        return (str[0] == compare);
+        return startsWith(str, std::string{1, compare});
     }
 
     bool endsWith(const std::string &str, const std::string &compare)
@@ -216,10 +215,7 @@ namespace FirmwareUtilities
 
     bool endsWith(const std::string &str, char compare)
     {
-        if (str.length() == 0) {
-            return false;
-        }
-        return (str[0] == compare);
+        return endsWith(str, std::string{1,compare});
     }
 
     std::vector<std::string> parseToVector(const std::string &thingToParse, char delimiter)

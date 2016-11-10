@@ -491,13 +491,18 @@ namespace GeneralUtilities
 
     bool startsWith(const std::string &stringToCheck, const std::string &matchString)
     {
-       return (stringToCheck.substr(0,matchString.length()) == matchString);
+       return (stringToCheck.find(matchString) == 0);
     }
 
     bool startsWith(const std::string &stringToCheck, char matchChar)
     {
-       return startsWith(stringToCheck, std::string(1, matchChar));
+       return startsWith(stringToCheck, std::string{1, matchChar});
     } 
+
+    bool startsWith(const std::string &str, const char *compare)
+    {
+        return startsWith(str, static_cast<std::string>(compare));
+    }
 
     bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, const std::string &matchString)
     {
@@ -508,7 +513,12 @@ namespace GeneralUtilities
 
     bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, char matchChar)
     {
-        return startsWithNotIncludingWhitespace(stringToCheck, std::string(1, matchChar));
+        return startsWithNotIncludingWhitespace(stringToCheck, std::string{1, matchChar});
+    }
+
+    bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, const char *compare)
+    {
+        return startsWithNotIncludingWhitespace(stringToCheck, static_cast<std::string>(compare));
     }
 
     /*Logging simple strings to stdout or to a file. On file opening failure, the string will be output to stdout*/

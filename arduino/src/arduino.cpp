@@ -260,6 +260,7 @@ std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serial
             }
         }
     }
+    delayMilliseconds(50);
     std::pair<IOStatus, std::string> firmwareVersion;
     for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
         try {
@@ -277,7 +278,6 @@ std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serial
             }
         }
     }
-
     std::pair<IOStatus, int> analogToDigitalThreshold;
     for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
         try {
@@ -607,6 +607,7 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
     *returnString = serialPort->readStringUntil('}');
+    std::cout << "returnString = " << *returnString << std::endl;
     if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);
@@ -736,7 +737,7 @@ std::pair<IOStatus, int> Arduino::getAnalogToDigitalThreshold(std::shared_ptr<Se
     std::string stringToSend{static_cast<std::string>(Arduino::CURRENT_A_TO_D_THRESHOLD_HEADER) + '}'};
     for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
         std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CURRENT_A_TO_D_THRESHOLD_HEADER, serialPort)};
-        if (states.size() != Arduino::CAN_BUS_ENABLED_RETURN_SIZE) {
+        if (states.size() != Arduino::A_TO_D_THRESHOLD_RETURN_SIZE) {
             if (i+1 == Arduino::IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {

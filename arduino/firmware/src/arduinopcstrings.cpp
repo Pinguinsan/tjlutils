@@ -55,6 +55,10 @@ namespace ArduinoPCStrings
 #endif
 
 #if defined(__HAVE_CAN_BUS__)
+    const char *CLEAR_NEGATIVE_CAN_MASKS_HEADER{"{clearncanmasks"};
+    const char *CURRENT_NEGATIVE_CAN_MASKS_HEADER{"{curncanmasks"};
+    const char *CURRENT_POSITIVE_CAN_MASKS_HEADER{"{curpcanmasks"};
+    const char *CLEAR_ALL_CAN_MASKS_HEADER{"{clearallcanmasks"};
     const char *CAN_INIT_HEADER{"{caninit"};
     const char *CAN_READ_HEADER{"{canread"};
     const char *CAN_WRITE_HEADER{"{canwrite"};
@@ -64,60 +68,65 @@ namespace ArduinoPCStrings
     const char *CLEAR_CAN_MESSAGE_BY_ID_HEADER{"{clearcanmsgid"};
     const char *CURRENT_CAN_MESSAGES_HEADER{"{curcanmsgs"};
     const char *CURRENT_CAN_MESSAGE_BY_ID_HEADER{"{curcanmsgid}"};
-    const char *ADD_POSITIVE_CAN_MASK_HEADER{"{addpcanmask"};
-    const char *REMOVE_POSITIVE_CAN_MASK_HEADER{"{rempcanmask"};
     const char *CLEAR_POSITIVE_CAN_MASKS_HEADER{"{clearpcanmasks"};
+    
+    const char *ADD_POSITIVE_CAN_MASK_HEADER{"{addpcanmask"};
     const char *ADD_NEGATIVE_CAN_MASK_HEADER{"{addncanmask"};
-    const char *REMOVE_NEGATIVE_CAN_MASK_HEADER{"{remncanmask"};
-    const char *CLEAR_NEGATIVE_CAN_MASKS_HEADER{"{clearncanmasks"};
     const char *ALL_CURRENT_CAN_MASKS_HEADER{"{allcanmasks"};
-    const char *CURRENT_NEGATIVE_CAN_MASKS_HEADER{"{curncanmasks"};
-    const char *CURRENT_POSITIVE_CAN_MASKS_HEADER{"{curpcanmasks"};
-    const char *CLEAR_ALL_CAN_MASKS_HEADER{"{clearallcanmasks"};
+    
+    const char *REMOVE_POSITIVE_CAN_MASK_HEADER{"{rempcanmask"};
+    const char *REMOVE_NEGATIVE_CAN_MASK_HEADER{"{remncanmask"};
 #endif
 
+    const char *ARDUINO_TYPE_HEADER{"{ardtype"};
+    const char *ANALOG_READ_HEADER{"{aread"};
+    const char *ANALOG_WRITE_HEADER{"{awrite"};
+    const char *CHANGE_A_TO_D_THRESHOLD_HEADER{"{atodchange"};
+    const char *CURRENT_A_TO_D_THRESHOLD_HEADER{"{atodthresh"};
+    const char *ADD_SHORT_WATCHDOG_HEADER{"{addshortwd"};
+    
+    const char *CAN_BUS_ENABLED_HEADER{"{canbus"};
+    
+    const char *DIGITAL_READ_HEADER{"{dread"};
+    const char *DIGITAL_WRITE_HEADER{"{dwrite"};
+    
+    const char *HEARTBEAT_HEADER{"{heartbeat"};
+    
+    const char *IO_REPORT_HEADER{"{ioreport"};
+    
+    const char *LOAD_SYSTEM_STATE_HEADER{"{loadstate"};
+    
+    const char *PIN_TYPE_HEADER{"{ptype"};
+    const char *PIN_TYPE_CHANGE_HEADER{"{ptchange"};
+    
+    const char *REMOVE_SHORT_WATCHDOG_HEADER{"{remshortwd"};
+    
+    const char *SOFT_DIGITAL_READ_HEADER{"{sdread"};
+    const char *SOFT_ANALOG_READ_HEADER{"{saread"};
+    const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
+
+    const char *FIRMWARE_VERSION_HEADER{"{version"};
+    
+    const char *SHORT_EVENT_DETECTED_HEADER{"{shortevent"};
+    const char *STORE_SYSTEM_STATE_END_HEADER{"{storestateend"};
     const char *CHAR_ARRAY_TERMINATOR{"fish"};
     const char *DIGITAL_STATE_HIGH_IDENTIFIERS[]{"1", "high", "true", "on", "fish"};
     const char *DIGITAL_STATE_LOW_IDENTIFIERS[]{"0", "low", "false", "off", "fish"};
     const char *VALID_PIN_TYPE_IDENTIFIERS[]{"dout", "din", "aout", "ain", "dinpup", "fish"};
+    const char *IO_REPORT_END_HEADER{"{ioreportend"};
+    const char *LOAD_SYSTEM_STATE_END_HEADER{"{loadstateend"};
     const char *DIGITAL_INPUT_IDENTIFIER{"din"};
     const char *DIGITAL_OUTPUT_IDENTIFIER{"dout"};
+    const char *DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
     const char *ANALOG_INPUT_IDENTIFIER{"ain"};
     const char *ANALOG_OUTPUT_IDENTIFIER{"aout"};
-    const char *DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
+    const char *FAILSAFE_INTERIM_HEADER{":failsafe:"};
+    const char *INVALID_LENGTH_EXCEEDED_HEADER{"{invalid:length_exceeded}"};
+    const char *UNSPECIFIED_IO_TYPE_IDENTIFIER{"unspecified"};
+    const char *CAN_BUS_ENABLED_STRING{"1"};
     const char *DIGITAL_STATE_HIGH_STRING{"1"};
     const char *DIGITAL_STATE_LOW_STRING{"0"};
     const char *INVALID_HEADER{"{invalid"};
-    const char *DIGITAL_READ_HEADER{"{dread"};
-    const char *ANALOG_READ_HEADER{"{aread"};
-    const char *DIGITAL_WRITE_HEADER{"{dwrite"};
-    const char *ANALOG_WRITE_HEADER{"{awrite"};
-    const char *SOFT_DIGITAL_READ_HEADER{"{sdread"};
-    const char *SOFT_ANALOG_READ_HEADER{"{saread"};
-    const char *PIN_TYPE_HEADER{"{ptype"};
-    const char *PIN_TYPE_CHANGE_HEADER{"{ptchange"};
-    const char *ARDUINO_TYPE_HEADER{"{ardtype"};
-    const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
-    const char *LOAD_SYSTEM_STATE_HEADER{"{loadstate"};
-    const char *STORE_SYSTEM_STATE_END_HEADER{"{storestateend"};
-    const char *LOAD_SYSTEM_STATE_END_HEADER{"{loadstateend"};
-    
-    const char *IO_REPORT_HEADER{"{ioreport"};
-    const char *IO_REPORT_END_HEADER{"{ioreportend"};
-    const char *CHANGE_A_TO_D_THRESHOLD_HEADER{"{atodchange"};
-    const char *CURRENT_A_TO_D_THRESHOLD_HEADER{"{atodthresh"};
-
-    const char *ADD_SHORT_WATCHDOG_HEADER{"{addshortwd"};
-    const char *FAILSAFE_INTERIM_HEADER{":failsafe:"};
-    const char *REMOVE_SHORT_WATCHDOG_HEADER{"{remshortwd"};
-    const char *SHORT_EVENT_DETECTED_HEADER{"{shortevent"};
-
-    const char *CAN_BUS_ENABLED_HEADER{"{canbus"};
-    const char *FIRMWARE_VERSION_HEADER{"{version"};
-    const char *INVALID_LENGTH_EXCEEDED_HEADER{"{invalid:length_exceeded}"};
-    const char *UNSPECIFIED_IO_TYPE_IDENTIFIER{"unspecified"};
-    const char *HEARTBEAT_HEADER{"{heartbeat"};
-    const char *CAN_BUS_ENABLED_STRING{"1"};
     const char *CAN_BUS_DISABLED_STRING{"0"};
     const char *FIRMWARE_VERSION{"0.50"};
     const char *EMPTY_STRING{""};

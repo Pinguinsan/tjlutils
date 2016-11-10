@@ -22,7 +22,7 @@ const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
-const int SerialPort::DEFAULT_TIMEOUT{20};
+const int SerialPort::DEFAULT_TIMEOUT{10};
 const int SerialPort::DEFAULT_RETRY_COUNT{3};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
