@@ -607,7 +607,6 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
     *returnString = serialPort->readStringUntil('}');
-    std::cout << "returnString = " << *returnString << std::endl;
     if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);
