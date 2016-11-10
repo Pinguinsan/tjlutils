@@ -47,6 +47,7 @@ static const int STATE_FAILURE{-1};
 static const int OPERATION_SUCCESS{1};
 static const int OPERATION_KIND_OF_SUCCESS{2};
 static const int PIN_PLACEHOLDER{1};
+static const int EEPROM_ADVANCE{7};
 static const bool SOFT{true};
 void printString(const std::string &str) { std::cout << str; }
 void printStringWithNewline(const std::string &str) { std::cout << str << std::endl; }
@@ -507,7 +508,7 @@ void storeSystemStateRequest()
             for (int i = EEPROMWriteOffset::STATE0; i < EEPROMWriteOffset::STATE4 + 1; i++) {
                 EEPROM.write(eepromAddress + i, rawState.at(i-2));
                 stringToLog += toString(static_cast<int>(rawState.at(i-2)));
-                if ((i + 1) != EEPROMWriteOffset::STATE4) {
+                if ((i + 1) != (EEPROMWriteOffset::STATE4+1)) {
                     stringToLog += ':';
                 } else {
                     stringToLog += '}';
@@ -515,6 +516,7 @@ void storeSystemStateRequest()
             }
         }
         std::cout << stringToLog << ';';
+        eepromAddress += EEPROM_ADVANCE;
     }
     std::cout << STORE_SYSTEM_STATE_END_HEADER;
 }
@@ -555,7 +557,7 @@ void loadSystemStateRequest()
                 stringToLog += getIOTypeString(oldIOType) + "->" + getIOTypeString(newIOType);
             }
         } else {
-            stringToLog += getIOTypeString(oldIOType);
+            stringToLog += getIOTypeString(oldIOType) + ':';
         }
 
         if (newIOType == IOType::DIGITAL_OUTPUT) {
@@ -582,6 +584,7 @@ void loadSystemStateRequest()
         }
         stringToLog += '}';
         std::cout << stringToLog << ';';
+        eepromAddress += EEPROM_ADVANCE;
     }
     std::cout << LOAD_SYSTEM_STATE_END_HEADER;
 }
