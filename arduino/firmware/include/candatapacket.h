@@ -18,7 +18,6 @@ public:
                   unsigned char seventh, unsigned char eighth);
     CanDataPacket(const CanDataPacket &dataPacket);                  
     void setDataPacket(const std::vector<unsigned char> &dataPacket);
-
     void setDataPacket(unsigned char first, unsigned char second, 
                        unsigned char third, unsigned char fourth, 
                        unsigned char fifth, unsigned char sixth, 
@@ -40,9 +39,6 @@ public:
         }
         return true;
     }
-
-
-
 
     static CanDataPacket combineDataPackets(const CanDataPacket &first, const CanDataPacket &second);
 

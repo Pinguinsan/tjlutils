@@ -23,7 +23,7 @@ const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
 const int SerialPort::DEFAULT_TIMEOUT{10};
-const int SerialPort::DEFAULT_RETRY_COUNT{3};
+const int SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
@@ -767,9 +767,6 @@ void SerialPort::enableDTR()
     EscapeCommFunction(this->m_serialPort[this->m_portNumber], SETDTR);
 #else
     int status{0};
-    if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMGET, &status) == -1) {
-        std::cout << "WARNING: Unable to get port status while enabling DTR for serial port " << this->m_portName << std::endl;
-    }
     status |= TIOCM_DTR;    /* turn on DTR */
     if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMSET, &status) == -1) {
         std::cout << "WARNING: Unable to set port status while enabling DTR for serial port " << this->m_portName << std::endl;
@@ -783,9 +780,6 @@ void SerialPort::disableDTR()
     EscapeCommFunction(this->m_serialPort[this->m_portNumber], CLRDTR);
 #else
     int status{0};
-    if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMGET, &status) == -1) {
-        std::cout << "WARNING: Unable to get port status while disabling DTR for serial port " << this->m_portName << std::endl;
-    }
     status &= ~TIOCM_DTR;    /* turn off DTR */
     if(ioctl(this->m_serialPort[this->m_portNumber], TIOCMSET, &status) == -1) {
         std::cout << "WARNING: Unable to set port status while disabling DTR for serial port " << this->m_portName << std::endl;
@@ -1074,8 +1068,8 @@ int SerialPort::retryCount() const
 }
 
 void SerialPort::setTimeout(long long int timeout) {
-    if (timeout < 1) {
-        throw std::runtime_error("ERROR: Serial timeout cannot be negative (" + std::to_string(timeout) + " < 0");
+    if (timeout < 0) {
+        throw std::runtime_error("ERROR: Serial timeout cannot be negative (" + std::to_string(timeout) + " < 0)");
     } else {
         this->m_timeout = timeout;
     }
@@ -1083,8 +1077,8 @@ void SerialPort::setTimeout(long long int timeout) {
 
 void SerialPort::setRetryCount(int retryCount)
 {
-    if (retryCount < 1) {
-        throw std::runtime_error("ERROR: Serial retry count cannot be negative (" + std::to_string(retryCount) + " < 0");
+    if (retryCount < 0) {
+        throw std::runtime_error("ERROR: Serial retry count cannot be negative (" + std::to_string(retryCount) + " < 0)");
     } else {
         this->m_retryCount = retryCount;
     }

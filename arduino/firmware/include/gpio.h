@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "firmwareutilities.h"
+#include "fastio.h"
 
 #ifndef HIGH
     #define HIGH true
