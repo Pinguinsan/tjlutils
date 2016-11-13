@@ -182,7 +182,6 @@ const double Arduino::SERIAL_TIMEOUT{1000};
 const int Arduino::BLUETOOTH_RETRY_COUNT{10};
 const double Arduino::BOOTLOADER_BOOT_TIME{2000};
 const double Arduino::BLUETOOTH_SERIAL_SEND_DELAY{100};
-const int Arduino::IO_TRY_COUNT{3};
 const int Arduino::ANALOG_MAX{1023};
 const double Arduino::VOLTAGE_MAX{5.0};
 const double Arduino::ANALOG_TO_VOLTAGE_SCALE_FACTOR{0.0049};
@@ -218,6 +217,8 @@ const char *Arduino::CAN_CLEAR_MESSAGE_HEADER{"{canmsgclear"};
 std::vector<ProtectedSerialPort> Arduino::s_serialPorts;
 unsigned int Arduino::s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{3};
 double Arduino::bluetoothSendDelayMultiplier{Arduino::DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
+
+const int Arduino::IO_TRY_COUNT{1};
 
 const int CanMessage::CAN_BYTE_WIDTH{2};
 const int CanMessage::CAN_ID_WIDTH{3};
@@ -597,7 +598,12 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
         serialPort->openPort();
         delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
     }
+    long long int tempTimeout{serialPort->timeout()};
+    serialPort->setTimeout(100);
+
+    serialPort->flushRXTX();
     serialPort->writeString(stringToSend);
+    serialPort->flushTX();
 #if defined(__USE_SERIAL_WRITE_DELAY__)
     delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
 #else
@@ -607,6 +613,7 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
     *returnString = serialPort->readStringUntil('}');
+    serialPort->setTimeout(tempTimeout);
     std::cout << "returnString = " << *returnString << std::endl;
     if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);

@@ -840,6 +840,8 @@ void pinTypeRequest(const std::string &str)
 
 void pinTypeChangeRequest(const std::string &str)
 {   
+    std::cout << "str = " << str;
+    return;
     if (str.length() == 0) {
         printResult(PIN_TYPE_CHANGE_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
