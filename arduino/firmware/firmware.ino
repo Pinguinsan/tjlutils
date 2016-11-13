@@ -78,6 +78,17 @@ enum EEPROMWriteOffset { PIN = 0,
 
 void handleSerialString(const std::string &str);
 void handleSerialString(const char *str);
+void handleAPrefixedString(const std::string &str);
+void handleCPrefixedString(const std::string &str);
+void handleDPrefixedString(const std::string &str);
+void handleHPrefixedString(const std::string &str);
+void handleIPrefixedString(const std::string &str);
+void handleLPrefixedString(const std::string &str);
+void handlePPrefixedString(const std::string &str);
+void handleRPrefixedString(const std::string &str);
+void handleSPrefixedString(const std::string &str);
+void handleVPrefixedString(const std::string &str);
+
 void digitalReadRequest(const std::string &str, bool soft = false);
 void digitalWriteRequest(const std::string &str);
 void analogReadRequest(const std::string &str);
@@ -288,24 +299,38 @@ void handleSerialString(const char *str)
 
 void handleSerialString(const std::string &str)
 {
-    if (str == "") {
+    if (str.length() == 0) {
         return;
     } else if (isWhitespace(str)) {
         return;
+    } else if (startsWith(str, "{a")) {
+        handleAPrefixedString(str);
+    } else if (startsWith(str, "{c")) {
+        handleCPrefixedString(str);
+    } else if (startsWith(str, "{d")) {
+        handleDPrefixedString(str);
+    } else if (startsWith(str, "{h")) {
+        handleHPrefixedString(str);
+    } else if (startsWith(str, "{i")) {
+        handleIPrefixedString(str);
+    } else if (startsWith(str, "{l")) {
+        handleLPrefixedString(str);
+    } else if (startsWith(str, "{p")) {
+        handlePPrefixedString(str);
+    } else if (startsWith(str, "{r")) {
+        handleRPrefixedString(str);
+    } else if (startsWith(str, "{s")) {
+        handleSPrefixedString(str);
+    } else if (startsWith(str, "{v")) {
+        handleVPrefixedString(str);
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
     }
-    if (startsWith(str, DIGITAL_READ_HEADER)) {
-        if (checkValidRequestString(DIGITAL_READ_HEADER, str)) {
-            digitalReadRequest(str.substr(static_cast<std::string>(DIGITAL_READ_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, DIGITAL_WRITE_HEADER)) {
-        if (checkValidRequestString(DIGITAL_WRITE_HEADER, str)) {
-            digitalWriteRequest(str.substr(static_cast<std::string>(DIGITAL_WRITE_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, ANALOG_READ_HEADER)) {
+}
+
+void handleAPrefixedString(const std::string &str)
+{
+    if (startsWith(str, ANALOG_READ_HEADER)) {
         if (checkValidRequestString(ANALOG_READ_HEADER, str)) {
             analogReadRequest(str.substr(static_cast<std::string>(ANALOG_READ_HEADER).length()+1));
         } else {
@@ -317,27 +342,9 @@ void handleSerialString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    } else if (startsWith(str, PIN_TYPE_HEADER)) {
-        if (checkValidRequestString(PIN_TYPE_HEADER, str)) {
-            pinTypeRequest(str.substr(static_cast<std::string>(PIN_TYPE_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, PIN_TYPE_CHANGE_HEADER)) {
-        if (checkValidRequestString(PIN_TYPE_CHANGE_HEADER, str)) {
-            pinTypeChangeRequest(str.substr(static_cast<std::string>(PIN_TYPE_CHANGE_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, SOFT_DIGITAL_READ_HEADER)) {
-        if (checkValidRequestString(SOFT_DIGITAL_READ_HEADER, str)) {
-            digitalReadRequest(str.substr(static_cast<std::string>(SOFT_DIGITAL_READ_HEADER).length()+1), SOFT);
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, SOFT_ANALOG_READ_HEADER)) {
-        if (checkValidRequestString(SOFT_ANALOG_READ_HEADER, str)) {
-            softAnalogReadRequest(str.substr(static_cast<std::string>(SOFT_ANALOG_READ_HEADER).length()+1));
+    } else if (startsWith(str, CHANGE_A_TO_D_THRESHOLD_HEADER)) {
+        if (checkValidRequestString(CHANGE_A_TO_D_THRESHOLD_HEADER, str)) {
+            changeAToDThresholdRequest(str.substr(static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER).length()+1));
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
@@ -347,34 +354,35 @@ void handleSerialString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    } else if (startsWith(str, REMOVE_SHORT_WATCHDOG_HEADER)) {
-        if (checkValidRequestString(REMOVE_SHORT_WATCHDOG_HEADER, str)) {
-            removeShortWatchdogRequest(str.substr(static_cast<std::string>(REMOVE_SHORT_WATCHDOG_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, CHANGE_A_TO_D_THRESHOLD_HEADER)) {
-        if (checkValidRequestString(CHANGE_A_TO_D_THRESHOLD_HEADER, str)) {
-            changeAToDThresholdRequest(str.substr(static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
     } else if (startsWith(str, CURRENT_A_TO_D_THRESHOLD_HEADER)) {
         currentAToDThresholdRequest();
-    } else if (startsWith(str, IO_REPORT_HEADER)) {
-        ioReportRequest();
     } else if (startsWith(str, ARDUINO_TYPE_HEADER)) {
         arduinoTypeRequest();
-    } else if (startsWith(str, CAN_BUS_ENABLED_HEADER)) {
-        canBusEnabledRequest();
-    } else if (startsWith(str, FIRMWARE_VERSION_HEADER)) {
-        firmwareVersionRequest();
-    } else if (startsWith(str, STORE_SYSTEM_STATE_HEADER)) {
-        storeSystemStateRequest();
-    } else if (startsWith(str, LOAD_SYSTEM_STATE_HEADER)) {
-        loadSystemStateRequest();
-    } else if (startsWith(str, HEARTBEAT_HEADER)) {
-        heartbeatRequest();
+#if defined(__HAVE_CAN_BUS__)
+    } else if (startsWith(str, ADD_POSITIVE_CAN_MASK_HEADER)) {
+        if (checkValidRequestString(ADD_POSITIVE_CAN_MASK_HEADER, str)) {
+            addPositiveCanMaskRequest(str.substr(static_cast<std::string>(ADD_POSITIVE_CAN_MASK_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, ADD_NEGATIVE_CAN_MASK_HEADER)) {
+        if (checkValidRequestString(ADD_NEGATIVE_CAN_MASK_HEADER, str)) {
+            addNegativeCanMaskRequest(str.substr(static_cast<std::string>(ADD_NEGATIVE_CAN_MASK_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, ALL_CURRENT_CAN_MASKS_HEADER)) {
+        allCurrentCanMasksRequest();
+#endif
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleCPrefixedString(const std::string &str)
+{
+    if (startsWith(str, CAN_BUS_ENABLED_HEADER)) {
+        canBusEnabledRequest(); 
 #if defined(__HAVE_CAN_BUS__)
     } else if (startsWith(str, CAN_INIT_HEADER)) {
         canInitRequest();
@@ -398,31 +406,7 @@ void handleSerialString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    } else if (startsWith(str, ADD_POSITIVE_CAN_MASK_HEADER)) {
-        if (checkValidRequestString(ADD_POSITIVE_CAN_MASK_HEADER, str)) {
-            addPositiveCanMaskRequest(str.substr(static_cast<std::string>(ADD_POSITIVE_CAN_MASK_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, REMOVE_POSITIVE_CAN_MASK_HEADER)) {
-        if (checkValidRequestString(REMOVE_POSITIVE_CAN_MASK_HEADER, str)) {
-            removePositiveCanMaskRequest(str.substr(static_cast<std::string>(REMOVE_POSITIVE_CAN_MASK_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, ADD_NEGATIVE_CAN_MASK_HEADER)) {
-        if (checkValidRequestString(ADD_NEGATIVE_CAN_MASK_HEADER, str)) {
-            addNegativeCanMaskRequest(str.substr(static_cast<std::string>(ADD_NEGATIVE_CAN_MASK_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, REMOVE_NEGATIVE_CAN_MASK_HEADER)) {
-        if (checkValidRequestString(REMOVE_NEGATIVE_CAN_MASK_HEADER, str)) {
-            removeNegativeCanMaskRequest(str.substr(static_cast<std::string>(REMOVE_NEGATIVE_CAN_MASK_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    }  else if (startsWith(str, CLEAR_CAN_MESSAGE_BY_ID_HEADER)) {
+    } else if (startsWith(str, CLEAR_CAN_MESSAGE_BY_ID_HEADER)) {
         if (checkValidRequestString(CLEAR_CAN_MESSAGE_BY_ID_HEADER, str)) {
             clearCurrentMessageByIdRequest(str.substr(static_cast<std::string>(CLEAR_CAN_MESSAGE_BY_ID_HEADER).length()+1));
         } else {
@@ -433,7 +417,7 @@ void handleSerialString(const std::string &str)
             currentCachedCanMessageByIdRequest(str.substr(static_cast<std::string>(CURRENT_CAN_MESSAGE_BY_ID_HEADER).length()+1));
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }   
+        }
     } else if (startsWith(str, CURRENT_CAN_MESSAGES_HEADER)) {
         currentCachedCanMessagesRequest();
     } else if (startsWith(str, CLEAR_CAN_MESSAGES_HEADER)) {
@@ -442,15 +426,135 @@ void handleSerialString(const std::string &str)
         currentPositiveCanMasksRequest();
     } else if (startsWith(str, CURRENT_NEGATIVE_CAN_MASKS_HEADER)) {
         currentNegativeCanMasksRequest();
-    } else if (startsWith(str, ALL_CURRENT_CAN_MASKS_HEADER)) {
-        allCurrentCanMasksRequest();
-    }  else if (startsWith(str, CLEAR_POSITIVE_CAN_MASKS_HEADER)) {
+    } else if (startsWith(str, CLEAR_POSITIVE_CAN_MASKS_HEADER)) {
         clearPositiveCanMasksRequest();
     } else if (startsWith(str, CLEAR_NEGATIVE_CAN_MASKS_HEADER)) {
         clearNegativeCanMasksRequest();
     } else if (startsWith(str, CLEAR_ALL_CAN_MASKS_HEADER)) {
         clearAllCanMasksRequest();
 #endif
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleDPrefixedString(const std::string &str)
+{
+    if (startsWith(str, DIGITAL_READ_HEADER)) {
+        if (checkValidRequestString(DIGITAL_READ_HEADER, str)) {
+            digitalReadRequest(str.substr(static_cast<std::string>(DIGITAL_READ_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, DIGITAL_WRITE_HEADER)) {
+        if (checkValidRequestString(DIGITAL_WRITE_HEADER, str)) {
+            digitalWriteRequest(str.substr(static_cast<std::string>(DIGITAL_WRITE_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleHPrefixedString(const std::string &str)
+{
+    if (startsWith(str, HEARTBEAT_HEADER)) {
+        heartbeatRequest();
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleIPrefixedString(const std::string &str)
+{
+    if (startsWith(str, IO_REPORT_HEADER)) {
+        ioReportRequest();
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleLPrefixedString(const std::string &str)
+{
+    if (startsWith(str, LOAD_SYSTEM_STATE_HEADER)) {
+        loadSystemStateRequest();
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handlePPrefixedString(const std::string &str)
+{
+    if (startsWith(str, PIN_TYPE_HEADER)) {
+        if (checkValidRequestString(PIN_TYPE_HEADER, str)) {
+            pinTypeRequest(str.substr(static_cast<std::string>(PIN_TYPE_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, PIN_TYPE_CHANGE_HEADER)) {
+        if (checkValidRequestString(PIN_TYPE_CHANGE_HEADER, str)) {
+            pinTypeChangeRequest(str.substr(static_cast<std::string>(PIN_TYPE_CHANGE_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleRPrefixedString(const std::string &str)
+{
+    if (startsWith(str, REMOVE_SHORT_WATCHDOG_HEADER)) {
+        if (checkValidRequestString(REMOVE_SHORT_WATCHDOG_HEADER, str)) {
+            removeShortWatchdogRequest(str.substr(static_cast<std::string>(REMOVE_SHORT_WATCHDOG_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+#if defined(__HAVE_CAN_BUS__)
+    } else if (startsWith(str, REMOVE_NEGATIVE_CAN_MASK_HEADER)) {
+        if (checkValidRequestString(REMOVE_NEGATIVE_CAN_MASK_HEADER, str)) {
+            removeNegativeCanMaskRequest(str.substr(static_cast<std::string>(REMOVE_NEGATIVE_CAN_MASK_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, REMOVE_POSITIVE_CAN_MASK_HEADER)) {
+        if (checkValidRequestString(REMOVE_POSITIVE_CAN_MASK_HEADER, str)) {
+            removePositiveCanMaskRequest(str.substr(static_cast<std::string>(REMOVE_POSITIVE_CAN_MASK_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+#endif
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleSPrefixedString(const std::string &str)
+{
+    if (startsWith(str, SOFT_DIGITAL_READ_HEADER)) {
+        if (checkValidRequestString(SOFT_DIGITAL_READ_HEADER, str)) {
+            digitalReadRequest(str.substr(static_cast<std::string>(SOFT_DIGITAL_READ_HEADER).length()+1), SOFT);
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, SOFT_ANALOG_READ_HEADER)) {
+        if (checkValidRequestString(SOFT_ANALOG_READ_HEADER, str)) {
+            softAnalogReadRequest(str.substr(static_cast<std::string>(SOFT_ANALOG_READ_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, STORE_SYSTEM_STATE_HEADER)) {
+        storeSystemStateRequest();
+    } else {
+        printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
+    }
+}
+
+void handleVPrefixedString(const std::string &str)
+{
+    if (startsWith(str, FIRMWARE_VERSION_HEADER)) {
+        firmwareVersionRequest();
     } else {
         printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
     }
