@@ -205,7 +205,7 @@ const unsigned int Arduino::CAN_READ_BLANK_RETURN_SIZE{1};
 const unsigned int Arduino::CAN_INIT_RETURN_SIZE{1};
 const unsigned int Arduino::CAN_ID_WIDTH{3};
 const unsigned int Arduino::CAN_BYTE_WIDTH{2};
-const unsigned int Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT{250};
+const unsigned int Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT{100};
 const unsigned int Arduino::SERIAL_REPORT_OVERALL_TIME_LIMIT{550};
 
 const char *Arduino::CAN_INIT_HEADER{"{caninit"};
@@ -599,7 +599,7 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
         delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
     }
     long long int tempTimeout{serialPort->timeout()};
-    serialPort->setTimeout(100);
+    serialPort->setTimeout(Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT);
 
     serialPort->flushRXTX();
     serialPort->writeString(stringToSend);
