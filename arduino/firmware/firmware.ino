@@ -134,10 +134,10 @@ bool isValidAnalogInputPin(int pinNumber);
 int parseAnalogPin(const std::string &str);
 int parseToState(const std::string &str);
 
-std::pair<int, std::string> parseToAnalogState(const std::string &str);
+int parseToAnalogState(const std::string &str);
 IOType parseIOType(const std::string &str);
-std::pair<int, std::string> parseToDigitalState(const std::string &str);
-std::pair<int, std::string> parsePin(const std::string &str);
+int parseToDigitalState(const std::string &str);
+int parsePin(const std::string &str);
 void populateGpioMap();
 
 std::string getIOTypeString(IOType type);
@@ -677,12 +677,12 @@ void changeAToDThresholdRequest(const std::string &str)
         printTypeResult(CHANGE_A_TO_D_THRESHOLD_HEADER, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::pair<int, std::string> maybeState{parseToAnalogState(str)};
-    if (maybeState.first == STATE_FAILURE) {
-        printTypeResult(CHANGE_A_TO_D_THRESHOLD_HEADER, maybeState.second, OPERATION_FAILURE);
+    int maybeState{parseToAnalogState(str)};
+    if (maybeState == OPERATION_FAILURE) {
+        printTypeResult(CHANGE_A_TO_D_THRESHOLD_HEADER, str, OPERATION_FAILURE);
         return;
     } 
-    GPIO::setAnalogToDigitalThreshold(maybeState.first);
+    GPIO::setAnalogToDigitalThreshold(maybeState);
     printTypeResult(CHANGE_A_TO_D_THRESHOLD_HEADER, GPIO::analogToDigitalThreshold(), OPERATION_SUCCESS);
 }
 
@@ -737,17 +737,17 @@ void digitalReadRequest(const std::string &str, bool soft)
         printResult(PIN_TYPE_CHANGE_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::pair<int, std::string> pinNumber = parsePin(str);
-    if (pinNumber.first == INVALID_PIN) {
-        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    int pinNumber = parsePin(str);
+    if (pinNumber == INVALID_PIN) {
+        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    if (!isValidDigitalInputPin(pinNumber.first)) {
-        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (!isValidDigitalInputPin(pinNumber)) {
+        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    bool state{(soft ? gpioPinByPinNumber(pinNumber.first)->g_softDigitalRead() : gpioPinByPinNumber(pinNumber.first)->g_digitalRead())};
-    printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber.second, state, OPERATION_SUCCESS);
+    bool state{(soft ? gpioPinByPinNumber(pinNumber)->g_softDigitalRead() : gpioPinByPinNumber(pinNumber)->g_digitalRead())};
+    printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber, state, OPERATION_SUCCESS);
 }
 
 void digitalWriteRequest(const std::string &str)
@@ -758,23 +758,23 @@ void digitalWriteRequest(const std::string &str)
     }
     size_t foundPosition{str.find(":")};
     std::string maybePin{str.substr(0, foundPosition).c_str()};
-    std::pair<int, std::string> pinNumber{parsePin(maybePin)};
-    if (pinNumber.first == INVALID_PIN) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    int pinNumber{parsePin(maybePin)};
+    if (pinNumber == INVALID_PIN) {
+        printResult(DIGITAL_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    if (!isValidDigitalOutputPin(pinNumber.first)) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (!isValidDigitalOutputPin(pinNumber)) {
+        printResult(DIGITAL_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     std::string maybeState{str.substr(foundPosition+1).c_str()};
-    std::pair<int, std::string> state{parseToDigitalState(maybeState)};
-    if (state.first == STATE_FAILURE) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber.second, state.second, OPERATION_FAILURE);
+    int state{parseToDigitalState(maybeState)};
+    if (state == OPERATION_FAILURE) {
+        printResult(DIGITAL_WRITE_HEADER, pinNumber, maybeState, OPERATION_FAILURE);
         return;
     } 
-    gpioPinByPinNumber(pinNumber.first)->g_digitalWrite(state.first);
-    printResult(DIGITAL_WRITE_HEADER, pinNumber.second, state.second, OPERATION_SUCCESS);
+    gpioPinByPinNumber(pinNumber)->g_digitalWrite(state);
+    printResult(DIGITAL_WRITE_HEADER, pinNumber, maybeState, OPERATION_SUCCESS);
 }
 
 void analogReadRequest(const std::string &str)
@@ -783,17 +783,16 @@ void analogReadRequest(const std::string &str)
         printResult(PIN_TYPE_CHANGE_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::pair<int, std::string> pinNumber{parsePin(str)};
-    if ((pinNumber.first == INVALID_PIN) || (!isValidAnalogInputPin(pinNumber.first))) {
-        printResult(ANALOG_READ_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    int pinNumber{parsePin(str)};
+    if ((pinNumber == INVALID_PIN) || (!isValidAnalogInputPin(pinNumber))) {
+        printResult(ANALOG_READ_HEADER, str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    if (!isValidAnalogInputPin(pinNumber.first)) {
-        printResult(ANALOG_READ_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (!isValidAnalogInputPin(pinNumber)) {
+        printResult(ANALOG_READ_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    int state{gpioPinByPinNumber(pinNumber.first)->g_analogRead()};
-    printResult(ANALOG_READ_HEADER, pinNumber.second, state, OPERATION_SUCCESS);
+    printResult(ANALOG_READ_HEADER, pinNumber, gpioPinByPinNumber(pinNumber)->g_analogRead(), OPERATION_SUCCESS);
 }
 
 void analogWriteRequest(const std::string &str)
@@ -804,23 +803,23 @@ void analogWriteRequest(const std::string &str)
     }
     size_t foundPosition{str.find(":")};
     std::string maybePin{str.substr(0, foundPosition).c_str()};
-    std::pair<int, std::string> pinNumber{parsePin(maybePin)};
+    int pinNumber{parsePin(maybePin)};
 
-    if (pinNumber.first == INVALID_PIN) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (pinNumber == INVALID_PIN) {
+        printResult(ANALOG_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    if (!isValidAnalogOutputPin(pinNumber.first)) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (!isValidAnalogOutputPin(pinNumber)) {
+        printResult(ANALOG_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     std::string maybeState{str.substr(foundPosition+1).c_str()};
-    std::pair<int, std::string> state{parseToAnalogState(maybeState)};
-    if (state.first == STATE_FAILURE) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber.second, state.second, OPERATION_FAILURE);
+    int state{parseToAnalogState(maybeState)};
+    if (state == OPERATION_FAILURE) {
+        printResult(ANALOG_WRITE_HEADER, pinNumber, maybeState, OPERATION_FAILURE);
     } else {
-        gpioPinByPinNumber(pinNumber.first)->g_analogWrite(state.first);
-        printResult(ANALOG_WRITE_HEADER, pinNumber.second, state.second, OPERATION_SUCCESS);
+        gpioPinByPinNumber(pinNumber)->g_analogWrite(state);
+        printResult(ANALOG_WRITE_HEADER, pinNumber, state, OPERATION_SUCCESS);
     }
 }
 
@@ -830,41 +829,42 @@ void pinTypeRequest(const std::string &str)
         printResult(PIN_TYPE_CHANGE_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::pair<int, std::string> pinNumber = parsePin(str);
-    if (pinNumber.first == INVALID_PIN) {
-        printResult(PIN_TYPE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    int pinNumber = parsePin(str);
+    if (pinNumber == INVALID_PIN) {
+        printResult(PIN_TYPE_HEADER, str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    printResult(PIN_TYPE_HEADER, pinNumber.second, getIOTypeString(gpioPinByPinNumber(pinNumber.first)->ioType()), OPERATION_SUCCESS);
+    printResult(PIN_TYPE_HEADER, pinNumber, getIOTypeString(gpioPinByPinNumber(pinNumber)->ioType()), OPERATION_SUCCESS);
 }
 
 void pinTypeChangeRequest(const std::string &str)
 {   
-    std::cout << "str = " << str;
-    return;
     if (str.length() == 0) {
         printResult(PIN_TYPE_CHANGE_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     size_t foundPosition{str.find(":")};
-    std::string maybePin{str.substr(0, foundPosition).c_str()};
-    std::pair<int, std::string> pinNumber = parsePin(maybePin);
-    if (pinNumber.first == INVALID_PIN) {
-        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    
+    std::string maybePin{str.substr(0, foundPosition)};
+    int pinNumber{parsePin(maybePin)};
+
+    if (pinNumber == INVALID_PIN) {
+        printResult(PIN_TYPE_CHANGE_HEADER, maybePin, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::string maybeType{str.substr(foundPosition+1).c_str()};
+
+    std::string maybeType{str.substr(foundPosition+1)};
     IOType type{parseIOType(maybeType)};
     if (type == IOType::UNSPECIFIED) {
-        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber.second, maybeType, OPERATION_FAILURE);
+        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, maybeType, OPERATION_FAILURE);
         return;
     }
-    if (!checkValidIOChangeRequest(type, pinNumber.first)) {
-        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber.second, maybeType, OPERATION_FAILURE);
+    if (!checkValidIOChangeRequest(type, pinNumber)) {
+        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, getIOTypeString(type), OPERATION_FAILURE);
         return;
     }
-    gpioPinByPinNumber(pinNumber.first)->setIOType(type);
-    printResult(PIN_TYPE_CHANGE_HEADER, pinNumber.second, maybeType, OPERATION_SUCCESS);
+    gpioPinByPinNumber(pinNumber)->setIOType(type);
+    printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, getIOTypeString(type), OPERATION_SUCCESS);
 }
 
 void softAnalogReadRequest(const std::string &str)
@@ -873,17 +873,17 @@ void softAnalogReadRequest(const std::string &str)
         printResult(SOFT_ANALOG_READ_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    std::pair<int, std::string> pinNumber{parsePin(str)};
-    if (pinNumber.first == INVALID_PIN) {
-        printResult(SOFT_ANALOG_READ_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    int pinNumber{parsePin(str)};
+    if (pinNumber == INVALID_PIN) {
+        printResult(SOFT_ANALOG_READ_HEADER, str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    if (!isValidAnalogOutputPin(pinNumber.first)) {
-        printResult(SOFT_ANALOG_READ_HEADER, pinNumber.second, STATE_FAILURE, OPERATION_FAILURE);
+    if (!isValidAnalogOutputPin(pinNumber)) {
+        printResult(SOFT_ANALOG_READ_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    int state{gpioPinByPinNumber(pinNumber.first)->g_softAnalogRead()};
-    printResult(SOFT_ANALOG_READ_HEADER, pinNumber.second, state, OPERATION_SUCCESS);
+    int state{gpioPinByPinNumber(pinNumber)->g_softAnalogRead()};
+    printResult(SOFT_ANALOG_READ_HEADER, pinNumber, state, OPERATION_SUCCESS);
 }
 
 
@@ -1002,14 +1002,14 @@ std::string getIOTypeString(IOType ioType)
     }
 }
 
-std::pair<int, std::string> parsePin(const std::string &str)
+int parsePin(const std::string &str)
 {
     if (isValidAnalogPinIdentifier(str)) {
-        return std::pair<int, std::string>(parseAnalogPin(str), str);
+        return parseAnalogPin(str);
     } else if (isValidPinIdentifier(str)) {
-        return std::pair<int, std::string>(atoi(str.c_str()), str);
+        return atoi(str.c_str());
     } else {
-        return std::pair<int, std::string>(INVALID_PIN, str);
+        return INVALID_PIN;
     }
 }
 
@@ -1041,33 +1041,34 @@ bool isValidAnalogStateIdentifier(const std::string &str)
 
 bool isValidDigitalStateIdentifier(const std::string &str)
 {
-    return ((str == "1") || (str == "0"));
+    return ((str == "1") || (str == "true") || (str == "high") ||
+            (str == "0") || (str == "false") || (str == "low"));
 }
 
-std::pair<int, std::string> parseToDigitalState(const std::string &str)
+int parseToDigitalState(const std::string &str)
 {
-    if (str == "1") {
-        return std::pair<int, std::string>(HIGH, str); 
-    } else if (str == "0") {
-        return std::pair<int, std::string>(LOW, str);
+    if ((str == "1") || (str == "true") || (str == "high")) {
+        return HIGH; 
+    } else if ((str == "0") || (str == "false") || (str == "low")) {
+        return LOW;
     } else {
-        return std::pair<int, std::string>(OPERATION_FAILURE, str);
+        return OPERATION_FAILURE;
     }
 }
 
-std::pair<int, std::string> parseToAnalogState(const std::string &str)
+int parseToAnalogState(const std::string &str)
 {
     if (!isValidAnalogStateIdentifier(str)) {
-        return std::pair<int, std::string>(INVALID_PIN, str);
+        return OPERATION_FAILURE;
     } else {
         int temp{atoi(str.c_str())};
         if (temp > GPIO::ANALOG_MAX) {
             temp = GPIO::ANALOG_MAX;
         }
         if (temp < 0) {
-            return std::pair<int, std::string>(INVALID_PIN, str);
+            return OPERATION_FAILURE;
         }
-        return std::pair<int, std::string>(temp, toDecString(temp));
+        return temp;
     }
 }
 
@@ -1248,18 +1249,18 @@ std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str)
             pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
         } 
         for (auto &it : pairs) {
-            std::pair<int, std::string> maybePin{parsePin(it.first)};
-            if (maybePin.first == INVALID_PIN) {
+            int maybePin{parsePin(it.first)};
+            if (maybePin == INVALID_PIN) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            if (!isValidDigitalInputPin(maybePin.first)) {
+            if (!isValidDigitalInputPin(maybePin)) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            std::pair<int, std::string> maybeState{parseToDigitalState(it.second)};
-            if (maybeState.first == STATE_FAILURE) {
+            int maybeState{parseToDigitalState(it.second)};
+            if (maybeState == OPERATION_FAILURE) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin.first), maybeState.first));
+            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin), maybeState));
         }
 
         std::set<FailSafe> fails;
@@ -1272,18 +1273,18 @@ std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str)
             pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
         } 
         for (auto &it : pairs) {
-            std::pair<int, std::string> maybePin{parsePin(it.first)};
-            if (maybePin.first == INVALID_PIN) {
+            int maybePin{parsePin(it.first)};
+            if (maybePin == INVALID_PIN) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            if (!isValidDigitalOutputPin(maybePin.first)) {
+            if (!isValidDigitalOutputPin(maybePin)) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            std::pair<int, std::string> maybeState{parseToDigitalState(it.second)};
-            if (maybeState.first == STATE_FAILURE) {
+            int maybeState{parseToDigitalState(it.second)};
+            if (maybeState == OPERATION_FAILURE) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            fails.insert(FailSafe{gpioPinByPinNumber(maybePin.first), maybeState.first});
+            fails.insert(FailSafe{gpioPinByPinNumber(maybePin), maybeState});
         }
         return std::pair<int, ShortWatchdog>(OPERATION_SUCCESS, ShortWatchdog{shorts, fails});
     } else {
@@ -1297,18 +1298,18 @@ std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str)
             pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
         } 
         for (auto &it : pairs) {
-            std::pair<int, std::string> maybePin{parsePin(it.first)};
-            if (maybePin.first == INVALID_PIN) {
+            int maybePin{parsePin(it.first)};
+            if (maybePin == INVALID_PIN) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            if (!isValidDigitalInputPin(maybePin.first)) {
+            if (!isValidDigitalInputPin(maybePin)) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            std::pair<int, std::string> maybeState{parseToDigitalState(it.second)};
-            if (maybeState.first == STATE_FAILURE) {
+            int maybeState{parseToDigitalState(it.second)};
+            if (maybeState == OPERATION_FAILURE) {
                 return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
             }
-            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin.first), maybeState.first));
+            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin), maybeState));
         }
         return std::pair<int, ShortWatchdog>(OPERATION_SUCCESS, ShortWatchdog{shorts});
     }
