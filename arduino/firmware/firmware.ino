@@ -4,7 +4,6 @@
 #include "include/gpio.h"
 #include "include/firmwareutilities.h"
 #include "include/arduinopcstrings.h"
-#include "include/shortwatchdog.h"
 
 /* 
  * Standard C++ headers
@@ -97,13 +96,6 @@ void softAnalogReadRequest(const std::string &str);
 
 void pinTypeRequest(const std::string &str);
 void pinTypeChangeRequest(const std::string &str);
-
-void printWatchdogShortEventResult(const std::string &header, const ShortWatchdog &shortWatchdog);
-void printWatchdogResult(const std::string &header, const ShortWatchdog &shortWatchdog, int resultCode);
-void addShortWatchdogRequest(const std::string &str);
-void removeShortWatchdogRequest(const std::string &str);
-std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str);
-static std::set<ShortWatchdog> shortWatchdogs;
 
 void changeAToDThresholdRequest(const std::string &str);
 void currentAToDThresholdRequest();
@@ -247,17 +239,6 @@ int main()
                 handleSerialString(serialRead.c_str());
             }
         }
-
-        if (shortWatchdogs.size() != 0) {
-            for (auto &it : shortWatchdogs) {
-                it.checkForShorts();
-                if (it.shortEvent()) {
-                    it.executeFailSafe();
-                    printWatchdogShortEventResult(SHORT_EVENT_DETECTED_HEADER, it);
-                    it.reset();
-                }
-            }
-        }
         #if defined(__HAVE_CAN_BUS__)
             if (canLiveUpdate) {
                 canReadRequest(canLiveUpdate);
@@ -345,12 +326,6 @@ void handleAPrefixedString(const std::string &str)
     } else if (startsWith(str, CHANGE_A_TO_D_THRESHOLD_HEADER)) {
         if (checkValidRequestString(CHANGE_A_TO_D_THRESHOLD_HEADER, str)) {
             changeAToDThresholdRequest(str.substr(static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
-    } else if (startsWith(str, ADD_SHORT_WATCHDOG_HEADER)) {
-        if (checkValidRequestString(ADD_SHORT_WATCHDOG_HEADER, str)) {
-            addShortWatchdogRequest(str.substr(static_cast<std::string>(ADD_SHORT_WATCHDOG_HEADER).length()+1));
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
@@ -505,12 +480,8 @@ void handlePPrefixedString(const std::string &str)
 
 void handleRPrefixedString(const std::string &str)
 {
-    if (startsWith(str, REMOVE_SHORT_WATCHDOG_HEADER)) {
-        if (checkValidRequestString(REMOVE_SHORT_WATCHDOG_HEADER, str)) {
-            removeShortWatchdogRequest(str.substr(static_cast<std::string>(REMOVE_SHORT_WATCHDOG_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
+    if (str.length() == 0) {
+        return;
 #if defined(__HAVE_CAN_BUS__)
     } else if (startsWith(str, REMOVE_NEGATIVE_CAN_MASK_HEADER)) {
         if (checkValidRequestString(REMOVE_NEGATIVE_CAN_MASK_HEADER, str)) {
@@ -1075,7 +1046,7 @@ int parseToAnalogState(const std::string &str)
 bool isValidPinIdentifier(const std::string &str)
 {
     for (auto &it : gpioPins) {
-        if (str == toString(it.first)) {
+        if (str == toDecString(it.first)) {
             return true;
         }
     }
@@ -1203,143 +1174,6 @@ std::string analogPinFromNumber(int pinNumber)
         i++;
     }  
     return "";
-}
-
-void addShortWatchdogRequest(const std::string &str)
-{
-    std::pair<int, ShortWatchdog> shortWatchdog{parseShortWatchdog(str)};
-    if (shortWatchdog.first == OPERATION_FAILURE) {
-        printTypeResult(ADD_SHORT_WATCHDOG_HEADER, str, OPERATION_FAILURE);
-        return;
-    }
-    if ((shortWatchdogs.insert(shortWatchdog.second)).second) {
-        printWatchdogResult(ADD_SHORT_WATCHDOG_HEADER, shortWatchdog.second, OPERATION_SUCCESS);
-    } else {
-        printWatchdogResult(ADD_SHORT_WATCHDOG_HEADER, shortWatchdog.second, OPERATION_KIND_OF_SUCCESS);
-    }
-}
-
-void removeShortWatchdogRequest(const std::string &str)
-{
-    std::pair<int, ShortWatchdog> shortWatchdog{parseShortWatchdog(str)};
-    if (shortWatchdog.first == OPERATION_FAILURE) {
-        printTypeResult(ADD_SHORT_WATCHDOG_HEADER, str, OPERATION_FAILURE);
-        return;
-    }
-    shortWatchdogs.erase(shortWatchdogs.find(shortWatchdog.second));
-    printWatchdogResult(ADD_SHORT_WATCHDOG_HEADER, shortWatchdog.second, OPERATION_SUCCESS);
-}
-
-std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str)
-{
-    if (str.length() == 0) {
-        return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-    }
-    if (str.find(FAILSAFE_INTERIM_HEADER) != std::string::npos) {
-        std::string firstHalf{str.substr(0, str.find(FAILSAFE_INTERIM_HEADER))};
-        std::string secondHalf{str.substr(str.find(FAILSAFE_INTERIM_HEADER)+static_cast<std::string>(FAILSAFE_INTERIM_HEADER).length())};
-
-        std::vector<std::string> states{parseToVector(firstHalf, ':')};
-        std::vector<std::pair<std::string, std::string>> pairs;
-        std::vector<std::pair<GPIO*, bool>> shorts;
-        if (!isEven(states.size())) {
-            return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-        }
-        for (unsigned int i = 0; i < states.size(); i += 2) {
-            pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
-        } 
-        for (auto &it : pairs) {
-            int maybePin{parsePin(it.first)};
-            if (maybePin == INVALID_PIN) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            if (!isValidDigitalInputPin(maybePin)) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            int maybeState{parseToDigitalState(it.second)};
-            if (maybeState == OPERATION_FAILURE) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin), maybeState));
-        }
-
-        std::set<FailSafe> fails;
-        pairs.clear();
-        states = parseToVector(secondHalf, ':');
-        if (!isEven(states.size())) {
-            return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-        }
-        for (unsigned int i = 0; i < states.size(); i += 2) {
-            pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
-        } 
-        for (auto &it : pairs) {
-            int maybePin{parsePin(it.first)};
-            if (maybePin == INVALID_PIN) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            if (!isValidDigitalOutputPin(maybePin)) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            int maybeState{parseToDigitalState(it.second)};
-            if (maybeState == OPERATION_FAILURE) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            fails.insert(FailSafe{gpioPinByPinNumber(maybePin), maybeState});
-        }
-        return std::pair<int, ShortWatchdog>(OPERATION_SUCCESS, ShortWatchdog{shorts, fails});
-    } else {
-        std::vector<std::string> states{parseToVector(str, ':')};
-        if (!isEven(states.size())) {
-            return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-        }
-        std::vector<std::pair<GPIO*, bool>> shorts;
-        std::vector<std::pair<std::string, std::string>> pairs;
-        for (unsigned int i = 0; i < states.size(); i += 2) {
-            pairs.push_back(std::pair<std::string, std::string>(states.at(i), states.at(i+1)));
-        } 
-        for (auto &it : pairs) {
-            int maybePin{parsePin(it.first)};
-            if (maybePin == INVALID_PIN) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            if (!isValidDigitalInputPin(maybePin)) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            int maybeState{parseToDigitalState(it.second)};
-            if (maybeState == OPERATION_FAILURE) {
-                return std::pair<int, ShortWatchdog>(OPERATION_FAILURE, ShortWatchdog{std::vector<std::pair<GPIO*, bool>>{}});
-            }
-            shorts.push_back(std::pair<GPIO*, int>(gpioPinByPinNumber(maybePin), maybeState));
-        }
-        return std::pair<int, ShortWatchdog>(OPERATION_SUCCESS, ShortWatchdog{shorts});
-    }
-}
-
-void printWatchdogShortEventResult(const std::string &header, const ShortWatchdog &shortWatchdog)
-{
-    std::cout << header;
-    for (auto &it : shortWatchdog.shorts()) {
-        std::cout << ':' << it.first->pinNumber() << ':' << it.second;
-    }
-    std::cout << '}';
-}
-void printWatchdogResult(const std::string &header, const ShortWatchdog &shortWatchdog, int resultCode)
-{
-    std::cout << header;
-    for (auto &it : shortWatchdog.shorts()) {
-        std::cout << ':' << it.first->pinNumber() << ':' << it.second;
-    }
-    if (shortWatchdog.failSafes().size() != 0) {
-        std::cout << FAILSAFE_INTERIM_HEADER;
-        int i{0};
-        for (auto &it : shortWatchdog.failSafes()) {
-            if (i++ != 0) {
-                std::cout << ':';
-            }
-            std::cout << it.gpio()->pinNumber() << ':' << it.state();
-        }
-    }
-    std::cout << ':' << resultCode << '}';
 }
 
 #if defined(__HAVE_CAN_BUS__)
