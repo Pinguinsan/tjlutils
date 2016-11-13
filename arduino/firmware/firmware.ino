@@ -4,7 +4,7 @@
 #include "include/gpio.h"
 #include "include/firmwareutilities.h"
 #include "include/arduinopcstrings.h"
-//#include "include/shortwatchdog.h"
+#include "include/shortwatchdog.h"
 
 /* 
  * Standard C++ headers
@@ -87,14 +87,12 @@ void softAnalogReadRequest(const std::string &str);
 void pinTypeRequest(const std::string &str);
 void pinTypeChangeRequest(const std::string &str);
 
-/*
 void printWatchdogShortEventResult(const std::string &header, const ShortWatchdog &shortWatchdog);
 void printWatchdogResult(const std::string &header, const ShortWatchdog &shortWatchdog, int resultCode);
 void addShortWatchdogRequest(const std::string &str);
 void removeShortWatchdogRequest(const std::string &str);
 std::pair<int, ShortWatchdog> parseShortWatchdog(const std::string &str);
 static std::set<ShortWatchdog> shortWatchdogs;
-*/
 
 void changeAToDThresholdRequest(const std::string &str);
 void currentAToDThresholdRequest();
@@ -238,7 +236,7 @@ int main()
                 handleSerialString(serialRead.c_str());
             }
         }
-        /*
+
         if (shortWatchdogs.size() != 0) {
             for (auto &it : shortWatchdogs) {
                 it.checkForShorts();
@@ -249,7 +247,6 @@ int main()
                 }
             }
         }
-        */
         #if defined(__HAVE_CAN_BUS__)
             if (canLiveUpdate) {
                 canReadRequest(canLiveUpdate);
@@ -344,7 +341,7 @@ void handleSerialString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    } /*else if (startsWith(str, ADD_SHORT_WATCHDOG_HEADER)) {
+    } else if (startsWith(str, ADD_SHORT_WATCHDOG_HEADER)) {
         if (checkValidRequestString(ADD_SHORT_WATCHDOG_HEADER, str)) {
             addShortWatchdogRequest(str.substr(static_cast<std::string>(ADD_SHORT_WATCHDOG_HEADER).length()+1));
         } else {
@@ -356,7 +353,7 @@ void handleSerialString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    }*/ else if (startsWith(str, CHANGE_A_TO_D_THRESHOLD_HEADER)) {
+    } else if (startsWith(str, CHANGE_A_TO_D_THRESHOLD_HEADER)) {
         if (checkValidRequestString(CHANGE_A_TO_D_THRESHOLD_HEADER, str)) {
             changeAToDThresholdRequest(str.substr(static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER).length()+1));
         } else {
@@ -1101,7 +1098,6 @@ std::string analogPinFromNumber(int pinNumber)
     return "";
 }
 
-/*
 void addShortWatchdogRequest(const std::string &str)
 {
     std::pair<int, ShortWatchdog> shortWatchdog{parseShortWatchdog(str)};
@@ -1238,7 +1234,6 @@ void printWatchdogResult(const std::string &header, const ShortWatchdog &shortWa
     }
     std::cout << ':' << resultCode << '}';
 }
-*/
 
 #if defined(__HAVE_CAN_BUS__)
     void canInit()
