@@ -127,21 +127,16 @@ PrettyPrinter::PrettyPrinter(ForegroundColor foregroundColor, BackgroundColor ba
 void PrettyPrinter::setForegroundColor(ForegroundColor foregroundColor)
 {
     this->m_foregroundColor = foregroundColor;
-    std::cout << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_foregroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
 }
 
 void PrettyPrinter::setBackgroundColor(BackgroundColor backgroundColor)
 {
     this->m_backgroundColor = backgroundColor;
-    std::cout << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_backgroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
 }
 
 void PrettyPrinter::setFontAttributes(int fontAttributes)
 {
     this->m_fontAttributes = fontAttributes;
-    for (auto &it : this->getFontAttributes(this->m_fontAttributes)) {
-        *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << it << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL; 
-    }
 }
 
 void PrettyPrinter::setOutputStream(std::ostream *outputStream)
@@ -203,7 +198,7 @@ void PrettyPrinter::resetForegroundColor()
 void PrettyPrinter::resetFontAttributes()
 {
     this->m_fontAttributes = FontAttribute::FA_DEFAULT;
-    *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << getFontAttributes(this->m_fontAttributes).at(0) << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+    *this->m_outputStream << PrettyPrinter::s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
 }
 
 std::vector<int> PrettyPrinter::getFontAttributes(int attr)
