@@ -110,9 +110,9 @@ public:
     template <typename T>
     void print(const T& toPrint)
     {
+        *this->m_outputStream << PrettyPrinter::s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
         *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_foregroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
         *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_backgroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
-        *this->m_outputStream << PrettyPrinter::s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
         for (auto &it : this->getFontAttributes(this->m_fontAttributes)) {
             *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << it << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
         }
@@ -123,9 +123,9 @@ public:
     template <typename T>
     void println(const T& toPrint)
     {
+        *this->m_outputStream << PrettyPrinter::s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
         *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_foregroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
         *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_backgroundColor << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
-        *this->m_outputStream << PrettyPrinter::s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
         for (auto &it : this->getFontAttributes(this->m_fontAttributes)) {
             *this->m_outputStream << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_BASE << it << PrettyPrinter::s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
         }
