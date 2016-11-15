@@ -464,11 +464,10 @@ namespace GeneralUtilities
 
     bool endsWith(const std::string &stringToCheck, const std::string &matchString)
     {
-        if (stringToCheck.length() < matchString.length()) {
+        if (matchString.size() > stringToCheck.size()) {
             return false;
         }
-        size_t startPosition = stringToCheck.length() - matchString.length();
-        return (stringToCheck.substr(startPosition) == matchString);
+        return std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
     }
 
     bool endsWith(const std::string &stringToCheck, char matchChar)
