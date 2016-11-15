@@ -263,12 +263,109 @@ void SystemCommand::systemCommandLaunch(PipeStatus pipe)
     this->m_hasError = (this->m_returnValue != 0);
 }
 
-
 /*
-STARTUPINFO si = { sizeof(STARTUPINFO) };
-si.cb = sizeof(si);
-si.dwFlags = STARTF_USESHOWWINDOW;
-si.wShowWindow = SW_HIDE;
-PROCESS_INFORMATION pi;
-CreateProcess(L"C:\\Users\\Public\\Public Documents\\EnumerateSerial.exe", NULL , NULL, NULL, FALSE, CREATE_NO_WINDOW , NULL, NULL, &si, &pi);
+#if defined(_WIN32) || defined(__CYGWIN__)
+
+std::string SystemCommand::asyncReadFromPipe() 
+{ 
+    DWORD bytesAvail = 0;
+    if (!PeekNamedPipe(g_hChildStd_OUT_Rd, NULL, 0, NULL, &bytesAvail, NULL)) {
+        return "";
+    }
+    if (bytesAvail) {
+        DWORD dwRead{0};
+        char chBuf[BUFSIZE]; 
+        bool bSuccess{FALSE};
+        std::string returnString{""};
+        bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+        chBuf[dwRead] = '\0';
+        if ((!bSuccess) || (dwRead == 0)) {
+            return "";
+        } else {
+            return std::string{chBuf};
+        }
+    } else {
+        return "";
+    }
+} 
+
+
+std::vector<std::string> SystemCommand::readFromPipe()
+{
+    std::vector<std::string> returnVector;
+    std::future<std::string> readTask{std::async(std::launch::async, asyncReadFromPipe)};
+    auto startTime{std::chrono::high_resolution_clock::now()};
+    auto endTime{std::chrono::high_resolution_clock::now()};
+    auto elapsedTime{std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()};
+    do {
+        if (readTask.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            std::string returnString{readTask.get()};
+            if (returnString != "") {
+                returnVector.emplace_back(returnString);
+                startTime = std::chrono::high_resolution_clock::now();
+                endTime = std::chrono::high_resolution_clock::now();
+                elapsedTime = 0;
+            }
+            readTask = std::async(std::launch::async, asyncReadFromPipe);
+        }
+        endTime = std::chrono::high_resolution_clock::now();
+        elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    } while (elapsedTime <= 100);
+    return returnVector;
+}
+
+int SystemCommand::createChildProcess()
+{ 
+    TCHAR szCmdLine[]=TEXT();
+    PROCESS_INFORMATION piProcInfo; 
+    STARTUPINFO siStartInfo;
+    BOOL bSuccess = FALSE; 
+
+    // Set up members of the PROCESS_INFORMATION structure. 
+    ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
+
+    // Set up members of the STARTUPINFO structure. 
+    // This structure specifies the STDIN and STDOUT handles for redirection.
+    ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
+    siStartInfo.cb = sizeof(STARTUPINFO); 
+    siStartInfo.hStdError = g_hChildStd_OUT_Wr;
+    siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+    siStartInfo.dwFlags = STARTF_USESHOWWINDOW;
+    siStartInfo.wShowWindow = SW_HIDE;
+    siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+    bSuccess = CreateProcess(NULL,
+        szCmdLine, 
+        NULL, 
+        NULL, 
+        TRUE, 
+        CREATE_NO_WINDOW, 
+        NULL, 
+        NULL, 
+        &siStartInfo, 
+        &piProcInfo);
+
+   // If an error occurs, exit the application. 
+    if ( ! bSuccess ) { 
+        return 1;
+    } else {
+        // Close handles to the child process and its primary thread.
+        // Some applications might keep these handles to monitor the status
+        // of the child process, for example. 
+        CloseHandle(piProcInfo.hProcess);
+        CloseHandle(piProcInfo.hThread);
+        return 0;
+    }
+}
+
+int SystemCommand::doWindowsChildProcessRead()
+{
+    HANDLE g_hChildStd_OUT_Rd{NULL};
+    HANDLE g_hChildStd_OUT_Wr{NULL};
+
+
+
+}
+
+#endif
 */
