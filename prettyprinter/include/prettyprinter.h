@@ -26,6 +26,7 @@
 #include <mathutilities.h>
 
 enum ForegroundColor {
+    FG_DEFAULT       = 39,
     FG_BLACK         = 30,
     FG_RED           = 31,
     FG_GREEN         = 32, 
@@ -33,8 +34,7 @@ enum ForegroundColor {
     FG_BLUE          = 34, 
     FG_MAGENTA       = 35, 
     FG_CYAN          = 36, 
-    FG_LIGHT_GRAY    = 37, 
-    FG_DEFAULT       = 39,
+    FG_LIGHT_GRAY    = 37,
     FG_DARK_GRAY     = 90, 
     FG_LIGHT_RED     = 91, 
     FG_LIGHT_GREEN   = 92, 
@@ -46,10 +46,33 @@ enum ForegroundColor {
 };
 
 enum BackgroundColor {
-    BG_RED           = 41, 
-    BG_GREEN         = 42, 
-    BG_BLUE          = 44, 
-    BG_DEFAULT       = 49
+    BG_DEFAULT       = 49,
+    BG_BLACK         = 40,
+    BG_RED           = 41,
+    BG_GREEN         = 42,
+    BG_YELLOW        = 43,
+    BG_BLUE          = 44,
+    BG_MAGENTA       = 45,
+    BG_CYAN          = 46,
+    BG_LIGHT_GRAY    = 47,
+    BG_DARK_GRAY     = 100,
+    BG_LIGHT_RED     = 101,
+    BG_LIGHT_GREEN   = 102,
+    BG_LIGHT_YELLOW  = 103,
+    BG_LIGHT_BLUE    = 104,
+    BG_LIGHT_MAGENTA = 105,
+    BG_LIGHT_CYAN    = 106,
+    BG_WHITE         = 107
+};
+
+enum FontAttribute {
+    FA_DEFAULT       = 0b00000000,
+    FA_BOLD          = 0b00000001,
+    FA_DIM           = 0b00000010,
+    FA_UNDERLINED    = 0b00000100,
+    FA_BLINK         = 0b00001000,
+    FA_REVERSE       = 0b00010000,
+    FA_HIDDEN        = 0b00100000
 };
 
 class PrettyPrinter 
@@ -66,14 +89,17 @@ public:
     void setForegroundColor(ForegroundColor ForegroundColor);
     void setBackgroundColor(BackgroundColor backgroundColor);
     void setOutputStream(std::ostream *outputStream);
+    void setFontAttributes(int fontAttributes);
     ForegroundColor foregroundColor() const;
     BackgroundColor backgroundColor() const;
     std::ostream *outputStream();
+    int fontAttributes() const;
 
     static ForegroundColor randomForegroundColor();
     static BackgroundColor randomBackgroundColor();
     void resetBackgroundColor();
     void resetForegroundColor();
+    void resetFontAttributes();
     
     template<typename T>
     void operator<<(const T &toPrint)
@@ -82,106 +108,28 @@ public:
     }
 
     template <typename T>
-    void print(const T &toPrint)
+    void print(const T& toPrint)
     {
-        return this->print(toPrint, this->m_foregroundColor, this->m_backgroundColor, *this->m_outputStream);
+        *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_foregroundColor << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_backgroundColor << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        for (auto &it : this->getFontAttributes(this->m_fontAttributes)) {
+            *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << it << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        }
+        *this->m_outputStream << toPrint;
+        this->resetStreamToDefault(this->m_outputStream);
     }
 
     template <typename T>
-    void print(const T& toPrint, ForegroundColor foregroundColor)
+    void println(const T& toPrint)
     {
-        return this->print(toPrint, foregroundColor, this->m_backgroundColor, *this->m_outputStream);
-    }
-        
-    template <typename T>
-    void print(const T& toPrint, BackgroundColor backgroundColor)
-    {
-        return this->print(toPrint, this->m_foregroundColor, backgroundColor, *this->m_outputStream);
-    }
-
-    template <typename T>
-    void print(const T& toPrint, ForegroundColor foregroundColor, BackgroundColor backgroundColor)
-    {
-        return this->print(toPrint, foregroundColor, backgroundColor, *this->m_outputStream);
-    }
-
-    template <typename T>
-    void print(const T& toPrint, std::ostream &outputStream)
-    {
-        return this->print(toPrint, this->m_foregroundColor, this->m_backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void print(const T& toPrint, ForegroundColor foregroundColor, std::ostream &outputStream)
-    {
-        return this->print(toPrint, foregroundColor, this->m_backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void print(const T& toPrint, BackgroundColor backgroundColor, std::ostream &outputStream)
-    {
-        return this->print(toPrint, this->m_foregroundColor, backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void print(const T& toPrint, ForegroundColor foregroundColor, BackgroundColor backgroundColor, std::ostream &outputStream)
-    {
-        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << foregroundColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
-        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << backgroundColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
-        outputStream << toPrint;
-        this->resetStreamToDefault(&outputStream);
-    }
-
-    template <typename T>
-    void println(const T &toPrint)
-    {
-        return this->println(toPrint, this->m_foregroundColor, this->m_backgroundColor, *this->m_outputStream);
-    }
-
-    template <typename T>
-    void println(const T& toPrint, ForegroundColor foregroundColor)
-    {
-        return this->println(toPrint, foregroundColor, this->m_backgroundColor, *this->m_outputStream);
-    }
-        
-    template <typename T>
-    void println(const T& toPrint, BackgroundColor backgroundColor)
-    {
-        return this->println(toPrint, this->m_foregroundColor, backgroundColor, *this->m_outputStream);
-    }
-
-    template <typename T>
-    void println(const T& toPrint, ForegroundColor foregroundColor, BackgroundColor backgroundColor)
-    {
-        return this->println(toPrint, foregroundColor, backgroundColor, *this->m_outputStream);
-    }
-
-    template <typename T>
-    void println(const T& toPrint, std::ostream &outputStream)
-    {
-        return this->println(toPrint, this->m_foregroundColor, this->m_backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void println(const T& toPrint, ForegroundColor foregroundColor, std::ostream &outputStream)
-    {
-        return this->println(toPrint, foregroundColor, this->m_backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void println(const T& toPrint, BackgroundColor backgroundColor, std::ostream &outputStream)
-    {
-        return this->println(toPrint, this->m_foregroundColor, backgroundColor, outputStream); 
-    }
-
-    template <typename T>
-    void println(const T& toPrint, ForegroundColor foregroundColor, BackgroundColor backgroundColor, std::ostream &outputStream)
-    {
-        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << foregroundColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
-        outputStream << TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE << backgroundColor << TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
-        outputStream << toPrint;
-        outputStream << std::endl;
-        this->resetStreamToDefault(&outputStream);
+        *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_foregroundColor << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << this->m_backgroundColor << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        for (auto &it : this->getFontAttributes(this->m_fontAttributes)) {
+            *this->m_outputStream << s_TERMINAL_ESCAPE_SEQUENCE_BASE << it << s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+        }
+        *this->m_outputStream << toPrint;
+        *this->m_outputStream << std::endl;
+        this->resetStreamToDefault(this->m_outputStream);
     }
 
     void println()
@@ -193,15 +141,31 @@ private:
     ForegroundColor m_foregroundColor;
     BackgroundColor m_backgroundColor;
     std::ostream *m_outputStream;
+    int m_fontAttributes;
 
     void resetStreamToDefault(std::ostream *oStream);
-    static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_BASE;
-    static const char *TERMINAL_COLOR_ESCAPE_SEQUENCE_TAIL;
-    static const char *DEFAULT_TERMINAL_FOREGROUND_COLOR;
-    static const char *DEFAULT_TERMINAL_BACKGROUND_COLOR;
+    std::vector<int> getFontAttributes(int attr);
+
+    static const char *s_TERMINAL_ESCAPE_SEQUENCE_BASE;
+    static const char *s_TERMINAL_ESCAPE_SEQUENCE_TAIL;
+    static const char *s_DEFAULT_TERMINAL_FOREGROUND_COLOR;
+    static const char *s_DEFAULT_TERMINAL_BACKGROUND_COLOR;
+    static const char *s_DEFAULT_TERMINAL_FONT_ATTRIBUTES;
 
     static const std::vector<ForegroundColor> s_FOREGROUND_TERMINAL_COLORS_CONTAINER;
     static const std::vector<BackgroundColor> s_BACKGROUND_TERMINAL_COLORS_CONTAINER;
+
+    static const int s_RESET_FONT_ATTRIBUTE_OFFSET;
+
+    enum UnderlyingFontAttribute {
+        UFA_DEFAULT       = 0,
+        UFA_BOLD          = 1,
+        UFA_DIM           = 2,
+        UFA_UNDERLINED    = 4,
+        UFA_BLINK         = 5,
+        UFA_REVERSE       = 7,
+        UFA_HIDDEN        = 8
+    };
 };
 
 #endif //TJUTILS_PRETTYPRINTER_H
