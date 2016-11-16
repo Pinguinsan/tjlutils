@@ -77,6 +77,13 @@ enum class BaudRate { BAUD50, BAUD75, BAUD110, BAUD134, BAUD150,
                       BAUD3000000, BAUD3500000, BAUD4000000 };
 #endif
 
+enum class LineEnding {
+    LE_None,
+    LE_CarriageReturn,
+    LE_LineFeed,
+    LE_CarriageReturnLineFeed
+};
+
 class SerialPort
 {
 public:
@@ -129,6 +136,7 @@ public:
     void setStopBits(StopBits stopBits);
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
+    void setLineEnding(LineEnding lineEnding);
     void setTimeout(long long int timeout);
     void setRetryCount(int retryCount);
 
@@ -139,6 +147,7 @@ public:
     DataBits dataBits() const;
     Parity parity() const;
     long long int timeout() const;
+    LineEnding lineEnding() const;
     int retryCount() const;
     bool isOpen() const;
 
@@ -146,38 +155,45 @@ public:
     std::string stopBitsToString() const;
     std::string dataBitsToString() const;
     std::string parityToString() const;
+    std::string lineEndingToString() const;
     static std::string baudRateToString(BaudRate baudRate);
     static std::string stopBitsToString(StopBits stopBits);
     static std::string dataBitsToString(DataBits dataBits);
     static std::string parityToString(Parity parity);
+    static std::string lineEndingToString(LineEnding lineEnding);
 
-    static const std::vector<std::string> SERIAL_PORT_NAMES;
+    static const std::vector<std::string> s_SERIAL_PORT_NAMES;
 
     static BaudRate parseBaudRateFromRaw(const std::string &baudRate);
     static DataBits parseDataBitsFromRaw(const std::string &dataBits);
     static StopBits parseStopBitsFromRaw(const std::string &stopBits);
     static Parity parseParityFromRaw(const std::string &parity);
+    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
 
     static BaudRate parseBaudRateFromRaw(const char *baudRate);
     static DataBits parseDataBitsFromRaw(const char *dataBits);
     static StopBits parseStopBitsFromRaw(const char *stopBits);
     static Parity parseParityFromRaw(const char *parity);
+    static LineEnding parseLineEndingFromRaw(const char *parity);
 
     static const DataBits DEFAULT_DATA_BITS;
     static const StopBits DEFAULT_STOP_BITS;
     static const Parity DEFAULT_PARITY;
     static const BaudRate DEFAULT_BAUD_RATE;
+    static const LineEnding DEFAULT_LINE_ENDING;
 
     static const std::string DEFAULT_DATA_BITS_STRING;
     static const std::string DEFAULT_STOP_BITS_STRING;
     static const std::string DEFAULT_PARITY_STRING;
     static const std::string DEFAULT_BAUD_RATE_STRING;
+    static const std::string DEFAULT_LINE_ENDING_STRING;
 
     static std::vector<std::string> availableSerialPorts();
     static std::vector<const char *> availableBaudRates();
     static std::vector<const char *> availableStopBits();
     static std::vector<const char *> availableDataBits();
     static std::vector<const char *> availableParity();
+    static std::vector<const char *> availableLineEndings();
     static bool isValidSerialPortName(const std::string &serialPortName);
 
     static const int DEFAULT_TIMEOUT;
@@ -200,6 +216,7 @@ private:
     StopBits m_stopBits;
     DataBits m_dataBits;
     Parity m_parity;
+    std::string m_lineEnding;
     long long int m_timeout;
     int m_retryCount;
     bool m_isOpen;
@@ -219,12 +236,18 @@ private:
     static int parseStopBits(StopBits stopBits);
     static int parseBaudRate(BaudRate baudRate);
     static std::pair<int, int> parseParity(Parity parity);
+    static std::string parseLineEnding(LineEnding lineEnding);
 
     static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
     static const std::vector<const char *> s_AVAILABLE_PARITY;
     static const std::vector<const char *> s_AVAILABLE_STOP_BITS;
     static const std::vector<const char *> s_AVAILABLE_DATA_BITS;
     static const std::vector<const char *> s_AVAILABLE_BAUD_RATE;
+    static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;
+    static const std::vector<const char *> s_NO_LINE_ENDING_IDENTIFIERS;
+    static const std::vector<const char *> s_CARRIAGE_RETURN_IDENTIFIERS;
+    static const std::vector<const char *> s_LINE_FEED_IDENTIFIERS;
+    static const std::vector<const char *> s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS;
     static const char *s_SERIAL_PORT_HELPER_LONG_NAME;
     static const char *s_SERIAL_PORT_HELPER_SHORT_NAME;
 };
