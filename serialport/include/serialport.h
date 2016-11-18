@@ -139,6 +139,9 @@ public:
     void setLineEnding(LineEnding lineEnding);
     void setTimeout(long long int timeout);
     void setRetryCount(int retryCount);
+    
+    void setMaximumReadSize(int maximumReadSize);
+    int maximumReadSize() const;
 
     std::string portName() const;
     int portNumber() const;
@@ -220,6 +223,7 @@ private:
     long long int m_timeout;
     int m_retryCount;
     bool m_isOpen;
+    int m_maximumReadSize;
 
     static const int constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);

@@ -74,7 +74,8 @@ SerialPort::SerialPort(const std::string &name) :
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -91,7 +92,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate) :
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -108,7 +110,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -125,7 +128,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -142,7 +146,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -159,7 +164,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -176,7 +182,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -193,7 +200,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -210,7 +218,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits) :
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -227,7 +236,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -244,7 +254,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -261,7 +272,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, Parity parity
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -278,7 +290,8 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits) :
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -295,7 +308,8 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits, Parity parity
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -312,7 +326,8 @@ SerialPort::SerialPort(const std::string &name, Parity parity) :
     m_lineEnding{""},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
-    m_isOpen{false}
+    m_isOpen{false},
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -329,7 +344,8 @@ SerialPort::SerialPort(SerialPort &&other) :
     m_lineEnding{std::move(other.m_lineEnding)},
     m_timeout{std::move(other.m_timeout)},
     m_retryCount{std::move(other.m_retryCount)},
-    m_isOpen{std::move(other.m_isOpen)}
+    m_isOpen{std::move(other.m_isOpen)},
+    m_maximumReadSize{std::move(other.m_maximumReadSize)}
 {
 
 }
@@ -337,6 +353,20 @@ SerialPort::SerialPort(SerialPort &&other) :
 bool operator==(const SerialPort &lhs, const SerialPort &rhs)
 {
     return (lhs.portName() == rhs.portName());
+}
+
+void SerialPort::setMaximumReadSize(int maximumReadSize)
+{
+    if (maximumReadSize <= 0) {
+        throw std::runtime_error("ERROR: SerialPort::maximumReadSize() must be greater than 0 (" + std::to_string(maximumReadSize) + " <= 0)");
+    } else {
+        this->m_maximumReadSize = maximumReadSize;
+    }
+}
+
+int SerialPort::maximumReadSize() const
+{
+    return this->m_maximumReadSize;
 }
 
 void SerialPort::openPort()
@@ -705,13 +735,20 @@ std::string SerialPort::readString()
                 exitBool = true;
             }
         }
+        if (returnString.length() >= this->m_maximumReadSize) {
+            exitBool = true;
+        }
     } while (!exitBool);
     return returnString;
 }
 
 std::string SerialPort::readStringUntil(const std::string &terminator)
 {
+    using namespace GeneralUtilities;
     std::string returnString{""};
+    if (terminator.length() > this->m_maximumReadSize) {
+        throw std::runtime_error("ERROR: SerialPort::readStringUntil(const std::string &) terminator parameter length is greater than maximum read size " + tQuoted(terminator) + ".length() >= " + std::to_string(this->m_maximumReadSize));
+    }
     int i{0};
     bool exitBool{false};
     do {
@@ -723,6 +760,9 @@ std::string SerialPort::readStringUntil(const std::string &terminator)
             if (++i > this->m_retryCount) {
                 exitBool = true;
             }
+        }
+        if (returnString.length() >= this->m_maximumReadSize) {
+            exitBool = true;
         }
     } while (!exitBool && !GeneralUtilities::endsWith(returnString, terminator));
     return returnString;
@@ -982,7 +1022,7 @@ bool SerialPort::isOpen() const
 void SerialPort::writeCString(const char *str)
 {
     while(*str != 0) {
-        writeByte(*(str++));
+        this->writeByte(*(str++));
     }
 }
 
@@ -993,22 +1033,22 @@ void SerialPort::writeString(const std::string &str)
     if (!endsWith(copyString, this->m_lineEnding)) {
         copyString += this->m_lineEnding;
     }
-    return writeCString(copyString.c_str());
+    return this->writeCString(copyString.c_str());
 }
 
 void SerialPort::writeString(const char *str)
 {
-    return writeString(static_cast<std::string>(str));
+    return this->writeString(static_cast<std::string>(str));
 }
 
 std::string SerialPort::readStringUntil(char identifier)
 {
-    return readStringUntil(std::string(1, identifier));
+    return this->readStringUntil(std::string{1, identifier});
 }
 
 std::string SerialPort::readStringUntil(const char *str)
 {
-    return readStringUntil(static_cast<std::string>(str));
+    return this->readStringUntil(static_cast<std::string>(str));
 }
 
 

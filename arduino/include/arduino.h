@@ -24,6 +24,7 @@ enum CanEnabledStatus { CAN_RETURN_STATE, CAN_OPERATION_RESULT };
 enum ADThresholdReq { AD_RETURN_STATE, AD_OPERATION_RESULT };
 enum CanMask { CAN_MASK_RETURN_STATE, CAN_MASK_OPERATION_RESULT };
 
+class LinMessage;
 class CanMessage;
 class ArduinoUno;
 class ArduinoNano;
@@ -907,6 +908,314 @@ private:
     uint8_t m_frame;
     uint8_t m_length;
     CanDataPacket m_dataPacket;
+
+    static const char *NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING;
+};
+
+
+class LinDataPacket
+{
+public:
+    LinDataPacket() :
+        m_dataPacket{std::vector<unsigned char>{0, 0, 0, 0, 0, 0, 0, 0}}
+    {
+
+    }
+
+    LinDataPacket(unsigned char first, unsigned char second, 
+                                unsigned char third, unsigned char fourth, 
+                                unsigned char fifth, unsigned char sixth, 
+                                unsigned char seventh, unsigned char eighth) :
+        m_dataPacket{std::vector<unsigned char>{first, second, third, fourth, 
+                                                fifth, sixth, seventh, eighth}}
+    {
+
+    }                                            
+
+    LinDataPacket(const std::vector<unsigned char> &dataPacket) :
+        m_dataPacket(dataPacket)
+    {
+
+    }
+
+    LinDataPacket(const LinDataPacket &dataPacket) :
+        m_dataPacket{dataPacket.m_dataPacket}
+    {
+
+    }
+
+    void setDataPacket(const std::vector<unsigned char> &dataPacket)
+    {
+        this->m_dataPacket = dataPacket;
+    }
+
+    void setDataPacket(unsigned char first, unsigned char second, 
+                                    unsigned char third, unsigned char fourth, 
+                                    unsigned char fifth, unsigned char sixth, 
+                                    unsigned char seventh, unsigned char eighth)
+    {
+        this->m_dataPacket = std::vector<unsigned char>{first, second, third, fourth,
+                                                        fifth, sixth, seventh, eighth};
+    }                         
+
+    bool setNthByte(int index, unsigned char nth)
+    {
+        if ((index >= 0) && (index < 8)) {
+            this->m_dataPacket.at(index) = nth;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    unsigned char nthByte(int index)
+    {
+        return this->m_dataPacket.at(index);
+    }
+
+    void toBasicArray(unsigned char copyArray[8]) const
+    {
+        int i = 0;
+        for (auto &it : this->m_dataPacket) {
+            copyArray[i++] = it;
+        }
+    }
+
+    std::vector<unsigned char> dataPacket() const
+    {
+        return m_dataPacket;
+    }
+
+    LinDataPacket combineDataPackets(const LinDataPacket &first, const LinDataPacket &second)
+    {
+        std::vector<unsigned char> constructorArg;
+        std::vector<unsigned char> firstCopy = first.dataPacket();
+        std::vector<unsigned char> secondCopy = second.dataPacket();
+        std::vector<unsigned char>::const_iterator firstIter = firstCopy.begin();
+        std::vector<unsigned char>::const_iterator secondIter = secondCopy.begin();
+        while (firstIter != firstCopy.end()) {
+            constructorArg.push_back((*firstIter++) | (*secondIter++));
+        }
+        return LinDataPacket(constructorArg);
+    }
+
+    friend bool operator==(const LinDataPacket &lhs, const LinDataPacket &rhs)
+    {
+        if (lhs.m_dataPacket.size() != rhs.m_dataPacket.size()) {
+            return false;
+        }
+        for (unsigned int i = 0; i < lhs.m_dataPacket.size(); i++) {
+            if (lhs.m_dataPacket.at(i) != rhs.m_dataPacket.at(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+private:
+    std::vector<unsigned char> m_dataPacket;
+
+};
+
+class LinMessage
+{
+public:
+    LinMessage(uint32_t id, uint8_t frame, uint8_t length, const LinDataPacket &dataPacket) :
+        m_id{id},
+        m_frame{frame},
+        m_length{length},
+        m_dataPacket{dataPacket}
+    {
+
+    }
+
+    LinMessage() :
+        m_id{0},
+        m_frame{0},
+        m_length{0},
+        m_dataPacket{LinDataPacket{0, 0, 0, 0, 0, 0, 0, 0}}
+    {
+
+    }
+
+    void setID(uint32_t id)
+    {
+        this->m_id = id;
+    }
+
+    void setFrame(uint8_t frame)
+    {
+        this->m_frame = frame;
+    }
+
+    void setLength(uint8_t length)
+    {
+        this->m_length = length;
+    }
+
+    void setDataPacket(const LinDataPacket &dataPacket)
+    {
+        this->m_dataPacket = dataPacket;
+    }
+
+    uint32_t id() const
+    {
+        return this->m_id;
+    }
+
+    uint8_t frame() const
+    {
+        return this->m_frame;
+    }
+
+    uint8_t length() const
+    {
+        return this->m_length;
+    }
+
+    unsigned char nthDataPacketByte(int index)
+    {
+        if ((index > 8) || (index < 0)) {
+            throw std::runtime_error(NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING + std::to_string(index));
+        }
+        return this->m_dataPacket.nthByte(index);
+    }
+
+    bool setDataPacketNthByte(int index, unsigned char nth)
+    {
+        return this->m_dataPacket.setNthByte(index, nth);
+    }
+
+    LinDataPacket dataPacket() const
+    {
+        return this->m_dataPacket;
+    }
+
+    std::string toString() const
+    {
+        using namespace GeneralUtilities;
+        if ((this->m_id == 0) &&
+            (this->m_frame == 0) &&
+            (this->m_length == 0) &&
+            (this->m_dataPacket == LinDataPacket{0, 0, 0, 0, 0, 0, 0, 0})) {
+            return "";
+        }
+        std::string returnString{"0x" + toFixedWidth(toHexString(this->m_id), LIN_ID_WIDTH) + ":"};
+        unsigned int i{0};
+        for (auto &it : this->m_dataPacket.dataPacket()) {
+            returnString += "0x" + toFixedWidth(toHexString(it), LIN_BYTE_WIDTH);
+            if (i++ != (this->m_dataPacket.dataPacket().size()-1)) {
+                returnString += ":";
+            }
+        }
+        return returnString;
+    }
+
+    std::string toPrettyString() const
+    {
+        using namespace GeneralUtilities;
+        if ((this->m_id == 0) &&
+            (this->m_frame == 0) &&
+            (this->m_length == 0) &&
+            (this->m_dataPacket == LinDataPacket{0, 0, 0, 0, 0, 0, 0, 0})) {
+            return "";
+        }
+        std::string returnString{"0x" + toFixedWidth(toHexString(this->m_id), LIN_ID_WIDTH) + " : "};
+        unsigned int i{0};
+        for (auto &it : this->m_dataPacket.dataPacket()) {
+            returnString += "0x" + toFixedWidth(toHexString(it), LIN_BYTE_WIDTH);
+            if (i++ != (this->m_dataPacket.dataPacket().size()-1)) {
+                returnString += " : ";
+            }
+        }
+        return returnString;
+    }
+
+    static uint32_t parseLinID(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        return hexStringToUInt(str);
+    }
+
+    static uint8_t parseLinByte(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        return hexStringToUChar(str);
+    }
+
+    static LinMessage parseLinMessage(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        std::vector<std::string> rawMsg{parseToVector(str, ':')};
+        if (rawMsg.size() != LIN_MESSAGE_SIZE) {
+            return LinMessage{};
+        }
+        LinMessage returnMessage;
+        int i{0};
+        returnMessage.setFrame(LIN_FRAME);
+        returnMessage.setLength(LIN_MESSAGE_LENGTH);
+        for (auto &it : rawMsg) {
+            if (i++ == 0) {
+                returnMessage.setID(parseLinID(it));
+            } else {
+                returnMessage.setDataPacketNthByte(i-2, parseLinByte(it));
+            }
+        }
+        return returnMessage;
+    }
+
+    friend bool operator==(const LinMessage &lhs, const LinMessage &rhs)
+    {
+        if (lhs.m_dataPacket.dataPacket().size() != lhs.m_dataPacket.dataPacket().size()) {
+            return false;
+        }
+        for (unsigned int i = 0; i < lhs.m_dataPacket.dataPacket().size(); i++) {
+            if (lhs.m_dataPacket.dataPacket().at(i) != rhs.m_dataPacket.dataPacket().at(i)) {
+                return false;
+            }
+        }
+        return ((lhs.m_id == rhs.m_id) &&
+                (lhs.m_frame == rhs.m_frame) &&
+                (lhs.m_length == rhs.m_length));
+    }
+
+    static uint8_t calculateChecksum(const LinMessage &linMessage)
+    {
+        //TODO:
+            /*
+            Public Function CheckSumCalc1(ByVal v As String) As String
+                Dim B As Integer
+                Dim ABit As Integer
+                Dim Rslt As Integer
+                For x = 1 To v.Length Step 2
+                    B = B + Val("&H" + Mid(v, x, 2))
+                Next
+                ABit = Int(B / 256)
+                B = (B And &HFF) + ABit
+                If B > 255 Then
+                    ABit = B / 256
+                    B = B + ABit
+                End If
+                Rslt = B Xor &HFF
+                CheckSumCalc1 = Hex(Rslt)
+            End Function
+            */
+        return 0;
+    }
+
+    static const int LIN_BYTE_WIDTH;
+    static const int LIN_ID_WIDTH;
+    static const unsigned int LIN_MESSAGE_SIZE;
+    static const unsigned char LIN_FRAME;
+    static const unsigned char LIN_MESSAGE_LENGTH;
+
+
+private:
+    uint32_t m_id;
+    uint8_t m_frame;
+    uint8_t m_length;
+    LinDataPacket m_dataPacket;
 
     static const char *NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING;
 };
