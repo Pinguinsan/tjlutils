@@ -77,6 +77,44 @@ namespace GeneralUtilities
     const long long int constexpr HOURS_PER_DAY{24};
     const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};
 
+    template <typename Container>
+    bool isSwitch(const std::string &switchToCheck, const Container &switches)
+    {
+        std::string copyString{switchToCheck};
+        std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
+        for (auto &it : switches) {
+            if ((copyString == it) && (copyString.length() == it.length()) && (copyString.find(it) == 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template <typename Container>
+    bool isSwitch(const char *switchToCheck, const Container &switches) 
+    { 
+        return isSwitch(static_cast<std::string>(switchToCheck), switches); 
+    }
+
+    template <typename Container>
+    bool isEqualSwitch(const std::string &switchToCheck, const Container &switches)
+    {
+        std::string copyString{switchToCheck};
+        std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
+        for (auto &it : switches) {
+            if (copyString.find(it + "=") == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template <typename Container>
+    bool isEqualSwitch(const char *switchToCheck, const Container &switches) 
+    { 
+        return isEqualSwitch(static_cast<std::string>(switchToCheck), switches); 
+    }
+
     bool isNonAsciiChar (char c);
     std::string stripNonAsciiCharacters(const std::string &str);    
     std::string stripLineEndings(const std::string &str);
