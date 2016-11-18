@@ -83,7 +83,7 @@ namespace GeneralUtilities
         std::string copyString{switchToCheck};
         std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
         for (auto &it : switches) {
-            if ((copyString == it) && (copyString.length() == it.length()) && (copyString.find(it) == 0)) {
+            if ((copyString == static_cast<std::string>(it)) && (copyString.length() == static_cast<std::string>(it).length()) && (copyString.find(static_cast<std::string>(it)) == 0)) {
                 return true;
             }
         }
@@ -97,12 +97,13 @@ namespace GeneralUtilities
     }
 
     template <typename Container>
-    bool isEqualSwitch(const std::string &switchToCheck, const Container &switches)
+    bool isEqualsSwitch(const std::string &switchToCheck, const Container &switches)
     {
         std::string copyString{switchToCheck};
         std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
         for (auto &it : switches) {
-            if (copyString.find(it + "=") == 0) {
+            std::string copySwitch{static_cast<std::string>(it) + "="};
+            if ((copyString.find(static_cast<std::string>(it) + "=") == 0)) {
                 return true;
             }
         }
@@ -110,9 +111,9 @@ namespace GeneralUtilities
     }
 
     template <typename Container>
-    bool isEqualSwitch(const char *switchToCheck, const Container &switches) 
+    bool isEqualsSwitch(const char *switchToCheck, const Container &switches) 
     { 
-        return isEqualSwitch(static_cast<std::string>(switchToCheck), switches); 
+        return isEqualsSwitch(static_cast<std::string>(switchToCheck), switches); 
     }
 
     bool isNonAsciiChar (char c);
