@@ -58,3 +58,9 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+win32 {
+    POST_LINK_SCRIPT = C:/Cygwin64/opt/GitHub/tjlutils/copy-headers-windows.sh
+    CYGWIN_DIR = C:/Cygwin64/bin/mintty.exe
+    QMAKE_POST_LINK += $$quote(cmd $$quote($${CYGWIN_DIR} $$quote($${POST_LINK_SCRIPT})))
+}
