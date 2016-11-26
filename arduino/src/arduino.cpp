@@ -205,8 +205,8 @@ const unsigned int Arduino::CAN_READ_BLANK_RETURN_SIZE{1};
 const unsigned int Arduino::CAN_INIT_RETURN_SIZE{1};
 const unsigned int Arduino::CAN_ID_WIDTH{3};
 const unsigned int Arduino::CAN_BYTE_WIDTH{2};
-const unsigned int Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT{100};
-const unsigned int Arduino::SERIAL_REPORT_OVERALL_TIME_LIMIT{550};
+const unsigned int Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT{1000};
+const unsigned int Arduino::SERIAL_REPORT_OVERALL_TIME_LIMIT{1000};
 
 const char *Arduino::CAN_INIT_HEADER{"{caninit"};
 const char *Arduino::CAN_READ_HEADER{"{canread"};
@@ -600,10 +600,7 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
     }
     long long int tempTimeout{serialPort->timeout()};
     serialPort->setTimeout(Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT);
-
-    serialPort->flushRXTX();
     serialPort->writeString(stringToSend);
-    serialPort->flushTX();
 #if defined(__USE_SERIAL_WRITE_DELAY__)
     delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
 #else
@@ -612,7 +609,13 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
     }
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
-    *returnString = serialPort->readStringUntil('}');
+    std::future<std::string> returnHandle{serialPort->asyncReadStringUntil("}")};
+    do {
+        if (returnHandle.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            *returnString = returnHandle.get();
+            break;
+        }
+    } while (true);
     serialPort->setTimeout(tempTimeout);
     if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
@@ -637,7 +640,6 @@ std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringT
         serialPort->openPort();
         delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
     }
-    serialPort->flushRXTX();
     serialPort->writeString(stringToSend);
 #if defined(__USE_SERIAL_WRITE_DELAY__)
     delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
@@ -647,7 +649,13 @@ std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringT
     }
 #endif
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
-    *returnString = serialPort->readStringUntil(endHeader);
+    std::future<std::string> returnHandle{serialPort->asyncReadStringUntil(endHeader)};
+    do {
+        if (returnHandle.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            *returnString = returnHandle.get();
+            break;
+        }
+    } while (true);
     if (startsWith(*returnString, header) && endsWith(*returnString, endHeader)) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);

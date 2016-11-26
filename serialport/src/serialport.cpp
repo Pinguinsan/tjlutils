@@ -415,13 +415,27 @@ std::string SerialPort::staticReadString(std::shared_ptr<SerialPort> serialPort)
 std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const std::string &readUntil)
 {
     std::string returnString{""};
+    std::unique_ptr<EventTimer> eventTimer{std::make_unique<EventTimer>()};
+    std::unique_ptr<EventTimer> innerEventTimer{std::make_unique<EventTimer>()};
+    long long int timeout{0};
+    if (serialPort->timeout() <= 0) {
+        timeout = 0;
+    } else {
+        timeout = serialPort->timeout();
+    }
+    eventTimer->start();
     do {
         std::string tempString{""};
+        innerEventTimer->start();
         do {
             tempString = serialPort->readStringUntil(readUntil);
-        } while (tempString.length() == 0);
+            innerEventTimer->update();
+        } while ((tempString.length() == 0) && (eventTimer->totalMilliseconds() <= timeout));
         returnString += tempString;
-    } while (!GeneralUtilities::endsWith(returnString, readUntil) && (returnString.size() < serialPort->maximumReadSize()));
+        eventTimer->update();
+    } while ((!GeneralUtilities::endsWith(returnString, readUntil)) && 
+             (returnString.size() < serialPort->maximumReadSize()) &&
+             eventTimer->totalMilliseconds() <= timeout);
     return returnString;
 }
 

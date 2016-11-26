@@ -46,6 +46,7 @@
 #include "fileutilities.h"
 #include "generalutilities.h"
 #include "prettyprinter.h"
+#include "eventtimer.h"
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
