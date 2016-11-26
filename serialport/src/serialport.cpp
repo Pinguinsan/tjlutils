@@ -1813,7 +1813,7 @@ LineEnding SerialPort::doUserSelectLineEndings()
                                              SerialPort::DEFAULT_LINE_ENDING_STRING.c_str());
 }
 
-std::shared_ptr<SerialPort> doUserSelectSerialPort()
+std::shared_ptr<SerialPort> SerialPort::doUserSelectSerialPort()
 {
     try {
         std::string serialPortName{SerialPort::doUserSelectSerialPortName()};
