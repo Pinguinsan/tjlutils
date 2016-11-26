@@ -1759,3 +1759,77 @@ bool SerialPort::isValidSerialPortName(const std::string &serialPortName)
         return false;
     #endif
 }
+
+std::string SerialPort::doUserSelectSerialPortName()
+{
+    std::vector<const char *> serialPorts;
+    for (auto &it : SerialPort::availableSerialPorts()) {
+        serialPorts.push_back(it.c_str());
+    }
+    return SerialPort::doUserSelectParameter<std::string>(std::string{"serial port"}, 
+                                             [](const std::string &str) -> std::string { return str; },
+                                             serialPorts,
+                                             ""); 
+}
+
+BaudRate SerialPort::doUserSelectBaudRate()
+{
+    std::function<BaudRate(const std::string &)> tempFunc{static_cast<BaudRate (*)(const std::string &)>(&SerialPort::parseBaudRateFromRaw)};
+    return SerialPort::doUserSelectParameter<BaudRate>(std::string{"baud rate"}, 
+                                             tempFunc,
+                                             SerialPort::availableBaudRates(),
+                                             SerialPort::DEFAULT_BAUD_RATE_STRING.c_str());
+}
+
+StopBits SerialPort::doUserSelectStopBits()
+{
+    return SerialPort::doUserSelectParameter<StopBits>(std::string{"stop bits"}, 
+                                             static_cast<StopBits (*)(const std::string &)>(&SerialPort::parseStopBitsFromRaw),
+                                             SerialPort::availableStopBits(),
+                                             SerialPort::DEFAULT_STOP_BITS_STRING.c_str());
+}
+
+DataBits SerialPort::doUserSelectDataBits()
+{
+    return SerialPort::doUserSelectParameter<DataBits>(std::string{"data bits"}, 
+                                             static_cast<DataBits (*)(const std::string &)>(&SerialPort::parseDataBitsFromRaw),
+                                             SerialPort::availableDataBits(),
+                                             SerialPort::DEFAULT_DATA_BITS_STRING.c_str());
+}
+
+Parity SerialPort::doUserSelectParity()
+{
+    return SerialPort::doUserSelectParameter<Parity>(std::string{"parity"}, 
+                                             static_cast<Parity (*)(const std::string &)>(&SerialPort::parseParityFromRaw),
+                                             SerialPort::availableParity(),
+                                             SerialPort::DEFAULT_PARITY_STRING.c_str());
+}
+
+LineEnding SerialPort::doUserSelectLineEndings()
+{
+    return SerialPort::doUserSelectParameter<LineEnding>(std::string{"line endings"},
+                                             static_cast<LineEnding (*)(const std::string &)>(&SerialPort::parseLineEndingFromRaw),
+                                             SerialPort::availableLineEndings(),
+                                             SerialPort::DEFAULT_LINE_ENDING_STRING.c_str());
+}
+
+std::shared_ptr<SerialPort> doUserSelectSerialPort()
+{
+    try {
+        std::string serialPortName{SerialPort::doUserSelectSerialPortName()};
+        BaudRate baudRate{SerialPort::doUserSelectBaudRate()};
+        DataBits dataBits{SerialPort::doUserSelectDataBits()};
+        StopBits stopBits{SerialPort::doUserSelectStopBits()};
+        Parity parity{SerialPort::doUserSelectParity()};
+        LineEnding lineEnding{SerialPort::doUserSelectLineEndings()};
+        std::shared_ptr<SerialPort> serialPort{std::make_shared<SerialPort>(serialPortName,
+                                                                            baudRate,
+                                                                            dataBits,
+                                                                            stopBits,
+                                                                            parity)};
+        serialPort->setLineEnding(lineEnding);
+        return serialPort;
+    } catch (std::exception &e) {
+        return nullptr;
+    }            
+}
