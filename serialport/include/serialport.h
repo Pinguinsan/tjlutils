@@ -41,8 +41,10 @@
 #include <chrono>
 #include <memory>
 #include <algorithm>
-#include <systemcommand.h>
-#include <fileutilities.h>
+#include <future>
+#include "systemcommand.h"
+#include "fileutilities.h"
+
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
@@ -84,7 +86,7 @@ enum class LineEnding {
     LE_CarriageReturnLineFeed
 };
 
-class SerialPort
+class SerialPort : public std::enable_shared_from_this<SerialPort>
 {
 public:
     SerialPort(const std::string &name);
@@ -114,11 +116,17 @@ public:
     void closePort();
     unsigned char readByte();
     std::string readString();
-    std::string readStringUntil(const std::string &str);
-    std::string readStringUntil(char identifier);
-    std::string readStringUntil(const char *str);
+    std::string readStringUntil(const std::string &readUntil);
+    std::string readStringUntil(char readUntil);
+    std::string readStringUntil(const char *readUntil);
     void writeString(const std::string &str);
     void writeString(const char *str);
+    void asyncWriteString(const std::string &str);
+    void asyncWriteString(const char *str);
+    std::future<std::string> asyncReadString();
+    std::future<std::string> asyncReadStringUntil(const std::string &readUntil);
+    std::future<std::string> asyncReadStringUntil(char readUntil);
+    std::future<std::string> asyncReadStringUntil(const char *readUntil);
     bool isDCDEnabled() const;
     bool isCTSEnabled() const;
     bool isDSREnabled() const;
@@ -224,7 +232,6 @@ private:
     int m_retryCount;
     bool m_isOpen;
     int m_maximumReadSize;
-    std::vector<std::string> m_internalBuffer;
 
     static const int constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);
@@ -243,6 +250,14 @@ private:
     static std::pair<int, int> parseParity(Parity parity);
     static std::string parseLineEnding(LineEnding lineEnding);
 
+    static void staticWriteString(std::shared_ptr<SerialPort> serialPort, const std::string &str);
+    static void staticWriteString(std::shared_ptr<SerialPort> serialPort, const char *str);
+
+    static std::string staticReadString(std::shared_ptr<SerialPort> serialPort);
+    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const std::string &readUntil);
+    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, char readUntil);
+    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const char *readUntil);
+    
     static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
     static const std::vector<const char *> s_AVAILABLE_PARITY;
     static const std::vector<const char *> s_AVAILABLE_STOP_BITS;

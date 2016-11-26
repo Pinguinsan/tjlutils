@@ -24,7 +24,7 @@
 #include <chrono>
 #include <string>
 #include "generalutilities.h"
-#include <mathutilities.h>
+#include "mathutilities.h"
 
 class EventTimer
 {

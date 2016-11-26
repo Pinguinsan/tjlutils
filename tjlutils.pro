@@ -37,8 +37,7 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            serialport/src/serialport.cpp \
            eventtimer/src/eventtimer.cpp \
            arduino/src/arduino.cpp \
-           prettyprinter/src/prettyprinter.cpp \
-    serialport/src/smartserialportfuture.cpp
+           prettyprinter/src/prettyprinter.cpp
 
 HEADERS += systemcommand/include/systemcommand.h \
            pythoncrypto/include/pythoncrypto.h \
@@ -53,8 +52,7 @@ HEADERS += systemcommand/include/systemcommand.h \
            prettyprinter/include/prettyprinter \
            arduino/include/arduino.h \
            templateobjects/templateobjects.h \
-           common/tjlutils.h \            
-    serialport/include/smartserialportfuture.h
+           common/tjlutils.h            
 
 unix {
     target.path = /usr/lib
