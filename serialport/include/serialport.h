@@ -224,6 +224,7 @@ private:
     int m_retryCount;
     bool m_isOpen;
     int m_maximumReadSize;
+    std::vector<std::string> m_internalBuffer;
 
     static const int constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);

@@ -75,7 +75,8 @@ SerialPort::SerialPort(const std::string &name) :
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -93,7 +94,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate) :
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -111,7 +113,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -129,7 +132,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -147,7 +151,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -165,7 +170,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -183,7 +189,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -201,7 +208,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -219,7 +227,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits) :
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -237,7 +246,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -255,7 +265,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -273,7 +284,8 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, Parity parity
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -291,7 +303,8 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits) :
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -309,7 +322,8 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits, Parity parity
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -327,7 +341,8 @@ SerialPort::SerialPort(const std::string &name, Parity parity) :
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_maximumReadSize{SERIAL_PORT_BUF_MAX}
+    m_maximumReadSize{SERIAL_PORT_BUF_MAX},
+    m_internalBuffer{}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -345,7 +360,8 @@ SerialPort::SerialPort(SerialPort &&other) :
     m_timeout{std::move(other.m_timeout)},
     m_retryCount{std::move(other.m_retryCount)},
     m_isOpen{std::move(other.m_isOpen)},
-    m_maximumReadSize{std::move(other.m_maximumReadSize)}
+    m_maximumReadSize{std::move(other.m_maximumReadSize)},
+    m_internalBuffer{}
 {
 
 }
@@ -703,6 +719,8 @@ unsigned char SerialPort::rawRead()
     }
 #endif
 }
+
+S
 
 unsigned char SerialPort::timedRead()
 {
