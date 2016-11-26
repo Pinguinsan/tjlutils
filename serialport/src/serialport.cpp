@@ -414,29 +414,25 @@ std::string SerialPort::staticReadString(std::shared_ptr<SerialPort> serialPort)
 
 std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const std::string &readUntil)
 {
-    std::string tempString{""};
+    std::string returnString{""};
     do {
-        tempString = serialPort->readStringUntil(readUntil);
-    } while (tempString.length() == 0);
-    return tempString;
+        std::string tempString{""};
+        do {
+            tempString = serialPort->readStringUntil(readUntil);
+        } while (tempString.length() == 0);
+        returnString += tempString;
+    } while (!GeneralUtilities::endsWith(returnString, readUntil) && (returnString.size() < serialPort->maximumReadSize()));
+    return returnString;
 }
 
 std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const char *readUntil)
 {
-    std::string tempString{""};
-    do {
-        tempString = serialPort->readStringUntil(static_cast<std::string>(readUntil));
-    } while (tempString.length() == 0);
-    return tempString;
+    return SerialPort::staticReadStringUntil(serialPort, static_cast<std::string>(readUntil));
 }
 
 std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, char readUntil)
 {    
-    std::string tempString{""};
-    do {
-        serialPort->readStringUntil(std::string{1, readUntil});
-    } while (tempString.length() == 0);
-    return tempString;
+    return SerialPort::staticReadStringUntil(serialPort, std::string{1, readUntil});
 }
 
 bool operator==(const SerialPort &lhs, const SerialPort &rhs)
