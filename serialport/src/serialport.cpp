@@ -433,6 +433,9 @@ std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serial
         } while ((tempString.length() == 0) && (innerEventTimer->totalMilliseconds() <= timeout));
         returnString += tempString;
         eventTimer->update();
+        if (returnString.find(readUntil) != std::string::npos) {
+            returnString = returnString.substr(0, returnString.find(readUntil));
+        }
     } while ((!GeneralUtilities::endsWith(returnString, readUntil)) && 
              (returnString.size() < serialPort->maximumReadSize()) &&
              eventTimer->totalMilliseconds() <= timeout);
