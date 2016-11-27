@@ -31,7 +31,7 @@ namespace FileUtilities
         struct dirent *entity;
         if ((targetDirectory = opendir(directory)) != nullptr) {
             while ((entity = readdir(targetDirectory)) != nullptr) {
-                if ((!directoryExists(entity->d_name)) && (fileExists(entity->d_name))) {
+                if (!directoryExists(entity->d_name)) {
                     returnVector.emplace_back(entity->d_name);
                 }
             }
@@ -75,21 +75,9 @@ namespace FileUtilities
 
     std::list<std::string> getFileList(const char *directory)
     {
-        if (!directoryExists(directory)) {
-            return std::list<std::string>{};
-        }
         std::list<std::string> returnList;
-        DIR *targetDirectory;
-        struct dirent *entity;
-        if ((targetDirectory = opendir(directory)) != nullptr) {
-            while ((entity = readdir(targetDirectory)) != nullptr) {
-                if ((!directoryExists(entity->d_name)) && (fileExists(entity->d_name))) {
-                    returnList.emplace_back(entity->d_name);
-                }
-            }
-            closedir (targetDirectory);
-        } else {
-            return std::list<std::string>{};
+        for (auto &it : FileUtilities::getFileListAsVector(directory)) {
+            returnList.emplace_back(it);
         }
         returnList.sort();
         return returnList;
@@ -97,21 +85,9 @@ namespace FileUtilities
 
     std::list<std::string> getDirectoryList(const char *directory)
     {
-        if (!directoryExists(directory)) {
-            return std::list<std::string>{};
-        }
         std::list<std::string> returnList;
-        DIR *targetDirectory;
-        struct dirent *entity;
-        if ((targetDirectory = opendir(directory)) != nullptr) {
-            while ((entity = readdir(targetDirectory)) != nullptr) {
-                if (directoryExists(entity->d_name)) {
-                    returnList.emplace_back(entity->d_name);
-                }
-            }
-            closedir (targetDirectory);
-        } else {
-            return std::list<std::string>{};
+        for (auto &it : FileUtilities::getDirectoryListAsVector(directory)) {
+            returnList.emplace_back(it);
         }
         returnList.sort();
         return returnList;
