@@ -21,7 +21,7 @@
 namespace FileUtilities
 {
 
-    std::vector<std::string> getFileListAsVector(const char *directory)
+    std::vector<std::string> getFileListAsVector(const char *directory, const char *mask, bool caseSensitive)
     {
         if (!directoryExists(directory)) {
             return std::vector<std::string>{};
@@ -32,7 +32,19 @@ namespace FileUtilities
         if ((targetDirectory = opendir(directory)) != nullptr) {
             while ((entity = readdir(targetDirectory)) != nullptr) {
                 if (!directoryExists(entity->d_name)) {
-                    returnVector.emplace_back(entity->d_name);
+                    std::string maskCopy{static_cast<std::string>(mask)};
+                    std::string nameCopy{static_cast<std::string>(entity->d_name)};
+                    if (maskCopy != "") {
+                        if (!caseSensitive) {
+                            std::transform(maskCopy.begin(), maskCopy.end(), maskCopy.begin(), ::tolower);
+                            std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
+                        }
+                        if (nameCopy.find(maskCopy) != std::string::npos) {
+                            returnVector.emplace_back(entity->d_name);
+                        }
+                    } else { 
+                        returnVector.emplace_back(entity->d_name);
+                    }
                 }
             }
             closedir (targetDirectory);
@@ -42,7 +54,7 @@ namespace FileUtilities
         return returnVector;
     }
 
-    std::vector<std::string> getDirectoryListAsVector(const char *directory)
+    std::vector<std::string> getDirectoryListAsVector(const char *directory, const char *mask, bool caseSensitive)
     {
         if (!directoryExists(directory)) {
             return std::vector<std::string>{};
@@ -53,7 +65,19 @@ namespace FileUtilities
         if ((targetDirectory = opendir(directory)) != nullptr) {
             while ((entity = readdir(targetDirectory)) != nullptr) {
                 if (directoryExists(entity->d_name)) {
-                    returnVector.emplace_back(entity->d_name);
+                    std::string maskCopy{static_cast<std::string>(mask)};
+                    std::string nameCopy{static_cast<std::string>(entity->d_name)};
+                    if (maskCopy != "") {
+                        if (!caseSensitive) {
+                            std::transform(maskCopy.begin(), maskCopy.end(), maskCopy.begin(), ::tolower);
+                            std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
+                        }
+                        if (nameCopy.find(maskCopy) != std::string::npos) {
+                            returnVector.emplace_back(entity->d_name);
+                        }
+                    } else { 
+                        returnVector.emplace_back(entity->d_name);
+                    }
                 }
             }
             closedir (targetDirectory);
@@ -63,44 +87,84 @@ namespace FileUtilities
         return returnVector;
     }
 
-    std::vector<std::string> getFileListAsVector(const std::string &directory)
+    std::vector<std::string> getFileListAsVector(const std::string &directory, const std::string &mask, bool caseSensitive)
     {
-        return getFileListAsVector(directory.c_str());
+        return getFileListAsVector(directory.c_str(), mask.c_str(), caseSensitive);
     }
 
-    std::vector<std::string> getDirectoryListAsVector(const std::string &directory)
+    std::vector<std::string> getFileListAsVector(const char *directory, const std::string &mask, bool caseSensitive)
     {
-        return getDirectoryListAsVector(directory.c_str());
+        return getFileListAsVector(directory, mask.c_str(), caseSensitive);
     }
 
-    std::list<std::string> getFileList(const char *directory)
+    std::vector<std::string> getFileListAsVector(const std::string &directory, const char *mask, bool caseSensitive)
+    {
+        return getFileListAsVector(directory.c_str(), mask, caseSensitive);
+    }
+
+    std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const std::string &mask, bool caseSensitive)
+    {
+        return getDirectoryListAsVector(directory.c_str(), mask.c_str(), caseSensitive);
+    }
+
+    std::vector<std::string> getDirectoryListAsVector(const char *directory, const std::string &mask, bool caseSensitive)
+    {
+        return getDirectoryListAsVector(directory, mask.c_str(), caseSensitive);
+    }
+
+    std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const char *mask, bool caseSensitive)
+    {
+        return getDirectoryListAsVector(directory.c_str(), mask, caseSensitive);
+    }
+
+    std::list<std::string> getFileList(const char *directory, const char *mask, bool caseSensitive)
     {
         std::list<std::string> returnList;
-        for (auto &it : FileUtilities::getFileListAsVector(directory)) {
+        for (auto &it : FileUtilities::getFileListAsVector(directory, mask, caseSensitive)) {
             returnList.emplace_back(it);
         }
         returnList.sort();
         return returnList;
     }
 
-    std::list<std::string> getDirectoryList(const char *directory)
+    std::list<std::string> getDirectoryList(const char *directory, const char *mask, bool caseSensitive)
     {
         std::list<std::string> returnList;
-        for (auto &it : FileUtilities::getDirectoryListAsVector(directory)) {
+        for (auto &it : FileUtilities::getDirectoryListAsVector(directory, mask, caseSensitive)) {
             returnList.emplace_back(it);
         }
         returnList.sort();
         return returnList;
     }
 
-    std::list<std::string> getFileList(const std::string &directory)
+    std::list<std::string> getFileList(const std::string &directory, const std::string &mask, bool caseSensitive)
     {
-        return getFileList(directory.c_str());
+        return getFileList(directory.c_str(), mask.c_str(), caseSensitive);
     }
 
-    std::list<std::string> getDirectoryList(const std::string &directory)
+    std::list<std::string> getFileList(const char *directory, const std::string &mask, bool caseSensitive)
     {
-        return getDirectoryList(directory.c_str());
+        return getFileList(directory, mask.c_str(), caseSensitive);
+    }
+
+    std::list<std::string> getFileList(const std::string &directory, const char *mask, bool caseSensitive)
+    {
+        return getFileList(directory.c_str(), mask, caseSensitive);
+    }
+
+    std::list<std::string> getDirectoryList(const std::string &directory, const std::string &mask, bool caseSensitive)
+    {
+        return getDirectoryList(directory.c_str(), mask.c_str(), caseSensitive);
+    }
+
+    std::list<std::string> getDirectoryList(const char *directory, const std::string &mask, bool caseSensitive)
+    {
+        return getDirectoryList(directory, mask.c_str(), caseSensitive);
+    }
+
+    std::list<std::string> getDirectoryList(const std::string &directory, const char *mask, bool caseSensitive)
+    {
+        return getDirectoryList(directory.c_str(), mask, caseSensitive);
     }
 
     std::string getCurrentDirectory()
