@@ -21,6 +21,112 @@
 namespace FileUtilities
 {
 
+    std::vector<std::string> getFileListAsVector(const char *directory)
+    {
+        if (!directoryExists(directory)) {
+            return std::vector<std::string>{};
+        }
+        std::vector<std::string> returnVector;
+        DIR *targetDirectory;
+        struct dirent *entity;
+        if ((targetDirectory = opendir(directory)) != nullptr) {
+            while ((entity = readdir(targetDirectory)) != nullptr) {
+                if ((!directoryExists(entity->d_name)) && (fileExists(entity->d_name))) {
+                    returnVector.emplace_back(entity->d_name);
+                }
+            }
+            closedir (targetDirectory);
+        } else {
+            return std::vector<std::string>{};
+        }
+        return returnVector;
+    }
+
+    std::vector<std::string> getDirectoryListAsVector(const char *directory)
+    {
+        if (!directoryExists(directory)) {
+            return std::vector<std::string>{};
+        }
+        std::vector<std::string> returnVector;
+        DIR *targetDirectory;
+        struct dirent *entity;
+        if ((targetDirectory = opendir(directory)) != nullptr) {
+            while ((entity = readdir(targetDirectory)) != nullptr) {
+                if (directoryExists(entity->d_name)) {
+                    returnVector.emplace_back(entity->d_name);
+                }
+            }
+            closedir (targetDirectory);
+        } else {
+            return std::vector<std::string>{};
+        }
+        return returnVector;
+    }
+
+    std::vector<std::string> getFileListAsVector(const std::string &directory)
+    {
+        return getFileListAsVector(directory.c_str());
+    }
+
+    std::vector<std::string> getDirectoryListAsVector(const std::string &directory)
+    {
+        return getDirectoryListAsVector(directory.c_str());
+    }
+
+    std::list<std::string> getFileList(const char *directory)
+    {
+        if (!directoryExists(directory)) {
+            return std::list<std::string>{};
+        }
+        std::list<std::string> returnList;
+        DIR *targetDirectory;
+        struct dirent *entity;
+        if ((targetDirectory = opendir(directory)) != nullptr) {
+            while ((entity = readdir(targetDirectory)) != nullptr) {
+                if ((!directoryExists(entity->d_name)) && (fileExists(entity->d_name))) {
+                    returnList.emplace_back(entity->d_name);
+                }
+            }
+            closedir (targetDirectory);
+        } else {
+            return std::list<std::string>{};
+        }
+        returnList.sort();
+        return returnList;
+    }
+
+    std::list<std::string> getDirectoryList(const char *directory)
+    {
+        if (!directoryExists(directory)) {
+            return std::list<std::string>{};
+        }
+        std::list<std::string> returnList;
+        DIR *targetDirectory;
+        struct dirent *entity;
+        if ((targetDirectory = opendir(directory)) != nullptr) {
+            while ((entity = readdir(targetDirectory)) != nullptr) {
+                if (directoryExists(entity->d_name)) {
+                    returnList.emplace_back(entity->d_name);
+                }
+            }
+            closedir (targetDirectory);
+        } else {
+            return std::list<std::string>{};
+        }
+        returnList.sort();
+        return returnList;
+    }
+
+    std::list<std::string> getFileList(const std::string &directory)
+    {
+        return getFileList(directory.c_str());
+    }
+
+    std::list<std::string> getDirectoryList(const std::string &directory)
+    {
+        return getDirectoryList(directory.c_str());
+    }
+
     std::string getCurrentDirectory()
     {
         #if defined(_WIN32) || defined (__MINGW32__)

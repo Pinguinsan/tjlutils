@@ -39,6 +39,7 @@
 #include <exception>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #if defined(_WIN32) || defined(__MINGW32__)
     #include <direct.h>
@@ -54,6 +55,14 @@ namespace FileUtilities
     const std::string _PATL_ARGC_ZERO_EXCEPTION_STRING{"argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant"};
 
     std::string getCurrentDirectory();
+    std::vector<std::string> getFileListAsVector(const std::string &directory);
+    std::vector<std::string> getFileListAsVector(const char *directory);
+    std::vector<std::string> getDirectoryListAsVector(const std::string &directory);
+    std::vector<std::string> getDirectoryListAsVector(const char *directory);
+    std::list<std::string> getFileList(const std::string &directory);
+    std::list<std::string> getFileList(const char *directory);
+    std::list<std::string> getDirectoryList(const std::string &directory);
+    std::list<std::string> getDirectoryList(const char *directory);
     bool directoryExists(const std::string &directoryToCheck);
     bool directoryExists(const char *directoryToCheck);
     bool fileExists(const std::string &fileToCheck);
