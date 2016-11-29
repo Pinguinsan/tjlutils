@@ -79,6 +79,33 @@
     <Filter Include="crypto\include">
       <UniqueIdentifier>{76b3172a-efb2-495a-986f-1b1554f0108e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="prettyprinter">
+      <UniqueIdentifier>{736ef01d-cab6-497b-a1ac-338497d29b5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prettyprinter\src">
+      <UniqueIdentifier>{8c45254b-523e-4038-9085-3e9e18816ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prettyprinter\include">
+      <UniqueIdentifier>{02c0e3e2-ce01-4812-888c-21959b0e6c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arduino">
+      <UniqueIdentifier>{5bbda4d1-baeb-4738-bf58-826ca45408bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arduino\src">
+      <UniqueIdentifier>{725d37ed-ce0f-44bd-a539-d25f1850712b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arduino\include">
+      <UniqueIdentifier>{985f485e-1b65-47a2-b694-45ed69d3da6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serialport">
+      <UniqueIdentifier>{4e03420d-59b8-4036-8f6d-2652feaeb9d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serialport\src">
+      <UniqueIdentifier>{209e846c-5ffb-411f-8f9d-26045f4c89b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serialport\include">
+      <UniqueIdentifier>{d53a9ab6-7cf1-4af2-badf-6668cd550ad5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\tjlutils.h">
@@ -111,6 +138,18 @@
     <ClInclude Include="crypto\include\hash.h">
       <Filter>crypto\include</Filter>
     </ClInclude>
+    <ClInclude Include="prettyprinter\include\prettyprinter.h">
+      <Filter>prettyprinter\include</Filter>
+    </ClInclude>
+    <ClInclude Include="arduino\include\arduino.h">
+      <Filter>arduino\include</Filter>
+    </ClInclude>
+    <ClInclude Include="serialport\include\serialport.h">
+      <Filter>serialport\include</Filter>
+    </ClInclude>
+    <ClInclude Include="fileutilities\include\win32-dirent.h">
+      <Filter>fileutilities\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="datetime\src\datetime.cpp">
@@ -133,6 +172,18 @@
     </ClCompile>
     <ClCompile Include="crypto\src\crypto.cpp">
       <Filter>crypto\src</Filter>
+    </ClCompile>
+    <ClCompile Include="prettyprinter\src\prettyprinter.cpp">
+      <Filter>prettyprinter\src</Filter>
+    </ClCompile>
+    <ClCompile Include="arduino\src\arduino.cpp">
+      <Filter>arduino\src</Filter>
+    </ClCompile>
+    <ClCompile Include="serialport\src\serialport.cpp">
+      <Filter>serialport\src</Filter>
+    </ClCompile>
+    <ClCompile Include="fileutilities\src\win32-dirent.cpp">
+      <Filter>fileutilities\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

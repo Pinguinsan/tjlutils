@@ -40,6 +40,7 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+#include <cctype>
 #include <algorithm>
 #include <future>
 #include "systemcommand.h"

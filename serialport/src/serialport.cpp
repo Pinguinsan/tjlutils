@@ -1240,7 +1240,7 @@ long long int SerialPort::timeout() const
 
 int SerialPort::retryCount() const
 {
-    return this->retryCount();
+    return this->m_retryCount;
 }
 
 void SerialPort::setTimeout(long long int timeout) {

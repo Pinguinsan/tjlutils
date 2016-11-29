@@ -40,6 +40,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "systemcommand.h"
+#include "fileutilities.h"
 #include "generalutilities.h"
 #include "mathutilities.h"
 
@@ -50,22 +51,21 @@ public:
     ~PythonCrypto();
     std::string getSHA256Hash(const std::string &stringToHash);
     std::string getSHA512Hash(const std::string &stringToHash);
-    bool fileExists(const std::string &filename);
     void generatePythonCryptoScript(const std::string &outputFilename);
     bool pythonInstalled();
 
 private:
-    static const std::string SYSTEM_PYTHON_COMMAND;
-    static const std::string PYTHON_CRYPTO_FILE_NAME;
-    static const std::string SHA256_SWITCH;
-    static const std::string SHA512_SWITCH;
-    static const std::string PYTHON_INSTALLED_QUERY_STRING;
-    static const std::string PYTHON_NOT_INSTALLED_IDENTIFIER_STRING;
-    static const std::vector<std::string> pythonCryptoScriptSource;
-    
+    std::string m_filename;
+    std::mt19937 m_rng;
+
     std::string getHash(const std::string &hashSwitch, const std::string &stringToHash);
-    std::string _filename;
-    std::mt19937 _rng;
+	static const std::string SYSTEM_PYTHON_COMMAND;
+	static const std::string PYTHON_CRYPTO_FILE_NAME;
+	static const std::string SHA256_SWITCH;
+	static const std::string SHA512_SWITCH;
+	static const std::string PYTHON_INSTALLED_QUERY_STRING;
+	static const std::string PYTHON_NOT_INSTALLED_IDENTIFIER_STRING;
+	static const std::vector<std::string> pythonCryptoScriptSource;
 
 };
 

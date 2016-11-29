@@ -51,13 +51,15 @@
 #include <list>
 
 #if (__cplusplus < 201402L)
-    namespace std {
-        template<typename T, typename ...Args>
-        unique_ptr<T> make_unique( Args&& ...args )
-        {
-            return unique_ptr<T>( new T( forward<Args>(args)... ) );
-        }
-    }
+	#if ((defined(_MSC_VER) && (_MSC_VER < 1700)) || (!defined(_MSC_VER)))
+		namespace std {
+			template<typename T, typename ...Args>
+			unique_ptr<T> make_unique( Args&& ...args )
+			{
+				return unique_ptr<T>( new T( forward<Args>(args)... ) );
+			}
+		}
+	#endif
 #endif
 
 namespace GeneralUtilities

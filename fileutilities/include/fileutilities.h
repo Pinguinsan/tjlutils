@@ -40,11 +40,12 @@
 #include <exception>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
-#if defined(_WIN32) || defined(__MINGW32__)
+#if defined(_WIN32) && !defined(__CYGWIN__)
     #include <direct.h>
+ 	#include "win32-dirent.h"
 #else
+	#include <dirent.h>
     #include <unistd.h>
     #include <climits>
 #endif

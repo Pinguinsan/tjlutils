@@ -5,7 +5,7 @@ const std::string PythonCrypto::PYTHON_CRYPTO_FILE_NAME{"crypto.py"};
 const std::string PythonCrypto::SHA256_SWITCH{"--sha256 "};
 const std::string PythonCrypto::SHA512_SWITCH{"--sha512 "};
 const std::string PythonCrypto::PYTHON_INSTALLED_QUERY_STRING{"python --help"};
-#ifdef _WIN32
+#if defined(_WIN32)
     const std::string PythonCrypto::PYTHON_NOT_INSTALLED_IDENTIFIER_STRING{"is not recognized"};
 #else
     const std::string PythonCrypto::PYTHON_NOT_INSTALLED_IDENTIFIER_STRING{"command not found"};
@@ -24,8 +24,8 @@ const std::vector<std::string> PythonCrypto::pythonCryptoScriptSource{"#!/bin/py
                                                                        "    print(sha512Hash(sys.argv[2]))"};
 
 PythonCrypto::PythonCrypto() :
-    _filename{PYTHON_CRYPTO_FILE_NAME},
-    _rng{MathUtilities::randomlySeededMersenneTwister()}
+    m_filename{PYTHON_CRYPTO_FILE_NAME},
+    m_rng{}
 {
     if (!pythonInstalled()) {
         throw std::runtime_error("Python is not installed in the path");
@@ -34,13 +34,13 @@ PythonCrypto::PythonCrypto() :
 
 std::string PythonCrypto::getHash(const std::string &hashSwitch, const std::string &stringToHash)
 {
-    this->_filename = GeneralUtilities::toString(this->_rng()) + PYTHON_CRYPTO_FILE_NAME;
-    generatePythonCryptoScript(this->_filename);
-    SystemCommand systemCommand{SYSTEM_PYTHON_COMMAND + this->_filename + " " + hashSwitch  + GeneralUtilities::tQuoted(stringToHash)};
+    this->m_filename = GeneralUtilities::toString(this->m_rng()) + PYTHON_CRYPTO_FILE_NAME;
+    generatePythonCryptoScript(this->m_filename);
+    SystemCommand systemCommand{SYSTEM_PYTHON_COMMAND + this->m_filename + " " + hashSwitch  + GeneralUtilities::tQuoted(stringToHash)};
     std::string hashedString = systemCommand.executeAndWaitForOutputAsString();
-    int tempRemove = std::remove(this->_filename.c_str());
+    int tempRemove = std::remove(this->m_filename.c_str());
     if (tempRemove) {
-        std::cout << "WARNING: Failed to remove " << GeneralUtilities::tQuoted(this->_filename) << ", this file can be removed manually" << std::endl;
+        std::cout << "WARNING: Failed to remove " << GeneralUtilities::tQuoted(this->m_filename) << ", this file can be removed manually" << std::endl;
     }
     return hashedString;
 }

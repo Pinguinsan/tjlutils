@@ -212,10 +212,10 @@ namespace FileUtilities
 
     bool fileExists(const std::string &fileToCheck)
     {
-        #if defined(_WIN32_) || defined(__CYGWIN__)
+        #if defined(_WIN32) && !defined(__CYGWIN__)
             std::ifstream readFromFile;
             readFromFile.open(fileToCheck);
-            if (readFromFile.is_open()) {
+            if (readFromFile.good()) {
                 readFromFile.close();
                 return true;
             } else {
