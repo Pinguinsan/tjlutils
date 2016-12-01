@@ -39,6 +39,7 @@
 #include <vector>
 #include <sstream>
 #include <random>
+#include <cstdlib>
 #include <memory>
 #include <chrono>
 #include <map>
@@ -598,7 +599,19 @@ namespace GeneralUtilities
             }
         }
         return copyString;
-    }   
+    }
+
+    #if defined(__ANDROID__)
+        namespace std {
+            template<typename T>
+            to_string(const T &convert) { return toString(convert); }
+            
+            int stoi(const std::stirng &str) {
+                return atoi(str.c_str());
+            }
+        }
+
+    #endif
 
 
 }
