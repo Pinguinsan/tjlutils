@@ -356,10 +356,11 @@ namespace GeneralUtilities
 
     void delaySeconds(double howLong)
     {
+        howLong = (howLong >= 0 ? howLong : -1*howLong);
         std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
-        long long int nanosecondsElapsed;
-        long long int secondsElapsed;
+        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
+        long long int nanosecondsElapsed{0};
+        long long int secondsElapsed{0};
 
         do {
             endTime = std::chrono::high_resolution_clock::now();
@@ -371,11 +372,11 @@ namespace GeneralUtilities
 
     void delayMilliseconds(double howLong)
     {
+        howLong = (howLong >= 0 ? howLong : -1*howLong);
         std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
-        long long int nanosecondsElapsed;
-        long long int millisecondsElapsed;
-
+        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
+        long long int nanosecondsElapsed{0};
+        long long int millisecondsElapsed{0};
         do {
             endTime = std::chrono::high_resolution_clock::now();
             nanosecondsElapsed = ((endTime - startTime).count());
@@ -387,10 +388,9 @@ namespace GeneralUtilities
     void delayMicroseconds(double howLong)
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
-        long long int nanosecondsElapsed;
-        long long int microsecondsElapsed;
-
+        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
+        long long int nanosecondsElapsed{0};
+        long long int microsecondsElapsed{0};
         do {
             endTime = std::chrono::high_resolution_clock::now();
             nanosecondsElapsed = ((endTime - startTime).count());
@@ -402,9 +402,8 @@ namespace GeneralUtilities
     void delayNanoseconds(double howLong)
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
-        long long int nanosecondsElapsed;
-
+        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
+        long long int nanosecondsElapsed{0};
         do {
             endTime = std::chrono::high_resolution_clock::now();
             nanosecondsElapsed = ((endTime - startTime).count());
@@ -414,10 +413,10 @@ namespace GeneralUtilities
 
     std::pair<std::string, std::string> splitFileName(const std::string &fullPath)
     {
-        std::string filePath;
-        std::string fileName;
+        std::string filePath{""};
+        std::string fileName{""};
         std::pair<std::string, std::string> returnPair;
-        std::size_t lastFoundSlash = fullPath.find_last_of("/\\");
+        std::size_t lastFoundSlash{fullPath.find_last_of("/\\")};
         if (lastFoundSlash != std::string::npos) {
             filePath = fullPath.substr(0, lastFoundSlash);
             fileName = fullPath.substr(lastFoundSlash+1);

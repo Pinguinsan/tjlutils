@@ -205,10 +205,10 @@ namespace GeneralUtilities
     void delaySecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
         howLong = (howLong >= 0 ? howLong : -1*howLong);
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_SECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        auto microsecondsToDelay = (howLong * MICROSECONDS_PER_SECOND);
+        auto startTime = std::chrono::high_resolution_clock::now();
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
         do {
             (void)function(functionArgs...);
             endTime = std::chrono::high_resolution_clock::now();
@@ -220,10 +220,10 @@ namespace GeneralUtilities
     void delayMillisecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
         howLong = (howLong >= 0 ? howLong : -1*howLong);
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        auto microsecondsToDelay = (howLong * MICROSECONDS_PER_SECOND);
+        auto startTime = std::chrono::high_resolution_clock::now();
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
         do {
             (void)function(functionArgs...);
             endTime = std::chrono::high_resolution_clock::now();
@@ -235,10 +235,10 @@ namespace GeneralUtilities
     void delayMicrosecondsWithCallback(int howLong, const Function &function, FunctionArgs... functionArgs)
     {
         howLong = (howLong >= 0 ? howLong : -1*howLong);
-        auto microsecondsToDelay{howLong * MICROSECONDS_PER_MILLISECOND};
-        auto startTime{std::chrono::high_resolution_clock::now()};
-        auto endTime{std::chrono::high_resolution_clock::now()};
-        auto elapsedTime{std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()};
+        auto microsecondsToDelay = (howLong * MICROSECONDS_PER_SECOND);
+        auto startTime = std::chrono::high_resolution_clock::now();
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
         do {
             (void)function(functionArgs...);
             endTime = std::chrono::high_resolution_clock::now();
