@@ -51,18 +51,6 @@
 #include <typeinfo>
 #include <list>
 
-#if (__cplusplus < 201402L)
-	#if ((defined(_MSC_VER) && (_MSC_VER < 1700)) || (!defined(_MSC_VER)))
-		namespace std {
-			template<typename T, typename ...Args>
-			unique_ptr<T> make_unique( Args&& ...args )
-			{
-				return unique_ptr<T>( new T( forward<Args>(args)... ) );
-			}
-		}
-	#endif
-#endif
-
 namespace GeneralUtilities
 {
     const size_t generalnpos{std::string::npos};
@@ -354,9 +342,6 @@ namespace GeneralUtilities
     template <typename BeginningIterator, typename EndingIterator, typename T>
     bool itemExists(BeginningIterator &&bit, EndingIterator &&eit, const T &searchTerm)
     {
-        //static_assert(std::is_same<typename std::iterator_traits<BeginningIterator>::value_type,  typename std::decay<T>::type>::value, "BeginningIter must be of same type as search term");
-        //static_assert(std::is_same<typename std::iterator_traits<EndingIterator>::value_type,  typename std::decay<T>::type>::value, "EndingIter must be of same type as search term");
-        //static_assert(std::is_same<typename std::decay<decltype(*bit)>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = bit; iter != eit; iter++) {
             if (*iter == searchTerm) {
                 return true;
@@ -368,7 +353,6 @@ namespace GeneralUtilities
     template <typename Container, typename T>
     bool itemExists(const Container &container, const T &searchTerm)
     {
-        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = std::begin(container); iter != std::end(container); iter++) {
             if (*iter == searchTerm) {
                 return true;
@@ -390,9 +374,6 @@ namespace GeneralUtilities
     template <typename BeginningIterator, typename EndingIterator, typename T>
     bool itemPartiallyExists(BeginningIterator &&bit, EndingIterator &&eit, const T &searchTerm)
     {
-        //static_assert(std::is_same<typename std::iterator_traits<BeginningIterator>::value_type,  typename std::decay<T>::type>::value, "BeginningIter must be of same type as search term");
-        //static_assert(std::is_same<typename std::iterator_traits<EndingIterator>::value_type,  typename std::decay<T>::type>::value, "EndingIter must be of same type as search term");
-        //static_assert(std::is_same<typename std::decay<decltype(*bit)>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = bit; iter != eit; iter++) {
             if (iter->find(searchTerm) != generalnpos) {
                 return true;
@@ -404,7 +385,6 @@ namespace GeneralUtilities
     template <typename Container, typename T>
     bool itemPartiallyExists(const Container &container, const T &searchTerm)
     {
-        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         for (auto iter = std::begin(container); iter != std::end(container); iter++) {
             if (iter->find(searchTerm) != generalnpos) {
                 return true;
@@ -418,7 +398,6 @@ namespace GeneralUtilities
     Container safeEraseExactMatch(const Container &container, const T &searchTerm)
     {
         Container returnContainer{container};
-        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         while (itemExists(returnContainer, searchTerm)) {
             for (auto iter = std::begin(returnContainer); iter != std::end(returnContainer); iter++) {
                 if (*iter == searchTerm) {
@@ -434,7 +413,6 @@ namespace GeneralUtilities
     Container safeErasePartialMatch(const Container &container, const T &searchTerm)
     {
         Container returnContainer{container};
-        //static_assert(std::is_same<typename std::decay<decltype(std::begin(container))>::type, typename std::decay<T>::type>::value, "Search term must be same type as container contents");
         while (itemPartiallyExists(returnContainer, searchTerm)) {
             for (auto iter = std::begin(returnContainer); iter != std::end(returnContainer); iter++) {
                 if (iter->find(searchTerm) != generalnpos) {
@@ -600,20 +578,106 @@ namespace GeneralUtilities
         }
         return copyString;
     }
+}
 
-    #if defined(__ANDROID__)
-        namespace std {
-            template<typename T>
-            to_string(const T &convert) { return toString(convert); }
-            
-            int stoi(const std::stirng &str) {
-                return atoi(str.c_str());
+#if defined(__ANDROID__)
+    namespace std {
+        template<typename T>
+        inline std::string to_string(const T &convert) { return GeneralUtilities::toString(convert); }
+        
+        int stoi(const std::string &str) 
+        {
+            std::string copyString{""};
+            for (auto &it : str) {
+                if (it != '0') {
+                    copyString += it;
+                }
             }
+            if (copyString.length() == 0) {
+                return 0;
+            } 
+            auto returnValue = atoi(str.c_str());
+            if (returnValue == 0) {
+                throw std::invalid_argument("stoi: invalid string " + str);
+            }
+            return returnValue;
         }
 
-    #endif
+        double stof(const std::string &str) 
+        {
+            std::string copyString{""};
+            for (auto &it : str) {
+                if ((it != '0') && (it != '.')) {
+                    copyString += it;
+                }
+            }
+            if (copyString.length() == 0) {
+                return 0;
+            } 
+            auto returnValue = atof(str.c_str());
+            if (returnValue == 0) {
+                throw std::invalid_argument("stof: invalid string " + str);
+            }
+            return returnValue;
+        }
 
+        double stod(const std::string &str) 
+        {
+            return stof(str);
+        }
 
-}
+        long int stol(const std::string &str)
+        {
+            std::string copyString{""};
+            for (auto &it : str) {
+                if (it != '0') {
+                    copyString += it;
+                }
+            }
+            if (copyString.length() == 0) {
+                return 0;
+            } 
+            auto returnValue = atoi(str.c_str());
+            if (returnValue == 0) {
+                throw std::invalid_argument("stol: invalid string " + str);
+            }
+            return returnValue;
+        }
+
+        long long int stoll(const std::string &str)
+        {
+            std::string copyString{""};
+            for (auto &it : str) {
+                if (it != '0') {
+                    copyString += it;
+                }
+            }
+            if (copyString.length() == 0) {
+                return 0;
+            } 
+            auto returnValue = atoi(str.c_str());
+            if (returnValue == 0) {
+                throw std::invalid_argument("stoll: invalid string " + str);
+            }
+            return returnValue;
+        }
+
+        template <typename T>
+        inline std::string quoted(const T &toQuote) { return GeneralUtilities::tQuoted(toQuote); }
+
+        
+    }
+
+#endif
+
+#if (__cplusplus < 201402L)
+	#if ((defined(_MSC_VER) && (_MSC_VER < 1700)) || (!defined(_MSC_VER)) || defined(__ANDROID__))
+		namespace std {
+			template<typename T, typename ...Args>
+			unique_ptr<T> make_unique( Args&& ...args ) { return unique_ptr<T>( new T( forward<Args>(args)... ) ); }
+		}
+	#endif
+#endif
+
 
 #endif // TJLUTILS_GENERALUTILITIES_H

@@ -1182,6 +1182,7 @@ public:
 
     static uint8_t calculateChecksum(const LinMessage &linMessage)
     {
+        (void)linMessage;
         //TODO:
             /*
             Public Function CheckSumCalc1(ByVal v As String) As String
