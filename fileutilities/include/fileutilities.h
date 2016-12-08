@@ -41,6 +41,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "generalutilities.h"
+
 #if defined(_WIN32) && !defined(__CYGWIN__)
     #include <direct.h>
  	#include "win32-dirent.h"
@@ -79,6 +81,9 @@ namespace FileUtilities
     std::list<std::string> getDirectoryList(const char *directory, const std::string &mask = "", bool caseSensitive = true);
     std::list<std::string> getDirectoryList(const std::string &directory, const char *mask = "", bool caseSensitive = true);
     
+    std::vector<std::string> getPathDirectoriesAsVector();
+    std::list<std::string> getPathDirectories();
+
     bool directoryExists(const std::string &directoryToCheck);
     bool directoryExists(const char *directoryToCheck);
     bool fileExists(const std::string &fileToCheck);

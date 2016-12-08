@@ -87,6 +87,21 @@ namespace FileUtilities
         return returnVector;
     }
 
+    std::vector<std::string> getPathDirectoriesAsVector()
+    {
+        return GeneralUtilities::parseToVector(static_cast<std::string>(getenv("PATH")), ':');
+    }
+
+    std::list<std::string> getPathDirectories()
+    {
+        std::list<std::string> returnList;
+        for (auto &it : FileUtilities::getPathDirectoriesAsVector()) {
+            returnList.emplace_back(it);
+        }
+        returnList.sort();
+        return returnList;
+    }
+
     std::vector<std::string> getFileListAsVector(const std::string &directory, const std::string &mask, bool caseSensitive)
     {
         return getFileListAsVector(directory.c_str(), mask.c_str(), caseSensitive);
