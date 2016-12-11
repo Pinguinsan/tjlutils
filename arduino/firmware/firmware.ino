@@ -55,21 +55,21 @@ using namespace FirmwareUtilities;
 #define EEPROM_ADVANCE 7
 #define SOFT 1
 
-void printString(const std::string &str, int coutIndex = 0);
-void printStringWithNewline(const std::string &str, int coutIndex = 0);
-void printResult(const std::string &header, const std::string &pinNumber, bool state, int resultCode, int coutIndex = 0);
-void printResult(const std::string &header, int pinNumber, bool state, int resultCode, int coutIndex = 0);
-void printResult(const std::string &header, const std::string &pinNumber, int state, int resultCode, int coutIndex = 0);
-void printResult(const std::string &header, int pinNumber, int state, int resultCode, int coutIndex = 0);
-void printResult(const std::string &header, const std::string &pinNumber, const std::string &state, int resultCode, int coutIndex = 0);
-void printResult(const std::string &header, int pinNumber, const std::string &state, int resultCode, int coutIndex = 0);
-void printSingleResult(const std::string &header, int resultCode, int coutIndex = 0);
-void printTypeResult(const std::string &header, const std::string &type, int resultCode, int coutIndex = 0);
-void printTypeResult(const std::string &header, int type, int resultCode, int coutIndex = 0);
+void printString(const std::string &str, int coutIndex);
+void printStringWithNewline(const std::string &str, int coutIndex);
+void printResult(const std::string &header, const std::string &pinNumber, bool state, int resultCode, int coutIndex);
+void printResult(const std::string &header, int pinNumber, bool state, int resultCode, int coutIndex);
+void printResult(const std::string &header, const std::string &pinNumber, int state, int resultCode, int coutIndex);
+void printResult(const std::string &header, int pinNumber, int state, int resultCode, int coutIndex);
+void printResult(const std::string &header, const std::string &pinNumber, const std::string &state, int resultCode, int coutIndex);
+void printResult(const std::string &header, int pinNumber, const std::string &state, int resultCode, int coutIndex);
+void printSingleResult(const std::string &header, int resultCode, int coutIndex);
+void printTypeResult(const std::string &header, const std::string &type, int resultCode, int coutIndex);
+void printTypeResult(const std::string &header, int type, int resultCode, int coutIndex);
 #if defined(__HAVE_CAN_BUS__)
-    void printCanResult(const std::string &header, const std::string &str, int resultCode, int coutIndex = 0);
-    void printCanResult(const std::string &header, const CanMessage &msg, int resultCode, int coutIndex = 0);
-    void printBlankCanResult(const std::string &header, int resultCode, int coutIndex = 0); 
+    void printCanResult(const std::string &header, const std::string &str, int resultCode, int coutIndex);
+    void printCanResult(const std::string &header, const CanMessage &msg, int resultCode, int coutIndex);
+    void printBlankCanResult(const std::string &header, int resultCode, int coutIndex); 
 #endif
 
 enum EEPROMWriteOffset { PIN = 0,
@@ -80,40 +80,40 @@ enum EEPROMWriteOffset { PIN = 0,
                          STATE3 = 5,
                          STATE4 = 6 };
 
-void handleSerialString(const std::string &str, int coutIndex = 0);
-void handleSerialString(const char *str, int coutIndex = 0);
-void handleAPrefixedString(const std::string &str, int coutIndex = 0);
-void handleCPrefixedString(const std::string &str, int coutIndex = 0);
-void handleDPrefixedString(const std::string &str, int coutIndex = 0);
-void handleHPrefixedString(const std::string &str, int coutIndex = 0);
-void handleIPrefixedString(const std::string &str, int coutIndex = 0);
-void handleLPrefixedString(const std::string &str, int coutIndex = 0);
-void handlePPrefixedString(const std::string &str, int coutIndex = 0);
-void handleRPrefixedString(const std::string &str, int coutIndex = 0);
-void handleSPrefixedString(const std::string &str, int coutIndex = 0);
-void handleVPrefixedString(const std::string &str, int coutIndex = 0);
+void handleSerialString(const std::string &str, int coutIndex);
+void handleSerialString(const char *str, int coutIndex);
+void handleAPrefixedString(const std::string &str, int coutIndex);
+void handleCPrefixedString(const std::string &str, int coutIndex);
+void handleDPrefixedString(const std::string &str, int coutIndex);
+void handleHPrefixedString(const std::string &str, int coutIndex);
+void handleIPrefixedString(const std::string &str, int coutIndex);
+void handleLPrefixedString(const std::string &str, int coutIndex);
+void handlePPrefixedString(const std::string &str, int coutIndex);
+void handleRPrefixedString(const std::string &str, int coutIndex);
+void handleSPrefixedString(const std::string &str, int coutIndex);
+void handleVPrefixedString(const std::string &str, int coutIndex);
 
-void digitalReadRequest(const std::string &str, bool soft = false, int coutIndex = 0);
-void digitalWriteRequest(const std::string &str, int coutIndex = 0);
-void digitalWriteAllRequest(const std::string &str, int coutIndex = 0);
-void analogReadRequest(const std::string &str, int coutIndex = 0);
-void analogWriteRequest(const std::string &str, int coutIndex = 0);
-void softAnalogReadRequest(const std::string &str, int coutIndex = 0);
-void changeSerialModeRequest(const std::string &str, int coutIndex = 0);
+void digitalReadRequest(const std::string &str, bool soft, int coutIndex);
+void digitalWriteRequest(const std::string &str, int coutIndex);
+void digitalWriteAllRequest(const std::string &str, int coutIndex);
+void analogReadRequest(const std::string &str, int coutIndex);
+void analogWriteRequest(const std::string &str, int coutIndex);
+void softAnalogReadRequest(const std::string &str, int coutIndex);
+void changeSerialModeRequest(const std::string &str, int coutIndex);
 
-void pinTypeRequest(const std::string &str, int coutIndex = 0);
-void pinTypeChangeRequest(const std::string &str, int coutIndex = 0);
+void pinTypeRequest(const std::string &str, int coutIndex);
+void pinTypeChangeRequest(const std::string &str, int coutIndex);
 
-void changeAToDThresholdRequest(const std::string &str, int coutIndex = 0);
-void currentAToDThresholdRequest(int coutIndex = 0);
+void changeAToDThresholdRequest(const std::string &str, int coutIndex);
+void currentAToDThresholdRequest(int coutIndex);
 
-void arduinoTypeRequest(int coutIndex = 0);
-void firmwareVersionRequest(int coutIndex = 0);
-void canBusEnabledRequest(int coutIndex = 0);
-void heartbeatRequest(int coutIndex = 0);
-void ioReportRequest(int coutIndex = 0);
-void storeSystemStateRequest(int coutIndex = 0);
-void loadSystemStateRequest(int coutIndex = 0);
+void arduinoTypeRequest(int coutIndex);
+void firmwareVersionRequest(int coutIndex);
+void canBusEnabledRequest(int coutIndex);
+void heartbeatRequest(int coutIndex);
+void ioReportRequest(int coutIndex);
+void storeSystemStateRequest(int coutIndex);
+void loadSystemStateRequest(int coutIndex);
 
 bool isValidAnalogPinIdentifier(const std::string &str);
 bool isValidPinIdentifier(const std::string &str);
@@ -199,23 +199,23 @@ static std::map<int, GPIO*> gpioPins;
     #ifndef INT8U
         #define INT8U byte
     #endif
-    void canInitRequest(int coutIndex = 0);
-    void canReadRequest(bool autoUp = false, int coutIndex = 0);
-    void canWriteRequest(const std::string &canMessage, bool once = false, int coutIndex = 0);
-    void addNegativeCanMaskRequest(const std::string &canMask, int coutIndex = 0);
-    void removePositiveCanMaskRequest(const std::string &canMask, int coutIndex = 0);
-    void canLiveUpdateRequest(const std::string &str, int coutIndex = 0);
-    void clearCurrentMessageByIdRequest(const std::string &str, int coutIndex = 0);
-    void currentCachedCanMessageByIdRequest(const std::string &str, int coutIndex = 0);
-    void clearCanMessagesRequest(int coutIndex = 0);
-    void currentPositiveCanMasksRequest(int coutIndex = 0);
-    void currentNegativeCanMasksRequest(int coutIndex = 0);
-    void allCurrentCanMasksRequest(int coutIndex = 0);
-    void clearPositiveCanMasksRequest(int coutIndex = 0);
-    void clearNegativeCanMasksRequest(int coutIndex = 0);
-    void clearCanMasksRequest(int coutIndex = 0);
-    void currentCachedCanMessagesRequest(int coutIndex = 0);
-    void clearAllCanMasksRequest(int coutIndex = 0);
+    void canInitRequest(int coutIndex);
+    void canReadRequest(bool autoUp = false, int coutIndex);
+    void canWriteRequest(const std::string &canMessage, bool once = false, int coutIndex);
+    void addNegativeCanMaskRequest(const std::string &canMask, int coutIndex);
+    void removePositiveCanMaskRequest(const std::string &canMask, int coutIndex);
+    void canLiveUpdateRequest(const std::string &str, int coutIndex);
+    void clearCurrentMessageByIdRequest(const std::string &str, int coutIndex);
+    void currentCachedCanMessageByIdRequest(const std::string &str, int coutIndex);
+    void clearCanMessagesRequest(int coutIndex);
+    void currentPositiveCanMasksRequest(int coutIndex);
+    void currentNegativeCanMasksRequest(int coutIndex);
+    void allCurrentCanMasksRequest(int coutIndex);
+    void clearPositiveCanMasksRequest(int coutIndex);
+    void clearNegativeCanMasksRequest(int coutIndex);
+    void clearCanMasksRequest(int coutIndex);
+    void currentCachedCanMessagesRequest(int coutIndex);
+    void clearAllCanMasksRequest(int coutIndex);
     std::pair<int, std::string> parseToCanState(const std::string &str);
     void sendCanMessage(const CanMessage &msg);
     #define SPI_CS_PIN 9 
@@ -260,9 +260,9 @@ using SWSerial = SerialPortInfo<SoftwareSerial>;
     };
     static std::vector<HWSerial *> hardwareSerialPorts {
         new HWSerial{&Serial,  &std::cout,  0,  1, SERIAL_BAUD, SERIAL_TIMEOUT, true},
-        new HWSerial{&Serial,  &std::cout,  19,  18, SERIAL_BAUD, SERIAL_TIMEOUT, true},
-        new HWSerial{&Serial,  &std::cout,  17,  16, SERIAL_BAUD, SERIAL_TIMEOUT, true},
-        new HWSerial{&Serial,  &std::cout,  15,  14, SERIAL_BAUD, SERIAL_TIMEOUT, true}
+        new HWSerial{&Serial1,  &std::cout1,  19,  18, SERIAL_BAUD, SERIAL_TIMEOUT, true},
+        new HWSerial{&Serial2,  &std::cout2,  17,  16, SERIAL_BAUD, SERIAL_TIMEOUT, true},
+        new HWSerial{&Serial3,  &std::cout3,  15,  14, SERIAL_BAUD, SERIAL_TIMEOUT, true}
     };
 
 #else
@@ -429,9 +429,9 @@ void handleAPrefixedString(const std::string &str, int coutIndex)
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE, coutIndex);
         }
     } else if (startsWith(str, CURRENT_A_TO_D_THRESHOLD_HEADER)) {
-        currentAToDThresholdRequest();
+        currentAToDThresholdRequest(coutIndex);
     } else if (startsWith(str, ARDUINO_TYPE_HEADER)) {
-        arduinoTypeRequest();
+        arduinoTypeRequest(coutIndex);
 #if defined(__HAVE_CAN_BUS__)
     } else if (startsWith(str, ADD_POSITIVE_CAN_MASK_HEADER)) {
         if (checkValidRequestString(ADD_POSITIVE_CAN_MASK_HEADER, str)) {
@@ -446,7 +446,7 @@ void handleAPrefixedString(const std::string &str, int coutIndex)
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE, coutIndex);
         }
     } else if (startsWith(str, ALL_CURRENT_CAN_MASKS_HEADER)) {
-        allCurrentCanMasksRequest();
+        allCurrentCanMasksRequest(coutIndex);
 #endif
     } else {
         printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE, coutIndex);
@@ -522,7 +522,7 @@ void handleDPrefixedString(const std::string &str, int coutIndex)
 {
     if (startsWith(str, DIGITAL_READ_HEADER)) {
         if (checkValidRequestString(DIGITAL_READ_HEADER, str)) {
-            digitalReadRequest(str.substr(static_cast<std::string>(DIGITAL_READ_HEADER).length()+1), coutIndex);
+            digitalReadRequest(str.substr(static_cast<std::string>(DIGITAL_READ_HEADER).length()+1), false, coutIndex);
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE, coutIndex);
         }
@@ -654,7 +654,7 @@ void storeSystemStateRequest(int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -694,7 +694,7 @@ void storeSystemStateRequest(int coutIndex)
                 }
             }
         }
-    *outputStream << stringToLog << ';';
+        *outputStream << stringToLog << ';';
         eepromAddress += EEPROM_ADVANCE;
     }
     *outputStream << STORE_SYSTEM_STATE_END_HEADER << '}';
@@ -706,7 +706,7 @@ void loadSystemStateRequest(int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -807,7 +807,7 @@ void ioReportRequest(int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -890,7 +890,7 @@ void digitalWriteAllRequest(const std::string &str, int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1413,7 +1413,7 @@ void printString(const std::string &str, int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1427,7 +1427,7 @@ void printStringWithNewline(const std::string &str, int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1441,7 +1441,7 @@ void printResult(const std::string &header, const std::string &pinNumber, bool s
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1455,7 +1455,7 @@ void printResult(const std::string &header, int pinNumber, bool state, int resul
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1469,7 +1469,7 @@ void printResult(const std::string &header, const std::string &pinNumber, int st
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     *outputStream << header << ':' << pinNumber << ':' << state << ':' << resultCode << '}'; 
 }
@@ -1480,7 +1480,7 @@ void printResult(const std::string &header, int pinNumber, int state, int result
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1494,7 +1494,7 @@ void printResult(const std::string &header, const std::string &pinNumber, const 
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1508,7 +1508,7 @@ void printResult(const std::string &header, int pinNumber, const std::string &st
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1522,7 +1522,7 @@ void printSingleResult(const std::string &header, int resultCode, int coutIndex)
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1536,7 +1536,7 @@ void printTypeResult(const std::string &header, const std::string &type, int res
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1550,7 +1550,7 @@ void printTypeResult(const std::string &header, int type, int resultCode, int co
     if (isSoftwareCoutStream(coutIndex)) {
         outputStream = getSoftwareCout(coutIndex);
     } else {
-        getHardwareCout(coutIndex);
+        outputStream = getHardwareCout(coutIndex);
     }
     if (!outputStream) {
         outputStream = &DEFAULT_NATIVE_PORT;
@@ -1606,17 +1606,44 @@ bool isSoftwareCoutStream(int coutIndex)
 #if defined(__HAVE_CAN_BUS__)
     void printCanResult(const std::string &header, const std::string &str, int resultCode, int coutIndex) 
     { 
-    *outputStream << header << ':' << str << ':' << resultCode << '}'; 
+        std::ohserialstream *outputStream{nullptr};
+        if (isSoftwareCoutStream(coutIndex)) {
+            outputStream = getSoftwareCout(coutIndex);
+        } else {
+            outputStream = getHardwareCout(coutIndex);
+        }
+        if (!outputStream) {
+            outputStream = &DEFAULT_NATIVE_PORT;
+        }
+        *outputStream << header << ':' << str << ':' << resultCode << '}'; 
     }
     
     void printCanResult(const std::string &header, const CanMessage &msg, int resultCode, int coutIndex) 
     { 
-    *outputStream << header << ':' << msg.toString(, int coutIndex) << ':' << resultCode << '}'; 
+        std::ohserialstream *outputStream{nullptr};
+        if (isSoftwareCoutStream(coutIndex)) {
+            outputStream = getSoftwareCout(coutIndex);
+        } else {
+            outputStream = getHardwareCout(coutIndex);
+        }
+        if (!outputStream) {
+            outputStream = &DEFAULT_NATIVE_PORT;
+        }
+        *outputStream << header << ':' << msg.toString(, int coutIndex) << ':' << resultCode << '}'; 
     }
     
     void printBlankCanResult(const std::string &header, int resultCode, int coutIndex) 
     { 
-    *outputStream << header << ':' << resultCode << '}'; 
+        std::ohserialstream *outputStream{nullptr};
+        if (isSoftwareCoutStream(coutIndex)) {
+            outputStream = getSoftwareCout(coutIndex);
+        } else {
+            outputStream = getHardwareCout(coutIndex);
+        }
+        if (!outputStream) {
+            outputStream = &DEFAULT_NATIVE_PORT;
+        }
+        *outputStream << header << ':' << resultCode << '}'; 
     } 
 
     void canInit()
