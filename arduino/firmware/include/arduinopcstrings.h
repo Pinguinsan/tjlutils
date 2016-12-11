@@ -34,9 +34,6 @@ namespace ArduinoPCStrings
 #endif
 
     extern const char *FAILSAFE_INTERIM_HEADER;
-    extern const char *ADD_SHORT_WATCHDOG_HEADER;
-    extern const char *REMOVE_SHORT_WATCHDOG_HEADER;
-    extern const char *SHORT_EVENT_DETECTED_HEADER;
     extern const char *DIGITAL_INPUT_IDENTIFIER;
     extern const char *DIGITAL_OUTPUT_IDENTIFIER;
     extern const char *ANALOG_INPUT_IDENTIFIER;
@@ -46,6 +43,7 @@ namespace ArduinoPCStrings
     extern const char *DIGITAL_READ_HEADER;
     extern const char *ANALOG_READ_HEADER;
     extern const char *DIGITAL_WRITE_HEADER;
+    extern const char *DIGITAL_WRITE_ALL_HEADER;
     extern const char *ANALOG_WRITE_HEADER;
     extern const char *SOFT_DIGITAL_READ_HEADER;
     extern const char *SOFT_ANALOG_READ_HEADER;
@@ -58,6 +56,7 @@ namespace ArduinoPCStrings
     extern const char *LOAD_SYSTEM_STATE_HEADER;
     extern const char *STORE_SYSTEM_STATE_END_HEADER;
     extern const char *LOAD_SYSTEM_STATE_END_HEADER;
+    extern const char *CHANGE_SERIAL_MODE_HEADER;
 
     extern const char *HEARTBEAT_HEADER;
     extern const char *IO_REPORT_HEADER;

@@ -39,12 +39,13 @@ namespace ArduinoPCStrings
     const char *ANALOG_WRITE_HEADER{"{awrite"};
     const char *CHANGE_A_TO_D_THRESHOLD_HEADER{"{atodchange"};
     const char *CURRENT_A_TO_D_THRESHOLD_HEADER{"{atodthresh"};
-    const char *ADD_SHORT_WATCHDOG_HEADER{"{addshortwd"};
+    const char *CHANGE_SERIAL_MODE_HEADER{"{changeserial"};
     
     const char *CAN_BUS_ENABLED_HEADER{"{canbus"};
     
     const char *DIGITAL_READ_HEADER{"{dread"};
     const char *DIGITAL_WRITE_HEADER{"{dwrite"};
+    const char *DIGITAL_WRITE_ALL_HEADER{"{dwritea"};
     
     const char *HEARTBEAT_HEADER{"{heartbeat"};
     
@@ -55,15 +56,12 @@ namespace ArduinoPCStrings
     const char *PIN_TYPE_HEADER{"{ptype"};
     const char *PIN_TYPE_CHANGE_HEADER{"{ptchange"};
     
-    const char *REMOVE_SHORT_WATCHDOG_HEADER{"{remshortwd"};
-    
     const char *SOFT_DIGITAL_READ_HEADER{"{sdread"};
     const char *SOFT_ANALOG_READ_HEADER{"{saread"};
     const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
 
     const char *FIRMWARE_VERSION_HEADER{"{version"};
     
-    const char *SHORT_EVENT_DETECTED_HEADER{"{shortevent"};
     const char *STORE_SYSTEM_STATE_END_HEADER{"{storestateend"};
     const char *IO_REPORT_END_HEADER{"{ioreportend"};
     const char *LOAD_SYSTEM_STATE_END_HEADER{"{loadstateend"};
@@ -72,7 +70,6 @@ namespace ArduinoPCStrings
     const char *DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
     const char *ANALOG_INPUT_IDENTIFIER{"ain"};
     const char *ANALOG_OUTPUT_IDENTIFIER{"aout"};
-    const char *FAILSAFE_INTERIM_HEADER{":failsafe:"};
     const char *INVALID_LENGTH_EXCEEDED_HEADER{"{invalid:length_exceeded}"};
     const char *UNSPECIFIED_IO_TYPE_IDENTIFIER{"unspecified"};
     const char *INVALID_HEADER{"{invalid"};

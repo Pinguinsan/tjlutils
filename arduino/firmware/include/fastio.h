@@ -90,6 +90,9 @@
         (((P) == 3 || (P) == 4) ? 5 : 7)))))))))))))))
 
 // 15 PWM
+#if defined(digitalPinToTimer)
+        #undef digitalPinToTimer
+#endif
 #define digitalPinToTimer(P) \
 (((P) == 13 || (P) ==  4) ? &TCCR0A : \
         (((P) == 11 || (P) == 12) ? &TCCR1A : \
