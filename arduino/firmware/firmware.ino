@@ -235,6 +235,9 @@ static std::map<int, GPIO*> gpioPins;
     static int canCommunicationStartTime{0};
     static int canCommunicationEndTime{0};
 #endif
+    
+using HWSerial = SerialPortInfo<HardwareSerial>;
+using SWSerial = SerialPortInfo<SoftwareSerial>;
 
 #if defined(ARDUINO_AVR_MEGA1280) || defined(ARDUINO_AVR_MEGA2560)
     namespace std { ohserialstream cout{Serial}; }
@@ -255,16 +258,6 @@ static std::map<int, GPIO*> gpioPins;
         ALL_SOFTWARE_PORTS = 9,
         ALL_PORTS = 10
     };
-    using HWSerial = SerialPortInfo<HardwareSerial>;
-    using SWSerial = SerialPortInfo<SoftwareSerial>;
-    /*
-    static std::map<int, HWSerial *> hardwareSerialPorts {
-        {std::pair<int, HWSerial>(SerialIndex::NATIVE_PORT_0, new SerialPortInfo<HardwareSerial>{&Serial,  &std::cout,  0,  1, SERIAL_BAUD, SERIAL_TIMEOUT, true} ) },
-        {std::pair<int, HWSerial>(SerialIndex::NATIVE_PORT_1, new SerialPortInfo<HardwareSerial>{&Serial1, &std::cout1, 19, 18, SERIAL_BAUD, SERIAL_TIMEOUT, true} ) },
-        {std::pair<int, HWSerial>(SerialIndex::NATIVE_PORT_2, new SerialPortInfo<HardwareSerial>{&Serial2, &std::cout2, 17, 16, SERIAL_BAUD, SERIAL_TIMEOUT, true} ) },
-        {std::pair<int, HWSerial>(SerialIndex::NATIVE_PORT_3, new SerialPortInfo<HardwareSerial>{&Serial3, &std::cout3, 15, 14, SERIAL_BAUD, SERIAL_TIMEOUT, true} ) } 
-    };
-    */
     static std::vector<HWSerial *> hardwareSerialPorts {
         new HWSerial{&Serial,  &std::cout,  0,  1, SERIAL_BAUD, SERIAL_TIMEOUT, true},
         new HWSerial{&Serial,  &std::cout,  19,  18, SERIAL_BAUD, SERIAL_TIMEOUT, true},
@@ -285,7 +278,7 @@ static std::map<int, GPIO*> gpioPins;
         ALL_PORTS = 6
     };
     static std::vector<HWSerial *> hardwareSerialPorts {
-        new HWSerial{&Serial,  &std::cout,  0,  1, SERIAL_BAUD, SERIAL_TIMEOUT, true};
+        new HWSerial{&Serial,  &std::cout,  0,  1, SERIAL_BAUD, SERIAL_TIMEOUT, true},
     };
 
 #endif
