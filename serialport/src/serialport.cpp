@@ -1060,9 +1060,12 @@ void SerialPort::flushTXRX()
 
 bool SerialPort::isAvailableSerialPort(const std::string &name)
 {
-    //TODO: Implement
-    (void)name;
-    return true;
+    for (auto &it : SerialPort::availableSerialPorts()) {
+        if (name == it) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::pair<int, std::string> SerialPort::getPortNameAndNumber(const std::string &name)

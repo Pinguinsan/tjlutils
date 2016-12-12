@@ -1,385 +1,22 @@
 #include "arduino.h"
 
-const std::vector<const char *> Arduino::VALID_DIGITAL_STATE_IDENTIFIERS{"1", "0", "HIGH", "high", "LOW", "low", "FALSE", "false", "TRUE", "true"};
-const std::vector<char> Arduino::VALID_ANALOG_STATE_IDENTIFIERS{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
-const std::vector<const char *> Arduino::DIGITAL_STATE_HIGH_IDENTIFIERS{"1", "high", "true", "on"};
-const std::vector<const char *> Arduino::DIGITAL_STATE_LOW_IDENTIFIERS{"0", "low", "false", "off"};
-const char *Arduino::INVALID_HEADER{"{invalid"};
-const char *Arduino::DIGITAL_READ_HEADER{"{dread"};
-const char *Arduino::ANALOG_READ_HEADER{"{aread"};
-const char *Arduino::DIGITAL_WRITE_HEADER{"{dwrite"};
-const char *Arduino::ANALOG_WRITE_HEADER{"{awrite"};
-const char *Arduino::SOFT_DIGITAL_READ_HEADER{"{sdread"};
-const char *Arduino::SOFT_ANALOG_READ_HEADER{"{saread"};
-const char *Arduino::PIN_TYPE_HEADER{"{ptype"};
-const char *Arduino::PIN_TYPE_CHANGE_HEADER{"{ptchange"};
-const char *Arduino::ARDUINO_TYPE_HEADER{"{ardtype"};
-const char *Arduino::CAN_BUS_ENABLED_HEADER{"{canbus"};
-const char *Arduino::FIRMWARE_VERSION_HEADER{"{version"};
-const char *Arduino::HEARTBEAT_HEADER{"{heartbeat"};
-const char *Arduino::IO_REPORT_HEADER{"{ioreport"};
-const char *Arduino::IO_REPORT_END_HEADER{"{ioreportend"};
-const char *Arduino::CHANGE_A_TO_D_THRESHOLD_HEADER{"{atodchange"};
-const char *Arduino::CURRENT_A_TO_D_THRESHOLD_HEADER{"{atodthresh"};
-const char *Arduino::ADD_POSITIVE_CAN_MASK_HEADER{"{addpcanmask"};
-const char *Arduino::ADD_NEGATIVE_CAN_MASK_HEADER{"{rempcanmask"};
-const char *Arduino::REMOVE_POSITIVE_CAN_MASK_HEADER{"{rempcanmask"};
-const char *Arduino::REMOVE_NEGATIVE_CAN_MASK_HEADER{"{remncanmask"};
-const char *Arduino::REMOVE_ALL_POSITIVE_CAN_MASKS_HEADER{"{remallpcanmasks"};
-const char *Arduino::REMOVE_ALL_NEGATIVE_CAN_MASKS_HEADER{"{remallnanmasks"};
-const char *Arduino::REMOVE_ALL_CAN_MASKS_HEADER{"{remallanmasks"};
-const char *Arduino::UNO_A0_STRING{"A0"};
-const char *Arduino::UNO_A1_STRING{"A1"};
-const char *Arduino::UNO_A2_STRING{"A2"};
-const char *Arduino::UNO_A3_STRING{"A3"};
-const char *Arduino::UNO_A4_STRING{"A4"};
-const char *Arduino::UNO_A5_STRING{"A5"};
-const char *Arduino::UNO_A0_EQUIVALENT_STRING{"14"};
-const char *Arduino::UNO_A1_EQUIVALENT_STRING{"15"};
-const char *Arduino::UNO_A2_EQUIVALENT_STRING{"16"};
-const char *Arduino::UNO_A3_EQUIVALENT_STRING{"17"};
-const char *Arduino::UNO_A4_EQUIVALENT_STRING{"18"};
-const char *Arduino::UNO_A5_EQUIVALENT_STRING{"19"};
-
-const char *Arduino::NANO_A0_STRING{"A0"};
-const char *Arduino::NANO_A1_STRING{"A1"};
-const char *Arduino::NANO_A2_STRING{"A2"};
-const char *Arduino::NANO_A3_STRING{"A3"};
-const char *Arduino::NANO_A4_STRING{"A4"};
-const char *Arduino::NANO_A5_STRING{"A5"};
-const char *Arduino::NANO_A6_STRING{"A6"};
-const char *Arduino::NANO_A7_STRING{"A7"};
-const char *Arduino::NANO_A0_EQUIVALENT_STRING{"14"};
-const char *Arduino::NANO_A1_EQUIVALENT_STRING{"15"};
-const char *Arduino::NANO_A2_EQUIVALENT_STRING{"16"};
-const char *Arduino::NANO_A3_EQUIVALENT_STRING{"17"};
-const char *Arduino::NANO_A4_EQUIVALENT_STRING{"18"};
-const char *Arduino::NANO_A5_EQUIVALENT_STRING{"19"};
-const char *Arduino::NANO_A6_EQUIVALENT_STRING{"20"};
-const char *Arduino::NANO_A7_EQUIVALENT_STRING{"21"};
-
-const char *Arduino::MEGA_A0_STRING{"A0"};
-const char *Arduino::MEGA_A1_STRING{"A1"};
-const char *Arduino::MEGA_A2_STRING{"A2"};
-const char *Arduino::MEGA_A3_STRING{"A3"};
-const char *Arduino::MEGA_A4_STRING{"A4"};
-const char *Arduino::MEGA_A5_STRING{"A5"};
-const char *Arduino::MEGA_A6_STRING{"A6"};
-const char *Arduino::MEGA_A7_STRING{"A7"};
-const char *Arduino::MEGA_A8_STRING{"A8"};
-const char *Arduino::MEGA_A9_STRING{"A9"};
-const char *Arduino::MEGA_A10_STRING{"A10"};
-const char *Arduino::MEGA_A11_STRING{"A11"};
-const char *Arduino::MEGA_A12_STRING{"A12"};
-const char *Arduino::MEGA_A13_STRING{"A13"};
-const char *Arduino::MEGA_A14_STRING{"A14"};
-const char *Arduino::MEGA_A15_STRING{"A15"};
-const char *Arduino::MEGA_A0_EQUIVALENT_STRING{"54"};
-const char *Arduino::MEGA_A1_EQUIVALENT_STRING{"55"};
-const char *Arduino::MEGA_A2_EQUIVALENT_STRING{"56"};
-const char *Arduino::MEGA_A3_EQUIVALENT_STRING{"57"};
-const char *Arduino::MEGA_A4_EQUIVALENT_STRING{"58"};
-const char *Arduino::MEGA_A5_EQUIVALENT_STRING{"59"};
-const char *Arduino::MEGA_A6_EQUIVALENT_STRING{"60"};
-const char *Arduino::MEGA_A7_EQUIVALENT_STRING{"61"};
-const char *Arduino::MEGA_A8_EQUIVALENT_STRING{"62"};
-const char *Arduino::MEGA_A9_EQUIVALENT_STRING{"63"};
-const char *Arduino::MEGA_A10_EQUIVALENT_STRING{"64"};
-const char *Arduino::MEGA_A11_EQUIVALENT_STRING{"65"};
-const char *Arduino::MEGA_A12_EQUIVALENT_STRING{"66"};
-const char *Arduino::MEGA_A13_EQUIVALENT_STRING{"67"};
-const char *Arduino::MEGA_A14_EQUIVALENT_STRING{"68"};
-const char *Arduino::MEGA_A15_EQUIVALENT_STRING{"69"};
-const char *Arduino::DIGITAL_INPUT_IDENTIFIER{"din"};
-const char *Arduino::DIGITAL_OUTPUT_IDENTIFIER{"dout"};
-const char *Arduino::ANALOG_INPUT_IDENTIFIER{"ain"};
-const char *Arduino::ANALOG_OUTPUT_IDENTIFIER{"aout"};
-const char *Arduino::DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
-const char *Arduino::OPERATION_FAILURE_STRING{"-1"};
-const char *Arduino::IO_REPORT_INVALID_DATA_STRING{"ioReportRequest(int) timed out or received invalid data"};
-const char *Arduino::CAN_REPORT_INVALID_DATA_STRING{"canReportRequest(int) timed out or received invalid data"};
-const char *Arduino::IO_MUTEX_INVALID_INDEX_STRING{"Invalid index passed to Arduino::ioMutexAtIndex(int): "};
-const char *Arduino::SERIAL_PORT_INVALID_INDEX_STRING{"Invalid index passed to Arduino::serialPortAtIndex(int): "};
-const char *Arduino::CAN_EMPTY_READ_SUCCESS_STRING{"{canread:1}"};
-
-const char *Arduino::BLUETOOTH_SERIAL_IDENTIFIER{"rfcomm"};
-const char *Arduino::INVALID_PIN_ALIAS_STRING{"Invalid pin alias: "};
-const char *Arduino::INVALID_GPIO_PIN_STRING{"Invalid gpio pin: "};
-const char *Arduino::INVALID_PIN_NUMBER_STRING{"Invalid pin number: "};
-const char *Arduino::INVALID_ANALOG_PIN_BASE_STRING{"Invalid analog pin: "};
-const char *Arduino::UNSPECIFIED_IO_TYPE_TO_PARSE_IO_TYPE_STRING{"Unspecified IOType passed to Arduino::parseIOType(IOType)"};
-const char *Arduino::INVALID_IO_TYPE_BASE_STRING{"Invalid IOType: "};
-const char *Arduino::INVALID_IO_TYPE_TAIL_STRING{" passed to Arduino::parseIOTypeFromString(const std::string &)"};
-const char *Arduino::INVALID_STATE_TO_PARSE_TO_DIGITAL_STATE_STRING{"ERROR: Invalid state passed to parseToDigitalState(const std::string &): "};
-const char *Arduino::INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_STRING{"ERROR: Invalid state passed to parseToAnalogState(const std::string &): "};
-const char *Arduino::INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_RAW_STRING{"ERROR: Invalid state passed to parseToAnalogStateRaw(const std::string &): "};
-const char *Arduino::FIRMWARE_VERSION_UNKNOWN_STRING{" unknown"};
-const char *Arduino::FIRMWARE_VERSION_BASE_STRING{"firmware version "};
-
-const char *Arduino::NULL_GPIO_PTR_TO_DIGITAL_READ_STRING{"Null std::shared_ptr<GPIO> passed to digitalRead(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_DIGITAL_WRITE_STRING{"Null std::shared_ptr<GPIO> passed to digitalWrite(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_ANALOG_READ_STRING{"Null std::shared_ptr<GPIO> passed to analogRead(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_ANALOG_READ_RAW_STRING{"Null std::shared_ptr<GPIO> passed to analogReadRaw(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_ANALOG_WRITE_STRING{"Null std::shared_ptr<GPIO> passed to analogWrite(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_ANALOG_WRITE_RAW_STRING{"Null std::shared_ptr<GPIO> passed to analogWriteRaw(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_SOFT_DIGITAL_READ_STRING{"Null std::shared_ptr<GPIO> passed to softDigitalRead(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_STRING{"Null std::shared_ptr<GPIO> passed to softAnalogRead(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_RAW_STRING{"Null std::shared_ptr<GPIO> passed to softAnalogReadRaw(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_PIN_MODE_STRING{"Null std::shared_ptr<GPIO> passed to pinMode(const std::shared_ptr<GPIO> &)"};
-const char *Arduino::NULL_GPIO_PTR_TO_CURRENT_PIN_MODE_STRING{"Null std::shared_ptr<GPIO> passed to currentPinMode(const std::shared_ptr<GPIO> &)"};
-
-const char *Arduino::PASSED_TO_DIGITAL_READ_STRING_TAIL_STRING{" passed to digitalRead(const std::string &)"};
-const char *Arduino::PASSED_TO_DIGITAL_WRITE_STRING_TAIL_STRING{" passed to digitalWrite(const std::string &, bool)"};
-const char *Arduino::PASSED_TO_ANALOG_READ_STRING_TAIL_STRING{" passed to analogRead(const std::string &)"};
-const char *Arduino::PASSED_TO_ANALOG_READ_RAW_STRING_TAIL_STRING{" passed to analogReadRaw(const std::string &)"};
-const char *Arduino::PASSED_TO_ANALOG_WRITE_STRING_TAIL_STRING{" passed to analogWrite(const std::string &, double)"};
-const char *Arduino::PASSED_TO_ANALOG_WRITE_RAW_STRING_TAIL_STRING{" passed to analogWriteRaw(const std::string &, int)"};
-const char *Arduino::PASSED_TO_SOFT_DIGITAL_READ_STRING_TAIL_STRING{" passed to softDigitalRead(const std::string &)"};
-const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_STRING_TAIL_STRING{" passed to softAnalogRead(const std::string &)"};
-const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_RAW_STRING_TAIL_STRING{" passed to softAnalogReadRaw(const std::string &)"};
-const char *Arduino::PASSED_TO_PIN_MODE_STRING_TAIL_STRING{" passed to pinMode(const std::string &, IOType)"};
-const char *Arduino::PASSED_TO_CURRENT_PIN_MODE_STRING_TAIL_STRING{" passed to currentPinMode(const std::string &)"};
-
-const char *Arduino::PASSED_TO_DIGITAL_READ_GPIO_TAIL_STRING{" passed to digitalRead(const GPIO &)"};
-const char *Arduino::PASSED_TO_DIGITAL_WRITE_GPIO_TAIL_STRING{" passed to digitalWrite(const GPIO &, bool)"};
-const char *Arduino::PASSED_TO_ANALOG_READ_GPIO_TAIL_STRING{" passed to analogRead(const GPIO &)"};
-const char *Arduino::PASSED_TO_ANALOG_READ_RAW_GPIO_TAIL_STRING{" passed to analogReadRaw(const GPIO &)"};
-const char *Arduino::PASSED_TO_ANALOG_WRITE_GPIO_TAIL_STRING{" passed to analogWrite(const GPIO &, double)"};
-const char *Arduino::PASSED_TO_ANALOG_WRITE_RAW_GPIO_TAIL_STRING{" passed to analogWriteRaw(const GPIO &, int)"};
-const char *Arduino::PASSED_TO_SOFT_DIGITAL_READ_GPIO_TAIL_STRING{" passed to softDigitalRead(const GPIO &)"};
-const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_GPIO_TAIL_STRING{" passed to softAnalogRead(const GPIO &)"};
-const char *Arduino::PASSED_TO_SOFT_ANALOG_READ_RAW_GPIO_TAIL_STRING{" passed to softAnalogReadRaw(const GPIO &)"};
-const char *Arduino::PASSED_TO_PIN_MODE_GPIO_TAIL_STRING{" passed to pinMode(const GPIO &, IOType)"};
-const char *Arduino::PASSED_TO_CURRENT_PIN_MODE_GPIO_TAIL_STRING{" passed to currentPinMode(const GPIO &)"};
-const char *Arduino::UNO_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoUno::analogPin(const std::string&)"};
-const char *Arduino::UNO_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoUno::analogPinFromNumber(int)"};
-const char *Arduino::NANO_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoNano::analogPin(const std::string&)"};
-const char *Arduino::NANO_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoNano::analogPinFromNumber(int)"};
-const char *Arduino::MEGA_INVALID_ANALOG_STRING_TAIL_STRING{" passed to ArduinoMega::analogPin(const std::string&)"};
-const char *Arduino::MEGA_INVALID_ANALOG_INT_TAIL_STRING{" passed to ArduinoMega::analogPinFromNumber(int)"};
-
-const char *Arduino::GENERIC_FAILED_STRING{"failed"};
-const char *Arduino::GENERIC_SUCCESS_STRING{"success"};
-const char *Arduino::USING_ALIAS_STRING{"Using alias "};
-const char *Arduino::SETTING_IO_TYPE_STRING{"Setting IO type "};
-const char *Arduino::USING_INITIAL_STATE_STRING{"Using initial state "};
-const char *Arduino::FOR_PIN_NUMBER_STRING{" for pin number "};
-const char *Arduino::ELIPSES_STRING{"..."};
-
-const unsigned int Arduino::IO_STATE_RETURN_SIZE{3};
-const unsigned int Arduino::ARDUINO_TYPE_RETURN_SIZE{2};
-const unsigned int Arduino::PIN_TYPE_RETURN_SIZE{3};
-const unsigned int Arduino::IO_REPORT_RETURN_SIZE{3};
-const unsigned int Arduino::A_TO_D_THRESHOLD_RETURN_SIZE{2};
-const unsigned int Arduino::REMOVE_CAN_MASKS_RETURN_SIZE{1};
-const unsigned int Arduino::RETURN_SIZE_HIGH_LIMIT{1000};
-const unsigned int Arduino::ADD_CAN_MASK_RETURN_SIZE{2};
-const unsigned int Arduino::REMOVE_CAN_MASK_RETURN_SIZE{2};
-const int Arduino::OPERATION_FAILURE{-1};
-const int Arduino::STATE_FAILURE{-1};
-const int Arduino::INVALID_PIN{-1};
-const double Arduino::SERIAL_TIMEOUT{1000};
-const int Arduino::BLUETOOTH_RETRY_COUNT{10};
-const double Arduino::BOOTLOADER_BOOT_TIME{2000};
-const double Arduino::BLUETOOTH_SERIAL_SEND_DELAY{100};
-const int Arduino::ANALOG_MAX{1023};
-const double Arduino::VOLTAGE_MAX{5.0};
-const double Arduino::ANALOG_TO_VOLTAGE_SCALE_FACTOR{0.0049};
-const int Arduino::CAN_BUS_PIN{9};
-const unsigned int Arduino::RAW_CAN_MESSAGE_SIZE{9};
-const unsigned char Arduino::CAN_MESSAGE_LENGTH{8};
-const double Arduino::DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER{4.8};
-const unsigned char Arduino::CAN_FRAME{0};
-static const unsigned int ADD_CAN_MASK_RETURN_SIZE{2};
-static const unsigned int REMOVE_CAN_MASK_RETURN_SIZE{2};
-const BaudRate Arduino::FIRMWARE_BAUD{BaudRate::BAUD115200};
-const DataBits Arduino::FIRMWARE_DATA_BITS{DataBits::EIGHT};
-const StopBits Arduino::FIRMWARE_STOP_BITS{StopBits::ONE};
-const Parity Arduino::FIRMWARE_PARITY{Parity::NONE};
-
-const unsigned int Arduino::CAN_READ_RETURN_SIZE{10};
-const unsigned int Arduino::CAN_WRITE_RETURN_SIZE{10};
-const unsigned int Arduino::CAN_BUS_ENABLED_RETURN_SIZE{2};
-const unsigned int Arduino::CAN_AUTO_UPDATE_RETURN_SIZE{2};
-const unsigned int Arduino::CAN_READ_BLANK_RETURN_SIZE{1};
-const unsigned int Arduino::CAN_INIT_RETURN_SIZE{1};
-const unsigned int Arduino::CAN_ID_WIDTH{3};
-const unsigned int Arduino::CAN_BYTE_WIDTH{2};
-const unsigned int Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT{1000};
-const unsigned int Arduino::SERIAL_REPORT_OVERALL_TIME_LIMIT{1000};
-
-const char *Arduino::CAN_INIT_HEADER{"{caninit"};
-const char *Arduino::CAN_READ_HEADER{"{canread"};
-const char *Arduino::CAN_WRITE_HEADER{"{canwrite"};
-const char *Arduino::CAN_LIVE_UPDATE_HEADER{"{canlup"};
-const char *Arduino::CAN_CLEAR_MESSAGE_HEADER{"{canmsgclear"};
-
-std::vector<ProtectedSerialPort> Arduino::s_serialPorts;
-unsigned int Arduino::s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{3};
-double Arduino::bluetoothSendDelayMultiplier{Arduino::DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
-
-const int Arduino::IO_TRY_COUNT{1};
-
-const int CanMessage::CAN_BYTE_WIDTH{2};
-const int CanMessage::CAN_ID_WIDTH{3};
-const unsigned int CanMessage::CAN_MESSAGE_SIZE{9};
-const unsigned char CanMessage::CAN_FRAME{0};
-const unsigned char CanMessage::CAN_MESSAGE_LENGTH{8};
-const char *CanMessage::NTH_DATA_PACKET_BYTE_INDEX_OUT_OF_RANGE_STRING{"ERROR: Invalid index passed to nthDataPacket(int index) :"};
-
-std::shared_ptr<Arduino> Arduino::makeArduino(std::shared_ptr<SerialPort> serialPort)
+Arduino::Arduino(ArduinoType arduinoType, const std::string &serialPortName) :
+    m_arduinoType{arduinoType}
 {
-    using namespace GeneralUtilities;
-    std::string arduinoType{""};
-    for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
-        try {
-            std::pair<IOStatus, std::string> retrieveArduinoType{Arduino::getArduinoType(serialPort)};
-            if (retrieveArduinoType.first == IOStatus::OPERATION_SUCCESS) {
-                arduinoType = static_cast<std::string>(retrieveArduinoType.second);
-                if (arduinoType == static_cast<std::string>(ArduinoUno::IDENTIFIER)) {
-                    tryCount =  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-                    arduinoType = ArduinoUno::IDENTIFIER;
-                } else if (arduinoType == static_cast<std::string>(ArduinoNano::IDENTIFIER)) {
-                    tryCount =  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-                    arduinoType = ArduinoNano::IDENTIFIER;
-                } else if (arduinoType == static_cast<std::string>(ArduinoMega::IDENTIFIER)) {
-                    tryCount = Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-                    arduinoType = ArduinoMega::IDENTIFIER;
-                } else {
-                    if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                        return nullptr;
-                    }
-                }
-            } else {
-                if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                    return nullptr;
-                }
-            }
-        } catch (std::exception &e) {
-            if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                return nullptr;
-            }
-        }
+    try {
+        this->m_serialPort = std::make_unique<SerialPort>(serialPortName, FIRMWARE_BAUD, FIRMWARE_DATA_BITS, FIRMWARE_STOP_BITS, FIRMWARE_PARITY);
+        this->m_serialPort->openPort();
+        GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
+    } catch (std::exception &e) {
+        throw e;
     }
-    delayMilliseconds(50);
-    std::pair<IOStatus, std::string> firmwareVersion;
-    for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
-        try {
-            firmwareVersion = Arduino::getFirmwareVersion(serialPort);
-            if (firmwareVersion.first == IOStatus::OPERATION_SUCCESS) {
-                tryCount =  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-            } else {
-                if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                    return nullptr;
-                }
-            }
-        } catch (std::exception &e) {
-            if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                return nullptr;
-            }
-        }
-    }
-    std::pair<IOStatus, int> analogToDigitalThreshold;
-    for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
-        try {
-            analogToDigitalThreshold = Arduino::getAnalogToDigitalThreshold(serialPort);
-            if (analogToDigitalThreshold.first == IOStatus::OPERATION_SUCCESS) {
-                tryCount =  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-            } else {
-                if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                    return nullptr;
-                }
-            }
-        } catch (std::exception &e) {
-            (void)e;
-            if (tryCount == ( Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()-1)) {
-                return nullptr;
-            }
-        }
-    }
-    std::pair<IOStatus, bool> can;
-    for (unsigned int tryCount = 0; tryCount <  Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT(); tryCount++) {
-        try {
-            can = Arduino::getCanCapability(serialPort);
-            if (can.first == IOStatus::OPERATION_SUCCESS) {
-                tryCount = Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT();
-            }
-        } catch (std::exception &e) {
-            (void)e;
-        }
-    }
-    if (firmwareVersion.first == IOStatus::OPERATION_FAILURE) {
-        return nullptr;
-    }
-    if (can.first == IOStatus::OPERATION_FAILURE) {
-        return nullptr;
-    }
-    if (arduinoType == "") {
-        return nullptr;
-    }
-    if (analogToDigitalThreshold.first == IOStatus::OPERATION_FAILURE) {
-        return nullptr;
-    }
-
-    if (arduinoType == ArduinoUno::IDENTIFIER) {
-        return std::shared_ptr<Arduino>(new Arduino(ArduinoType::UNO, serialPort, firmwareVersion.second, can.second));
-    } else if (arduinoType == ArduinoNano::IDENTIFIER) {
-        return std::shared_ptr<Arduino>(new Arduino(ArduinoType::NANO, serialPort, firmwareVersion.second, can.second));
-    } else if (arduinoType == ArduinoMega::IDENTIFIER) {
-        return std::shared_ptr<Arduino>(new Arduino(ArduinoType::MEGA, serialPort, firmwareVersion.second, can.second));
-    } else {
-        return nullptr;
-    }
-}
-
-Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort) :
-    m_arduinoType{arduinoType},
-    m_serialPortIndex{Arduino::addSerialPort(serialPort)},
-    m_firmwareVersion{""},
-    m_canCapability{std::make_pair(false, false)},
-    m_canPinAlias{""},
-    m_analogToDigitalThreshold{-1}
-
-{
-    this->assignPinsAndIdentifiers();
-}
-
-Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, bool canCapability) :
-    m_arduinoType{arduinoType},
-    m_serialPortIndex{Arduino::addSerialPort(serialPort)},
-    m_firmwareVersion{""},
-    m_canCapability{std::make_pair(true, canCapability)},
-    m_canPinAlias{""},
-    m_analogToDigitalThreshold{-1}
-{
-    this->assignPinsAndIdentifiers();
-}
-
-Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion) :
-    m_arduinoType{arduinoType},
-    m_serialPortIndex{Arduino::addSerialPort(serialPort)},
-    m_firmwareVersion{firmwareVersion},
-    m_canCapability{std::make_pair(false, false)},
-    m_canPinAlias{""},
-    m_analogToDigitalThreshold{-1}
-{
-    this->assignPinsAndIdentifiers();
-}
-
-Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<SerialPort> serialPort, const std::string &firmwareVersion, bool canCapability) :
-    m_arduinoType{arduinoType},
-    m_serialPortIndex{Arduino::addSerialPort(serialPort)},
-    m_firmwareVersion{firmwareVersion},
-    m_canCapability{std::make_pair(true, canCapability)},
-    m_canPinAlias{""},
-    m_analogToDigitalThreshold{-1}
-{
+    //TODO: Validate type of Arduino
     this->assignPinsAndIdentifiers();
 }
 
 void Arduino::assignPinsAndIdentifiers()
 {
-    if (this->m_arduinoType == ArduinoType::UNO) {
+   if (this->m_arduinoType == ArduinoType::UNO) {
         this->m_availablePins = ArduinoUno::s_availablePins;
         this->m_availablePwmPins = ArduinoUno::s_availablePwmPins;
         this->m_availableAnalogPins = ArduinoUno::s_availableAnalogPins;
@@ -402,108 +39,17 @@ void Arduino::assignPinsAndIdentifiers()
         this->m_longName = ArduinoMega::LONG_NAME;
     }
     for (auto &it : this->m_availablePins) {
-        this->m_gpioPins.emplace(it, std::make_shared<GPIO>(it, IOType::UNSPECIFIED));
-    }
-
-    for (auto &it : this->m_gpioPins) {
-        if (it.first > this->m_numberOfDigitalPins) {
-            if (it.first == CAN_BUS_PIN) {
-                this->m_canPinAlias = std::to_string(it.first);
-            }
-            this->m_gpioPinsAlias.emplace(analogPinFromNumber(it.first), it.second);
-            this->m_gpioPinIterationAliasMap.emplace(it.first, analogPinFromNumber(it.first));
+        if (isValidAnalogInputPin(it)) {
+            this->m_gpioPins.emplace(it, std::make_shared<GPIO>(it, IOType::ANALOG_INPUT));
         } else {
-            this->m_gpioPinsAlias.emplace(std::to_string(it.first), it.second);
-            this->m_gpioPinIterationAliasMap.emplace(it.first, std::to_string(it.first));
-        }
-    }
-    if (this->m_canCapability.second) {
-        this->eraseCanPin();
-    }
-    assignIOTypes();
-}
-
-void Arduino::assignAliasesFromMap(const std::map<int, std::string> aliasesMap)
-{
-    using namespace GeneralUtilities;
-    for (auto &it : aliasesMap) {
-        if (confirmValidAlias(it)) {
-            std::cout << USING_ALIAS_STRING << tQuoted(it.second) << FOR_PIN_NUMBER_STRING << it.first;
-            std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
-        }
-        if (this->m_gpioPinsAlias.find(std::to_string(it.first)) != this->m_gpioPinsAlias.end()) {
-            auto iter = this->m_gpioPinsAlias.find(std::to_string(it.first));
-            std::swap(this->m_gpioPinsAlias[std::to_string(it.first)], iter->second);
-            this->m_gpioPinsAlias.erase(iter);
-            this->m_gpioPinIterationAliasMap.find(it.first)->second = it.second;
-        }
-    }
-}
-
-void Arduino::assignIOTypesFromMap(const std::map<int, std::string> ioTypesMap)
-{
-    using namespace GeneralUtilities;
-    for (auto &it : ioTypesMap) {
-        if (confirmValidIOType(it)) {
-            auto found{this->m_gpioPins.find(it.first)};
-            if (found != this->m_gpioPins.end()) {
-                found->second->setIOType(parseIOTypeFromString(it.second));
-                std::string stringToLog{toString(SETTING_IO_TYPE_STRING) + tQuoted(it.second) + toString(FOR_PIN_NUMBER_STRING) + toString(it.first) + toString(ELIPSES_STRING)};
-                std::pair<IOStatus, IOType> result{this->pinMode(found->second, found->second->ioType())};
-                if (result.first == IOStatus::OPERATION_FAILURE) {
-                    stringToLog.append(GENERIC_FAILED_STRING);
-                } else {
-                    stringToLog.append(GENERIC_SUCCESS_STRING);
-                }
-                std::cout << stringToLog;
-                std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
-            }
-        }
-    }
-}
-
-void Arduino::assignInitialStatesFromMap(const std::map<int, std::string> initialStatesMap)
-{
-    using namespace GeneralUtilities;
-    for (auto &it : initialStatesMap) {
-        std::string logString{toString(USING_INITIAL_STATE_STRING) + tQuoted(it.second) + toString(FOR_PIN_NUMBER_STRING) + toString(it.first) + toString(ELIPSES_STRING)};
-        try {
-            if (confirmValidStates(it)) {
-                auto found{this->m_gpioPins.find(it.first)};
-                if (found != this->m_gpioPins.end()) {
-                    if (found->second->ioType() == IOType::DIGITAL_OUTPUT) {
-                        std::pair<IOStatus, bool>  result{this->digitalWrite(found->second, parseToDigitalState(it.second))};
-                        if (result.first == IOStatus::OPERATION_FAILURE) {
-                            logString.append(GENERIC_FAILED_STRING);
-                        } else {
-                            logString.append(GENERIC_SUCCESS_STRING);
-                        }
-                    } else if (found->second->ioType() == IOType::ANALOG_OUTPUT) {
-                        std::pair<IOStatus, int> result{this->analogWriteRaw(found->second, parseToAnalogStateRaw(it.second))};
-                        if (result.first == IOStatus::OPERATION_FAILURE) {
-                            logString.append(GENERIC_FAILED_STRING);
-                        } else {
-                            logString.append(GENERIC_SUCCESS_STRING);
-                        }
-                    }
-                }
-                std::cout << logString;
-                std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
-            } else {
-                //TODO:Failure message
-            }
-        } catch (std::exception &e) {
-            logString.append(GENERIC_FAILED_STRING);
-            std::cout << logString;
-            std::cout << " (" << this->identifier() << ", " << this->serialPortName() << ")" << std::endl;
-            (void)e;
+            this->m_gpioPins.emplace(it, std::make_shared<GPIO>(it, IOType::DIGITAL_INPUT_PULLUP));
         }
     }
 }
 
 std::string Arduino::serialPortName() const
 {
-    return this->serialPort()->portName();
+    return this->m_serialPort->portName();
 }
 
 ArduinoType Arduino::arduinoType() const
@@ -521,165 +67,75 @@ std::string Arduino::longName() const
     return this->m_longName;
 }
 
-int Arduino::voltageToAnalog(double state)
+std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend, const std::string &header, double delay)
 {
-    return (state / Arduino::ANALOG_TO_VOLTAGE_SCALE_FACTOR);
-}
-
-double Arduino::analogToVoltage(int state)
-{
-    return state * Arduino::ANALOG_TO_VOLTAGE_SCALE_FACTOR;
-}
-
-unsigned int Arduino::SERIAL_PORT_TRY_COUNT_HIGH_LIMIT()
-{
-    return Arduino::s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT;
-}
-
-int Arduino::numberOfSerialPorts() const
-{
-    return Arduino::s_serialPorts.size();
-}
-
-bool Arduino::isBluetooth(int serialPortIndex)
-{
-    return (Arduino::serialPortAtIndex(serialPortIndex)->portName().find(BLUETOOTH_SERIAL_IDENTIFIER) != std::string::npos);
-}
-
-bool Arduino::isBluetooth(const std::string &name)
-{
-    return (name.find(BLUETOOTH_SERIAL_IDENTIFIER) != std::string::npos);
-}
-
-bool Arduino::isBluetooth(std::shared_ptr<SerialPort> serialPort)
-{
-    if (!serialPort) {
-        return false;
+    std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
+    if (!this->m_serialPort->isOpen()) {
+        this->m_serialPort->openPort();
+        GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
     }
-    return Arduino::isBluetooth(serialPort->portName());
-}
-
-int Arduino::addSerialPort(std::shared_ptr<SerialPort> serialPort)
-{
-    Arduino::s_serialPorts.emplace_back(serialPort);
-    return (Arduino::s_serialPorts.size()-1);
-}
-
-std::shared_ptr<SerialPort> Arduino::serialPortAtIndex(unsigned int serialPortIndex)
-{
-    if (serialPortIndex > Arduino::s_serialPorts.size()-1) {
-        throw std::runtime_error(SERIAL_PORT_INVALID_INDEX_STRING + std::to_string(serialPortIndex));
-    } else {
-        return Arduino::s_serialPorts.at(serialPortIndex).serialPort();
-    }
-}
-
-std::shared_ptr<std::mutex> Arduino::ioMutexAtIndex(unsigned int ioMutexIndex)
-{
-    if (ioMutexIndex > Arduino::s_serialPorts.size()-1) {
-        throw std::runtime_error(IO_MUTEX_INVALID_INDEX_STRING + std::to_string(ioMutexIndex));
-    } else {
-        return (Arduino::s_serialPorts.at(ioMutexIndex).ioMutex());
-    }
-}
-
-
-std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend, const std::string &header, int serialPortIndex, double delay)
-{
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    return Arduino::genericIOTask(stringToSend, header, serialPort, delay);
-}
-
-std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend, const std::string &header, std::shared_ptr<SerialPort> serialPort, double delay)
-{
-    using namespace GeneralUtilities;
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    long long int tempTimeout{serialPort->timeout()};
-    serialPort->setTimeout(Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT);
-    serialPort->writeString(stringToSend);
-#if defined(__USE_SERIAL_WRITE_DELAY__)
-    delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
-#else
-    if (isBluetooth(serialPort->portName())) {
-        delayMilliseconds(delay);
-    }
-#endif
+    long long int tempTimeout{this->m_serialPort->timeout()};
+    this->m_serialPort->setTimeout(SERIAL_REPORT_REQUEST_TIME_LIMIT);
+    this->m_serialPort->writeString(stringToSend);
+    GeneralUtilities::delayMilliseconds(delay);
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
-    std::future<std::string> returnHandle{serialPort->asyncReadStringUntil("}")};
+    std::future<std::string> returnHandle{this->m_serialPort->asyncReadStringUntil("}")};
     do {
         if (returnHandle.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
             *returnString = returnHandle.get();
             break;
         }
     } while (true);
-    serialPort->setTimeout(tempTimeout);
-    if (startsWith(*returnString, header) && endsWith(*returnString, '}')) {
+    this->m_serialPort->setTimeout(tempTimeout);
+    if (GeneralUtilities::startsWith(*returnString, header) && GeneralUtilities::endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);
     } else {
         return std::vector<std::string>{};
     }
-    return parseToVector(*returnString, ':');
+    return GeneralUtilities::parseToVector(*returnString, ':');
 }
 
-std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, int serialPortIndex, double delay)
+std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, double delay)
 {
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    return Arduino::genericIOReportTask(stringToSend, header, endHeader, serialPort, delay);
-}
-
-std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, std::shared_ptr<SerialPort> serialPort, double delay)
-{
-    using namespace GeneralUtilities;
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
+    std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
+    if (!this->m_serialPort->isOpen()) {
+        this->m_serialPort->openPort();
+        GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
     }
-    serialPort->writeString(stringToSend);
-#if defined(__USE_SERIAL_WRITE_DELAY__)
-    delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
-#else
-    if (isBluetooth(serialPort->portName())) {
-        delayMilliseconds(delay);
-    }
-#endif
+    this->m_serialPort->writeString(stringToSend);
+    GeneralUtilities::delayMilliseconds(delay);
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
-    std::future<std::string> returnHandle{serialPort->asyncReadStringUntil(endHeader)};
+    std::future<std::string> returnHandle{this->m_serialPort->asyncReadStringUntil(endHeader)};
     do {
         if (returnHandle.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
             *returnString = returnHandle.get();
             break;
         }
     } while (true);
-    if (startsWith(*returnString, header) && endsWith(*returnString, endHeader)) {
+    if (GeneralUtilities::startsWith(*returnString, header) && GeneralUtilities::endsWith(*returnString, endHeader)) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);
     } else {
         return std::vector<std::string>{};
     }
-    return parseToVector(*returnString, ';');
+    return GeneralUtilities::parseToVector(*returnString, ';');
 }
 
-std::pair<IOStatus, std::string> Arduino::getArduinoType(std::shared_ptr<SerialPort> serialPort)
+std::pair<IOStatus, std::string> Arduino::arduinoTypeString()
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::ARDUINO_TYPE_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ARDUINO_TYPE_HEADER, serialPort)};
-        if (states.size() != Arduino::ARDUINO_TYPE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(ARDUINO_TYPE_HEADER) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ARDUINO_TYPE_HEADER), 0)};
+        if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
             }
         }
         if (states.at(ArduinoTypeEnum::OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
@@ -690,21 +146,20 @@ std::pair<IOStatus, std::string> Arduino::getArduinoType(std::shared_ptr<SerialP
     return std::make_pair(IOStatus::OPERATION_FAILURE, "");
 }
 
-std::pair<IOStatus, std::string> Arduino::getFirmwareVersion(std::shared_ptr<SerialPort> serialPort)
+std::pair<IOStatus, std::string> Arduino::firmwareVersion()
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::FIRMWARE_VERSION_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::FIRMWARE_VERSION_HEADER, serialPort)};
-        if (states.size() != Arduino::ARDUINO_TYPE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(FIRMWARE_VERSION_HEADER) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(FIRMWARE_VERSION_HEADER), 0)};
+        if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
             }
         }
         if (states.at(ArduinoTypeEnum::OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
@@ -715,19 +170,18 @@ std::pair<IOStatus, std::string> Arduino::getFirmwareVersion(std::shared_ptr<Ser
     return std::make_pair(IOStatus::OPERATION_FAILURE, "");
 }
 
-std::pair<IOStatus, bool> Arduino::getCanCapability(std::shared_ptr<SerialPort> serialPort)
+std::pair<IOStatus, bool> Arduino::canCapability()
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_BUS_ENABLED_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CAN_BUS_ENABLED_HEADER, serialPort)};
-        if (states.size() != Arduino::CAN_BUS_ENABLED_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(CAN_BUS_ENABLED_HEADER) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CAN_BUS_ENABLED_HEADER), 0)};
+        if (states.size() != CAN_BUS_ENABLED_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             }
         }
         if (states.at(CanEnabledStatus::CAN_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             }
         }
@@ -735,7 +189,7 @@ std::pair<IOStatus, bool> Arduino::getCanCapability(std::shared_ptr<SerialPort> 
             return std::make_pair(IOStatus::OPERATION_SUCCESS, (std::stoi(states.at(CanEnabledStatus::CAN_RETURN_STATE)) == 1));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -745,21 +199,20 @@ std::pair<IOStatus, bool> Arduino::getCanCapability(std::shared_ptr<SerialPort> 
     return std::make_pair(IOStatus::OPERATION_FAILURE, false);
 }
 
-std::pair<IOStatus, int> Arduino::getAnalogToDigitalThreshold(std::shared_ptr<SerialPort> serialPort)
+std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CURRENT_A_TO_D_THRESHOLD_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CURRENT_A_TO_D_THRESHOLD_HEADER, serialPort)};
-        if (states.size() != Arduino::A_TO_D_THRESHOLD_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER), 0)};
+        if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(ADThresholdReq::AD_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -769,7 +222,7 @@ std::pair<IOStatus, int> Arduino::getAnalogToDigitalThreshold(std::shared_ptr<Se
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -779,241 +232,26 @@ std::pair<IOStatus, int> Arduino::getAnalogToDigitalThreshold(std::shared_ptr<Se
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
 }
 
-void Arduino::writeRawString(const std::string &str, int serialPortIndex)
+IOReport Arduino::ioReportRequest()
 {
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    Arduino::serialPortAtIndex(serialPortIndex)->writeString(str);
-}
-
-std::string Arduino::readRawString(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    return Arduino::serialPortAtIndex(serialPortIndex)->readString();
-}
-
-
-void Arduino::flushRX(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    Arduino::serialPortAtIndex(serialPortIndex)->flushRX();
-}
-
-void Arduino::flushTX(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    Arduino::serialPortAtIndex(serialPortIndex)->flushTX();
-}
-
-void Arduino::flushRXTX(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    if (!Arduino::serialPortAtIndex(serialPortIndex)->isOpen()) {
-        Arduino::serialPortAtIndex(serialPortIndex)->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    Arduino::serialPortAtIndex(serialPortIndex)->flushRXTX();
-}
-
-void Arduino::flushTXRX(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    Arduino::serialPortAtIndex(serialPortIndex)->flushTXRX();
-}
-
-std::pair<IOStatus, bool> Arduino::canAutoUpdate(bool state, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_LIVE_UPDATE_HEADER) + ':' + std::to_string(state) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CAN_LIVE_UPDATE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::CAN_AUTO_UPDATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        if (std::to_string(state) != states.at(CanEnabledStatus::CAN_RETURN_STATE)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        if (states.at(CanEnabledStatus::CAN_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(CanEnabledStatus::CAN_OPERATION_RESULT)) == 1);
-        } catch (std::exception &e) {
-            (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-}
-
-std::pair<IOStatus, bool> Arduino::initializeCanBus(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_INIT_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CAN_INIT_HEADER, serialPortIndex, Arduino::BLUETOOTH_SERIAL_SEND_DELAY*3)};
-        if (states.size() == 0) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        if (states.at(0) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        } else {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, true);
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-}
-
-std::pair<IOStatus, CanMessage> Arduino::canRead(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_READ_HEADER) + '}'};
-    CanMessage emptyMessage{0, 0, 0, CanDataPacket()};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CAN_READ_HEADER, serialPortIndex)};
-        if ((states.size() == Arduino::CAN_READ_RETURN_SIZE) && (states.size() != Arduino::CAN_READ_BLANK_RETURN_SIZE)){
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        if (states.size() == Arduino::CAN_READ_BLANK_RETURN_SIZE) {
-            if (states.at(0) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                } else {
-                    continue;
-                }
-            } else {
-                return std::make_pair(IOStatus::OPERATION_SUCCESS, emptyMessage);
-            }
-        }
-        if (states.at(CanIOStatus::CAN_IO_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        std::string message{states.at(CanIOStatus::MESSAGE_ID)};
-        for (unsigned int i = CanIOStatus::BYTE_0; i < CanIOStatus::CAN_IO_OPERATION_RESULT; i++) {
-            message += ":" + states.at(i);
-        }
-        return std::make_pair(IOStatus::OPERATION_SUCCESS, CanMessage::parseCanMessage(message));
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-}
-
-std::pair<IOStatus, CanMessage> Arduino::canWrite(const CanMessage &message, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    CanMessage emptyMessage{0, 0, 0, CanDataPacket()};
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_WRITE_HEADER) + ":" + message.toString() + "}" };
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CAN_WRITE_HEADER, serialPortIndex)};
-        if ((states.size() == Arduino::CAN_READ_RETURN_SIZE) && (states.size() != Arduino::CAN_READ_BLANK_RETURN_SIZE)){
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        if (states.size() != Arduino::CAN_WRITE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        if (states.at(CanIOStatus::CAN_IO_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        std::string returnMessage{states.at(CanIOStatus::MESSAGE_ID) + ":"};
-        for (unsigned int i = CanIOStatus::BYTE_0; i < CanIOStatus::CAN_IO_OPERATION_RESULT; i++) {
-            returnMessage += ":" + states.at(i);
-        }
-        return std::make_pair(IOStatus::OPERATION_SUCCESS, CanMessage::parseCanMessage(returnMessage));
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-}
-
-IOReport Arduino::ioReportRequest(int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::IO_REPORT_HEADER) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> allStates{Arduino::genericIOReportTask(stringToSend, Arduino::IO_REPORT_HEADER, static_cast<std::string>(Arduino::IO_REPORT_END_HEADER) + '}', serialPortIndex, 100)};
+    std::string stringToSend{static_cast<std::string>(IO_REPORT_HEADER) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> allStates{genericIOReportTask(stringToSend, 
+                                                               static_cast<std::string>(IO_REPORT_HEADER), 
+                                                               static_cast<std::string>(IO_REPORT_END_HEADER) + '}', 
+                                                               100)};
         IOReport ioReport;
         for (auto &it : allStates) {
-            it = stripAllFromString(it, '}');
-            it = stripAllFromString(it, '{');
-            std::vector<std::string> states{parseToVector(it, ':')};
-            std::string endCheck{stripAllFromString(Arduino::IO_REPORT_END_HEADER, '{')};
-            endCheck = stripAllFromString(endCheck, '}');
+            it = GeneralUtilities::stripAllFromString(it, '}');
+            it = GeneralUtilities::stripAllFromString(it, '{');
+            std::vector<std::string> states{GeneralUtilities::parseToVector(it, ':')};
+            std::string endCheck{GeneralUtilities::stripAllFromString(IO_REPORT_END_HEADER, '{')};
+            endCheck = GeneralUtilities::stripAllFromString(endCheck, '}');
             if (it.find(endCheck) != std::string::npos) {
                 continue;
             }
-            if ((states.size() != Arduino::IO_REPORT_RETURN_SIZE) && (states.size() != 0)) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
+            if ((states.size() != IO_REPORT_RETURN_SIZE) && (states.size() != 0)) {
+                if (i+1 == IO_TRY_COUNT) {
                     throw std::runtime_error(IO_REPORT_INVALID_DATA_STRING);
                 } else {
                     break;
@@ -1038,14 +276,12 @@ IOReport Arduino::ioReportRequest(int serialPortIndex)
     return IOReport{};
 }
 
-SerialReport Arduino::serialReportRequest(int serialPortIndex, const std::string &delimiter)
+SerialReport Arduino::serialReportRequest(const std::string &delimiter)
 {
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
+    std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
+    if (!this->m_serialPort->isOpen()) {
+        this->m_serialPort->openPort();
+        GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
     }
     SerialReport serialReport;
     std::unique_ptr<std::string> readString{std::make_unique<std::string>("")};
@@ -1072,16 +308,16 @@ SerialReport Arduino::serialReportRequest(int serialPortIndex, const std::string
         do {
             eventTimer->update();
             overallTimeout->update();
-            *readString = serialPort->readString();
-            if ((*readString == "") || (isWhitespace(*readString))) {
+            *readString = this->m_serialPort->readString();
+            if ((*readString == "") || (GeneralUtilities::isWhitespace(*readString))) {
                 continue;
             } else {
                 eventTimer->restart();
                 returnString += *readString;
             }
-        } while ((eventTimer->totalMilliseconds() <= Arduino::SERIAL_REPORT_REQUEST_TIME_LIMIT) &&
-                 (overallTimeout->totalMilliseconds() <= Arduino::SERIAL_REPORT_OVERALL_TIME_LIMIT) &&
-                 (!endsWith(returnString, delimiter)));
+        } while ((eventTimer->totalMilliseconds() <= SERIAL_REPORT_REQUEST_TIME_LIMIT) &&
+                 (overallTimeout->totalMilliseconds() <= SERIAL_REPORT_OVERALL_TIME_LIMIT) &&
+                 (!GeneralUtilities::endsWith(returnString, delimiter)));
     }
     std::vector<std::string> stringsToPrint;
     if (returnString.find("}{") != std::string::npos) {
@@ -1098,393 +334,27 @@ SerialReport Arduino::serialReportRequest(int serialPortIndex, const std::string
     return serialReport;
 }
 
-CanReport Arduino::canReportRequest(int serialPortIndex)
+std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
 {
-    using namespace GeneralUtilities;
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        CanReport canReport;
-        std::pair<IOStatus, CanMessage> result{Arduino::canListen(serialPortIndex)};
-        if (result.first == IOStatus::OPERATION_FAILURE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                throw std::runtime_error(CAN_REPORT_INVALID_DATA_STRING);
-            } else {
-                continue;
-            }
-        } else {
-            canReport.addCanMessageResult(result.second);
-        }
-        return canReport;
-    }
-    return CanReport{};
-}
-
-std::pair<IOStatus, CanMessage> Arduino::canListen(int serialPortIndex, double delay)
-{
-    using namespace GeneralUtilities;
-    std::lock_guard<std::mutex> ioLock{*Arduino::ioMutexAtIndex(serialPortIndex)};
-    std::shared_ptr<SerialPort> serialPort{Arduino::serialPortAtIndex(serialPortIndex)};
-    if (!serialPort->isOpen()) {
-        serialPort->openPort();
-        delayMilliseconds(Arduino::BOOTLOADER_BOOT_TIME);
-    }
-    std::string stringToSend{static_cast<std::string>(Arduino::CAN_READ_HEADER) + '}'};
-    CanMessage emptyMessage{0, 0, 0, CanDataPacket()};
-    serialPort->writeString(stringToSend);
-
-#if defined(__USE_SERIAL_WRITE_DELAY__)
-    delayMilliseconds(isBluetooth(serialPort->portName()) ? delay*Arduino::bluetoothSendDelayMultiplier : delay);
-#else
-    if (isBluetooth(serialPort)) {
-        delayMilliseconds(delay);
-    }
-#endif
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
-        *returnString = serialPort->readStringUntil('}');
-        bool canRead{false};
-        if ((returnString->find(CAN_EMPTY_READ_SUCCESS_STRING) != std::string::npos) && (returnString->length() > static_cast<std::string>(CAN_EMPTY_READ_SUCCESS_STRING).length() + 10)) {
-            *returnString = returnString->substr(static_cast<std::string>(CAN_EMPTY_READ_SUCCESS_STRING).length());
-        }
-        if (startsWith(*returnString, Arduino::CAN_READ_HEADER) && endsWith(*returnString, '}')) {
-            *returnString = returnString->substr(static_cast<std::string>(Arduino::CAN_READ_HEADER).length() + 1);
-            *returnString = returnString->substr(0, returnString->length()-1);
-            canRead = true;
-        } else if (startsWith(*returnString, Arduino::CAN_WRITE_HEADER) && endsWith(*returnString, '}')) {
-            *returnString = returnString->substr(static_cast<std::string>(Arduino::CAN_WRITE_HEADER).length() + 1);
-            *returnString = returnString->substr(0, returnString->find('}')+1);
-        } else {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-            } else {
-                continue;
-            }
-        }
-        if (canRead) {
-            std::vector<std::string> states{parseToVector(*returnString, ':')};
-            if ((states.size() != Arduino::CAN_READ_RETURN_SIZE) && (states.size() != Arduino::CAN_READ_BLANK_RETURN_SIZE)){
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                } else {
-                    continue;
-                }
-            }
-            if (states.size() == Arduino::CAN_READ_BLANK_RETURN_SIZE) {
-                if (states.at(0) == OPERATION_FAILURE_STRING) {
-                    if (i+1 == Arduino::IO_TRY_COUNT) {
-                        return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    return std::make_pair(IOStatus::OPERATION_SUCCESS, emptyMessage);
-                }
-            }
-            if (states.at(CanIOStatus::CAN_IO_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                } else {
-                    continue;
-                }
-            }
-            std::string message{states.at(CanIOStatus::MESSAGE_ID)};
-            for (unsigned int i = CanIOStatus::BYTE_0; i < CanIOStatus::CAN_IO_OPERATION_RESULT; i++) {
-                message += ":" + states.at(i);
-            }
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, CanMessage::parseCanMessage(message));
-        } else {
-            std::vector<std::string> states{parseToVector(*returnString, ':')};
-            if (states.size() != Arduino::CAN_WRITE_RETURN_SIZE) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(CanIOStatus::CAN_IO_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-                } else {
-                    continue;
-                }
-            }
-            std::string message{states.at(CanIOStatus::MESSAGE_ID)};
-            for (unsigned int i = CanIOStatus::BYTE_0; i < CanIOStatus::CAN_IO_OPERATION_RESULT; i++) {
-                message += ":" + states.at(i);
-            }
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, CanMessage::parseCanMessage(message));
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, emptyMessage);
-}
-
-std::pair<IOStatus, uint32_t> Arduino::addCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{""};
-    if (canMaskType == CanMaskType::POSITIVE) {
-        stringToSend = static_cast<std::string>(Arduino::ADD_POSITIVE_CAN_MASK_HEADER) + ':' + mask + '}';
-    } else if (canMaskType == CanMaskType::NEGATIVE) {
-        stringToSend = static_cast<std::string>(Arduino::ADD_NEGATIVE_CAN_MASK_HEADER) + ':' + mask + '}';
-    } else {
-        return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-    }
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        if (canMaskType == CanMaskType::POSITIVE) {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ADD_POSITIVE_CAN_MASK_HEADER, serialPortIndex)};
-            if (states.size() != Arduino::ADD_CAN_MASK_RETURN_SIZE) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (mask != states.at(CanMask::CAN_MASK_RETURN_STATE)) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(CanMask::CAN_MASK_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            try {
-                return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(CanMask::CAN_MASK_RETURN_STATE)));
-            } catch (std::exception &e) {
-                (void)e;
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-        } else if (canMaskType == CanMaskType::NEGATIVE) {
-            std::string stringToSend{static_cast<std::string>(Arduino::ADD_NEGATIVE_CAN_MASK_HEADER) + ':' + mask + '}'};
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ADD_NEGATIVE_CAN_MASK_HEADER, serialPortIndex)};
-            if (states.size() != Arduino::ADD_CAN_MASK_RETURN_SIZE) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (mask != states.at(CanMask::CAN_MASK_RETURN_STATE)) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(CanMask::CAN_MASK_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            try {
-                return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(CanMask::CAN_MASK_RETURN_STATE)));
-            } catch (std::exception &e) {
-                (void)e;
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-        } else {
-            return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-}
-
-
-std::pair<IOStatus, uint32_t> Arduino::removeCanMask(CanMaskType canMaskType, const std::string &mask, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{""};
-    if (canMaskType == CanMaskType::POSITIVE) {
-        stringToSend = static_cast<std::string>(Arduino::REMOVE_POSITIVE_CAN_MASK_HEADER) + ':' + mask + '}';
-    } else if (canMaskType == CanMaskType::NEGATIVE) {
-        stringToSend = static_cast<std::string>(Arduino::REMOVE_NEGATIVE_CAN_MASK_HEADER) + ':' + mask + '}';
-    } else {
-        return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-    }
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        if (canMaskType == CanMaskType::POSITIVE) {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::REMOVE_POSITIVE_CAN_MASK_HEADER, serialPortIndex)};
-            if (states.size() != Arduino::REMOVE_CAN_MASK_RETURN_SIZE) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (mask != states.at(CanMask::CAN_MASK_RETURN_STATE)) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(CanMask::CAN_MASK_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            try {
-                return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(CanMask::CAN_MASK_RETURN_STATE)));
-            } catch (std::exception &e) {
-                (void)e;
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-        } else if (canMaskType == CanMaskType::NEGATIVE) {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::REMOVE_NEGATIVE_CAN_MASK_HEADER, serialPortIndex)};
-            if (states.size() != Arduino::REMOVE_CAN_MASK_RETURN_SIZE) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (mask != states.at(CanMask::CAN_MASK_RETURN_STATE)) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(CanMask::CAN_MASK_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-            try {
-                return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(CanMask::CAN_MASK_RETURN_STATE)));
-            } catch (std::exception &e) {
-                (void)e;
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-                } else {
-                    continue;
-                }
-            }
-        } else {
-            return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
-}
-
-std::pair<IOStatus, bool> Arduino::removeAllCanMasks(CanMaskType canMaskType, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{""};
-    if (canMaskType == CanMaskType::POSITIVE) {
-        stringToSend = static_cast<std::string>(Arduino::REMOVE_ALL_POSITIVE_CAN_MASKS_HEADER) + '}';
-    } else if (canMaskType == CanMaskType::NEGATIVE) {
-        stringToSend = static_cast<std::string>(Arduino::REMOVE_ALL_NEGATIVE_CAN_MASKS_HEADER) + '}';
-    } else {
-        stringToSend = static_cast<std::string>(Arduino::REMOVE_ALL_CAN_MASKS_HEADER) + '}';
-    }
-
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        if (canMaskType == CanMaskType::POSITIVE) {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::REMOVE_ALL_POSITIVE_CAN_MASKS_HEADER, serialPortIndex)};
-            if (states.size() != 1) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(0) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, true);
-        } else if (canMaskType == CanMaskType::NEGATIVE) {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::REMOVE_ALL_NEGATIVE_CAN_MASKS_HEADER, serialPortIndex)};
-            if (states.size() != 1) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(0) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, true);
-        } else {
-            std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::REMOVE_ALL_CAN_MASKS_HEADER, serialPortIndex)};
-            if (states.size() != 1) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            if (states.at(0) == OPERATION_FAILURE_STRING) {
-                if (i+1 == Arduino::IO_TRY_COUNT) {
-                    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-                } else {
-                    continue;
-                }
-            }
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, true);
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-}
-
-std::pair<IOStatus, int> Arduino::changeAnalogToDigitalThreshold(int threshold, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::CHANGE_A_TO_D_THRESHOLD_HEADER) + ':' + std::to_string(threshold) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::CHANGE_A_TO_D_THRESHOLD_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::A_TO_D_THRESHOLD_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER) + ':' + std::to_string(threshold) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER), 0)};
+        if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(threshold) != states.at(ADThresholdReq::AD_RETURN_STATE)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(ADThresholdReq::AD_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1494,7 +364,7 @@ std::pair<IOStatus, int> Arduino::changeAnalogToDigitalThreshold(int threshold, 
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1505,28 +375,27 @@ std::pair<IOStatus, int> Arduino::changeAnalogToDigitalThreshold(int threshold, 
 }
 
 
-std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType, int serialPortIndex)
+std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::PIN_TYPE_CHANGE_HEADER) + ':' + std::to_string(pinNumber) + ':' + parseIOType(ioType) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::PIN_TYPE_CHANGE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(PIN_TYPE_CHANGE_HEADER) + ':' + std::to_string(pinNumber) + ':' + parseIOType(ioType) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_CHANGE_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -1536,7 +405,7 @@ std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType, int s
             return std::make_pair(IOStatus::OPERATION_SUCCESS, parseIOTypeFromString(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -1547,28 +416,27 @@ std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType, int s
 }
 
 
-std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::PIN_TYPE_HEADER) + ':' + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::PIN_TYPE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::PIN_TYPE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(PIN_TYPE_HEADER) + ':' + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_HEADER), 0)};
+        if (states.size() != PIN_TYPE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -1578,7 +446,7 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber, int serialPor
             return std::make_pair(IOStatus::OPERATION_SUCCESS, parseIOTypeFromString(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -1588,69 +456,27 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber, int serialPor
     return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
 }
 
-std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + '}' };
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::DIGITAL_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + '}' };
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
-        } catch (std::exception &e) {
-            (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-    }
-    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-}
-
-std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state, int serialPortIndex)
-{
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::DIGITAL_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + '}' };
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::DIGITAL_WRITE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
-                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
-            } else {
-                continue;
-            }
-        }
-        if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -1660,7 +486,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state, int s
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -1670,28 +496,67 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state, int s
     return std::make_pair(IOStatus::OPERATION_FAILURE, false);
 }
 
-std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::SOFT_DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::SOFT_DIGITAL_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(DIGITAL_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + '}' };
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
+                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
+            } else {
+                continue;
+            }
+        }
+        if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
+            if (i+1 == IO_TRY_COUNT) {
+                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
+            } else {
+                continue;
+            }
+        }
+        if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
+            if (i+1 == IO_TRY_COUNT) {
+                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
+            } else {
+                continue;
+            }
+        }
+        try {
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
+        } catch (std::exception &e) {
+            (void)e;
+            if (i+1 == IO_TRY_COUNT) {
+                return std::make_pair(IOStatus::OPERATION_FAILURE, false);
+            } else {
+                continue;
+            }
+        }
+    }
+    return std::make_pair(IOStatus::OPERATION_FAILURE, false);
+}
+
+std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
+{
+    std::string stringToSend{static_cast<std::string>(SOFT_DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_DIGITAL_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1701,7 +566,7 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber, int serialPort
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1711,38 +576,37 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber, int serialPort
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
 }
 
-std::pair<IOStatus, double> Arduino::analogRead(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ANALOG_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, Arduino::analogToVoltage(std::stoi(states.at(IOState::STATE))));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -1752,28 +616,27 @@ std::pair<IOStatus, double> Arduino::analogRead(int pinNumber, int serialPortInd
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
 }
 
-std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ANALOG_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1783,7 +646,7 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber, int serialPortInd
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1793,38 +656,37 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber, int serialPortInd
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
 }
 
-std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, SOFT_ANALOG_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, Arduino::analogToVoltage(std::stoi(states.at(IOState::STATE))));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -1834,28 +696,27 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber, int serialPor
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
 }
 
-std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber, int serialPortIndex)
+std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::SOFT_ANALOG_READ_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1864,7 +725,7 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber, int serialPor
         try {
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1874,28 +735,27 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber, int serialPor
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
 }
 
-std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state, int serialPortIndex)
+std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::ANALOG_WRITE_HEADER) + ":" + std::to_string(Arduino::voltageToAnalog(pinNumber)) + ":" + std::to_string(state) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ANALOG_WRITE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(voltageToAnalog(pinNumber)) + ":" + std::to_string(state) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -1905,7 +765,7 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state, in
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stod(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -1915,28 +775,27 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state, in
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
 }
 
-std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state, int serialPortIndex)
+std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state)
 {
-    using namespace GeneralUtilities;
-    std::string stringToSend{static_cast<std::string>(Arduino::ANALOG_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + '}'};
-    for (int i = 0; i < Arduino::IO_TRY_COUNT; i++) {
-        std::vector<std::string> states{Arduino::genericIOTask(stringToSend, Arduino::ANALOG_WRITE_HEADER, serialPortIndex)};
-        if (states.size() != Arduino::IO_STATE_RETURN_SIZE) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+    std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + '}'};
+    for (int i = 0; i < IO_TRY_COUNT; i++) {
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), 0)};
+        if (states.size() != IO_STATE_RETURN_SIZE) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1946,7 +805,7 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state, int s
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == Arduino::IO_TRY_COUNT) {
+            if (i+1 == IO_TRY_COUNT) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -1956,733 +815,10 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state, int s
     return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
 }
 
-std::pair<IOStatus, std::string> Arduino::getArduinoType(int serialPortIndex)
-{
-    return Arduino::getArduinoType(Arduino::serialPortAtIndex(serialPortIndex));
-}
-
-bool Arduino::parseToDigitalState(const std::string &state) const
-{
-    std::string copyString{state};
-    std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
-    for (auto &it : DIGITAL_STATE_HIGH_IDENTIFIERS) {
-        if (copyString == static_cast<std::string>(it)) {
-            return HIGH;
-        }
-    }
-
-    for (auto &it : DIGITAL_STATE_LOW_IDENTIFIERS) {
-        if (copyString == static_cast<std::string>(it)) {
-            return LOW;
-        }
-    }
-    throw std::runtime_error(INVALID_STATE_TO_PARSE_TO_DIGITAL_STATE_STRING + state);
-}
-
-double Arduino::parseToAnalogState(const std::string &state) const
-{
-
-    try {
-        double temp{std::stod(state.c_str())};
-        if (temp > Arduino::VOLTAGE_MAX) {
-            temp = Arduino::VOLTAGE_MAX;
-        }
-        return temp;
-    } catch (std::exception &e) {
-        throw std::runtime_error(INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_STRING + state);
-    }
-}
-
-int Arduino::parseToAnalogStateRaw(const std::string &state) const
-{
-    try {
-        int temp{std::stoi(state.c_str())};
-        if (temp > Arduino::ANALOG_MAX) {
-            temp = Arduino::ANALOG_MAX;
-        }
-        return temp;
-    } catch (std::exception &e) {
-        throw std::runtime_error(INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_RAW_STRING + state);
-    }
-}
-
-bool Arduino::isValidDigitalStateIdentifier(const std::string &state) const
-{
-    std::string copyString{state};
-    std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
-    for (auto &it : DIGITAL_STATE_HIGH_IDENTIFIERS) {
-        if (copyString == static_cast<std::string>(it)) {
-            return true;
-        }
-    }
-
-    for (auto &it : DIGITAL_STATE_LOW_IDENTIFIERS) {
-        if (copyString == static_cast<std::string>(it)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool Arduino::isValidAnalogStateIdentifier(const std::string &state) const
-{
-    for (auto &it : VALID_ANALOG_STATE_IDENTIFIERS) {
-        if (state == std::string(1, it)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool Arduino::isValidAnalogRawStateIdentifier(const std::string &state) const
-{
-    bool match{false};
-    for (auto &it : state) {
-        match = false;
-        for (auto &charIt : VALID_ANALOG_STATE_IDENTIFIERS) {
-            if ((it == charIt) && (charIt != '.')) {
-                match = true;
-            }
-        }
-        if (!match) {
-            return false;
-        }
-    }
-    return true;
-}
-
-std::string Arduino::parseIOType(IOType ioType)
-{
-    if (ioType == IOType::DIGITAL_INPUT) {
-        return DIGITAL_INPUT_IDENTIFIER;
-    } else if (ioType == IOType::DIGITAL_OUTPUT) {
-        return DIGITAL_OUTPUT_IDENTIFIER;
-    } else if (ioType == IOType::ANALOG_INPUT) {
-        return ANALOG_INPUT_IDENTIFIER;
-    } else if (ioType == IOType::ANALOG_OUTPUT) {
-        return ANALOG_OUTPUT_IDENTIFIER;
-    } else if (ioType == IOType::DIGITAL_INPUT_PULLUP) {
-        return DIGITAL_INPUT_PULLUP_IDENTIFIER;
-    } else {
-        throw std::runtime_error(UNSPECIFIED_IO_TYPE_TO_PARSE_IO_TYPE_STRING);
-    }
-}
-
-IOType Arduino::parseIOTypeFromString(const std::string &ioType)
-{
-    if (ioType == DIGITAL_INPUT_IDENTIFIER) {
-        return IOType::DIGITAL_INPUT;
-    } else if (ioType == DIGITAL_OUTPUT_IDENTIFIER) {
-        return IOType::DIGITAL_OUTPUT;
-    } else if (ioType == ANALOG_INPUT_IDENTIFIER) {
-        return IOType::ANALOG_INPUT;
-    } else if (ioType == ANALOG_OUTPUT_IDENTIFIER) {
-        return IOType::ANALOG_OUTPUT;
-    } else if (ioType == DIGITAL_INPUT_PULLUP_IDENTIFIER) {
-        return IOType::DIGITAL_INPUT_PULLUP;
-    } else {
-        throw std::runtime_error(INVALID_IO_TYPE_BASE_STRING + ioType + INVALID_IO_TYPE_TAIL_STRING);
-    }
-}
-
-bool Arduino::setPinAlias(int pinNumber, const std::string &newAlias)
-{
-    if (this->m_gpioPinIterationAliasMap.find(pinNumber) == this->m_gpioPinIterationAliasMap.end()) {
-        return false;
-    } else {
-        this->m_gpioPinIterationAliasMap.find(pinNumber)->second = newAlias;
-        return true;
-    }
-}
-
-bool Arduino::setPinAlias(std::shared_ptr<GPIO> gpio, const std::string &newAlias)
-{
-    if (!gpio) {
-        return false;
-    }
-    if (this->m_gpioPinIterationAliasMap.find(gpio->pinNumber()) == this->m_gpioPinIterationAliasMap.end()) {
-        return false;
-    } else {
-        this->m_gpioPinIterationAliasMap.find(gpio->pinNumber())->second = newAlias;
-        return true;
-    }
-}
-
-
-bool Arduino::setPinAlias(const GPIO &gpio, const std::string &newAlias)
-{
-    if (this->m_gpioPinIterationAliasMap.find(gpio.pinNumber()) == this->m_gpioPinIterationAliasMap.end()) {
-        return false;
-    } else {
-        this->m_gpioPinIterationAliasMap.find(gpio.pinNumber())->second = newAlias;
-        return true;
-    }
-}
-
-
-bool Arduino::isBluetooth() const
-{
-    return Arduino::isBluetooth(this->m_serialPortIndex);
-}
-
-void Arduino::initializeIO()
-{
-    using namespace GeneralUtilities;
-    this->m_gpioPins.clear();
-    this->m_gpioPinIterationAliasMap.clear();
-    this->m_gpioPinsAlias.clear();
-    for (auto &it : this->m_availablePins) {
-        this->m_gpioPins.emplace(it, std::make_shared<GPIO>(it, IOType::UNSPECIFIED));
-    }
-    for (auto &it : this->m_gpioPins) {
-        if (it.first > this->m_numberOfDigitalPins) {
-            if (it.first == CAN_BUS_PIN) {
-                m_canPinAlias = std::to_string(it.first);
-            }
-            this->m_gpioPinsAlias.emplace(analogPinFromNumber(it.first), it.second);
-            this->m_gpioPinIterationAliasMap.emplace(it.first, analogPinFromNumber(it.first));
-        } else {
-            this->m_gpioPinsAlias.emplace(std::to_string(it.first), it.second);
-            this->m_gpioPinIterationAliasMap.emplace(it.first, std::to_string(it.first));
-        }
-    }
-    if (this->m_canCapability.second) {
-        this->eraseCanPin();
-    }
-
-    /*
-    ConfigurationFileReader cfr;
-    for (auto &it : cfr.nanoAliasesMap()) {
-        if (this->m_gpioPinsAlias.find(std::to_string(it.first)) != this->m_gpioPinsAlias.end()) {
-            auto iter = this->m_gpioPinsAlias.find(std::to_string(it.first));
-            std::swap(this->m_gpioPinsAlias[std::to_string(it.first)], iter->second);
-            this->m_gpioPinsAlias.erase(iter);
-            this->m_gpioPinIterationAliasMap.find(it.first)->second = it.second;
-        }
-    }
-    for (auto &it : cfr.nanoIOTypesMap()) {
-        auto found{this->m_gpioPins.find(it.first)};
-        if (found != this->m_gpioPins.end()) {
-            if (found->second->ioType() == IOType::UNSPECIFIED) {
-                found->second->setIOType(parseIOTypeFromString(it.second));
-            }
-        }
-    }
-    assignIOTypes();
-    for (auto &it : cfr.nanoInitialStatesMap()) {
-        try {
-            if (confirmValidStates(it)) {
-                auto found{this->m_gpioPins.find(it.first)};
-                if (found != this->m_gpioPins.end()) {
-                    if (found->second->ioType() == IOType::DIGITAL_OUTPUT) {
-                        std::pair<IOStatus, bool>  result{this->digitalWrite(found->second, parseToDigitalState(it.second))};
-                        (void)result;
-                    } else if (found->second->ioType() == IOType::ANALOG_OUTPUT) {
-                        std::pair<IOStatus, int> result{this->analogWriteRaw(found->second, parseToAnalogStateRaw(it.second))};
-                        (void)result;
-                    }
-                }
-            } else {
-                //TODO:Failure message
-            }
-        } catch (std::exception &e) {
-            (void)e;
-        }
-    }
-    if (cfr.bluetoothMultiplier() != -1) {
-        Arduino::bluetoothSendDelayMultiplier = cfr.bluetoothMultiplier();
-    }
-    */
-}
-
-
-
-void Arduino::writeRawString(const std::string &str)
-{
-    return Arduino::writeRawString(str, this->m_serialPortIndex);
-}
-
-std::string Arduino::readRawString()
-{
-    return Arduino::readRawString(this->m_serialPortIndex);
-}
-
-void Arduino::flushRX()
-{
-    return Arduino::flushRX(this->m_serialPortIndex);
-}
-
-void Arduino::flushTX()
-{
-    return Arduino::flushTX(this->m_serialPortIndex);
-}
-
-void Arduino::flushRXTX()
-{
-    return Arduino::flushRXTX(this->m_serialPortIndex);
-}
-
-void Arduino::flushTXRX()
-{
-    return Arduino::flushTXRX(this->m_serialPortIndex);
-}
-
-void Arduino::setCanCapability(const std::pair<bool, bool> &capability)
-{
-    this->m_canCapability = capability;
-    if ((this->m_canCapability.first) && (this->m_canCapability.second)) {
-        eraseCanPin();
-    }
-}
-
-void Arduino::setFirmwareVersion(const std::string &firmwareVersion)
-{
-    this->m_firmwareVersion = firmwareVersion;
-}
-
-std::string Arduino::firmwareVersion()
-{
-
-    if (this->m_firmwareVersion == "") {
-        std::pair<IOStatus, std::string> firmware{Arduino::getFirmwareVersion(Arduino::serialPortAtIndex(this->m_serialPortIndex))};
-        if (firmware.first == IOStatus::OPERATION_FAILURE) {
-            this->m_firmwareVersion = FIRMWARE_VERSION_UNKNOWN_STRING;
-            return this->m_firmwareVersion;
-        } else {
-            return (this->m_firmwareVersion = firmware.second);
-        }
-    } else {
-        return this->m_firmwareVersion;
-    }
-}
-
-void Arduino::setAnalogToDigitalThreshold(int state)
-{
-    this->m_analogToDigitalThreshold = state;
-}
-
-int Arduino::analogToDigitalThreshold()
-{
-
-    if (this->m_analogToDigitalThreshold == -1) {
-        std::pair<IOStatus, int> threshold{Arduino::getAnalogToDigitalThreshold(Arduino::serialPortAtIndex(this->m_serialPortIndex))};
-        if (threshold.first == IOStatus::OPERATION_FAILURE) {
-            return this->m_analogToDigitalThreshold;
-        } else {
-            return (this->m_analogToDigitalThreshold = threshold.second);
-        }
-    } else {
-        return this->m_analogToDigitalThreshold;
-    }
-}
-
-
-void Arduino::eraseCanPin()
-{
-    this->m_availablePins.erase(this->m_availablePins.find(CAN_BUS_PIN));
-    this->m_availablePwmPins.erase(this->m_availablePwmPins.find(CAN_BUS_PIN));
-    this->m_gpioPins.erase(this->m_gpioPins.find(CAN_BUS_PIN));
-    this->m_gpioPinsAlias.erase(this->m_gpioPinsAlias.find(std::to_string(CAN_BUS_PIN)));
-    this->m_numberOfDigitalPins--;
-
-}
-
-std::pair<bool, bool> Arduino::canCapability()
-{
-
-    if (this->m_canCapability.first == false) {
-        std::pair<IOStatus, bool> capability{Arduino::getCanCapability(Arduino::serialPortAtIndex(this->m_serialPortIndex))};
-        if (capability.first == IOStatus::OPERATION_FAILURE) {
-            return std::make_pair(false, this->m_canCapability.second);
-        } else {
-            this->m_canCapability = std::make_pair(true, capability.second);
-            if (capability.second) {
-                eraseCanPin();
-            }
-            return std::make_pair(true, this->m_canCapability.second);
-        }
-    } else {
-        return std::make_pair(true, this->m_canCapability.second);
-    }
-}
-
-std::shared_ptr<SerialPort> Arduino::serialPort() const
-{
-    return Arduino::serialPortAtIndex(this->m_serialPortIndex);
-}
-
-bool Arduino::confirmValidAlias(const std::pair<int, std::string> &alias) const
-{
-    (void)alias;
-    return true;
-}
-
-bool Arduino::confirmValidIOType(const std::pair<int, std::string> &ioType) const
-{
-    IOType io{IOType::UNSPECIFIED};
-    (void)io;
-    try {
-        io = parseIOTypeFromString(ioType.second);
-        return true;
-    } catch (std::exception &e) {
-        return false;
-    }
-}
-
-bool Arduino::confirmValidStates(const std::pair<int, std::string> &state) const
-{
-    (void)state;
-    return true;
-}
-
-void Arduino::assignIOTypes()
-{
-    using namespace GeneralUtilities;
-    for (auto &it : this->m_gpioPins) {
-        if (it.second->ioType() == IOType::UNSPECIFIED) {
-            it.second->setIOType(this->currentPinMode(it.second).second);
-        } else {
-            std::pair<IOStatus, IOType> result{this->pinMode(it.second, it.second->ioType())};
-            (void)result;
-        }
-    }
-}
-
-std::shared_ptr<GPIO> Arduino::gpioPinByPinAlias(const std::string &pinAlias) const
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return (this->m_gpioPinsAlias.find(pinAlias)->second);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias);
-    }
-}
-
-std::shared_ptr<GPIO> Arduino::gpioPinByPinNumber(int pinNumber) const
-{
-    if (this->m_gpioPins.find(pinNumber) != this->m_gpioPins.end()) {
-        return (this->m_gpioPins.find(pinNumber)->second);
-    } else {
-        throw std::runtime_error(INVALID_PIN_NUMBER_STRING + pinNumber);
-    }
-}
-
-std::string Arduino::gpioAliasByPinNumber(int number) const
-{
-    if (this->m_gpioPinIterationAliasMap.find(number) != this->m_gpioPinIterationAliasMap.end()) {
-        return this->m_gpioPinIterationAliasMap.find(number)->second;
-    } else {
-        throw std::runtime_error("");
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalRead(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return digitalRead(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_DIGITAL_READ_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalWrite(const std::string &pinAlias, bool state)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return digitalWrite(this->m_gpioPinsAlias.find(pinAlias)->first, state);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_DIGITAL_WRITE_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogRead(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return analogRead(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_ANALOG_READ_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogReadRaw(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return analogReadRaw(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_ANALOG_READ_RAW_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogWrite(const std::string &pinAlias, double state)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return analogWrite(this->m_gpioPinsAlias.find(pinAlias)->first, state);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_ANALOG_WRITE_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogWriteRaw(const std::string &pinAlias, int state)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return analogWriteRaw(this->m_gpioPinsAlias.find(pinAlias)->first, state);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_ANALOG_WRITE_RAW_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::softDigitalRead(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return softDigitalRead(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_SOFT_DIGITAL_READ_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::softAnalogRead(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return softAnalogRead(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_SOFT_ANALOG_READ_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return softAnalogReadRaw(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_SOFT_ANALOG_READ_RAW_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::pinMode(const std::string &pinAlias, IOType ioType)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return pinMode(this->m_gpioPinsAlias.find(pinAlias)->first, ioType);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_PIN_MODE_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::currentPinMode(const std::string &pinAlias)
-{
-    if (this->m_gpioPinsAlias.find(pinAlias) != this->m_gpioPinsAlias.end()) {
-        return currentPinMode(this->m_gpioPinsAlias.find(pinAlias)->first);
-    } else {
-        throw std::runtime_error(INVALID_PIN_ALIAS_STRING + pinAlias + PASSED_TO_CURRENT_PIN_MODE_STRING_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalRead(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::digitalRead(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_DIGITAL_READ_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalWrite(const GPIO &gpio, bool state)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::digitalWrite(gpio.pinNumber(), state, this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_DIGITAL_WRITE_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogRead(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::analogRead(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_ANALOG_READ_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogReadRaw(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::analogReadRaw(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_ANALOG_READ_RAW_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogWrite(const GPIO &gpio, double state)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::analogWrite(gpio.pinNumber(), state, this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_ANALOG_WRITE_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogWriteRaw(const GPIO &gpio, int state)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::analogWriteRaw(gpio.pinNumber(), state, this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_ANALOG_WRITE_RAW_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::softDigitalRead(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::softDigitalRead(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_SOFT_DIGITAL_READ_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::softAnalogRead(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::softAnalogRead(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_SOFT_ANALOG_READ_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::softAnalogReadRaw(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::softAnalogReadRaw(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_SOFT_ANALOG_READ_RAW_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::pinMode(GPIO &gpio, IOType ioType)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        std::pair<IOStatus, IOType> result{Arduino::pinMode(gpio.pinNumber(), ioType, this->m_serialPortIndex)};
-        if (result.first == IOStatus::OPERATION_SUCCESS) {
-            gpio.setIOType(ioType);
-        }
-        return result;
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_PIN_MODE_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::currentPinMode(const GPIO &gpio)
-{
-    if (this->m_gpioPins.find(gpio.pinNumber()) != this->m_gpioPins.end()) {
-        return Arduino::currentPinMode(gpio.pinNumber(), this->m_serialPortIndex);
-    } else {
-        throw std::runtime_error(INVALID_GPIO_PIN_STRING + std::to_string(gpio.pinNumber()) + PASSED_TO_CURRENT_PIN_MODE_GPIO_TAIL_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalRead(std::shared_ptr<GPIO> gpioPtr)
-{
-    if (gpioPtr) {
-        return digitalRead(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_DIGITAL_READ_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::digitalWrite(std::shared_ptr<GPIO> gpioPtr, bool state)
-{
-    if (gpioPtr) {
-        return digitalWrite(*gpioPtr, state);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_DIGITAL_WRITE_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogRead(std::shared_ptr<GPIO> gpioPtr)
-{
-    if (gpioPtr) {
-        return analogRead(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_ANALOG_READ_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogReadRaw(std::shared_ptr<GPIO> gpioPtr)
-{
-    if (gpioPtr) {
-        return analogReadRaw(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_ANALOG_READ_RAW_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::analogWrite(std::shared_ptr<GPIO> gpioPtr, double state)
-{
-    if (gpioPtr) {
-        return analogWrite(*gpioPtr, state);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_ANALOG_WRITE_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::analogWriteRaw(std::shared_ptr<GPIO> gpioPtr, int state)
-{
-
-    if (gpioPtr) {
-        return analogWriteRaw(*gpioPtr, state);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_ANALOG_WRITE_RAW_STRING);
-    }
-}
-
-std::pair<IOStatus, bool> Arduino::softDigitalRead(std::shared_ptr<GPIO> gpioPtr)
-{
-
-    if (gpioPtr) {
-        return softDigitalRead(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_SOFT_DIGITAL_READ_STRING);
-    }
-}
-
-std::pair<IOStatus, double> Arduino::softAnalogRead(std::shared_ptr<GPIO> gpioPtr)
-{
-
-    if (gpioPtr) {
-        return softAnalogRead(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_STRING);
-    }
-}
-
-std::pair<IOStatus, int> Arduino::softAnalogReadRaw(std::shared_ptr<GPIO> gpioPtr)
-{
-    if (gpioPtr) {
-        return softAnalogReadRaw(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_SOFT_ANALOG_READ_RAW_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::pinMode(std::shared_ptr<GPIO> gpioPtr, IOType ioType)
-{
-    if (gpioPtr) {
-        return pinMode(*gpioPtr, ioType);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_PIN_MODE_STRING);
-    }
-}
-
-std::pair<IOStatus, IOType> Arduino::currentPinMode(std::shared_ptr<GPIO> gpioPtr)
-{
-    if (gpioPtr) {
-        return currentPinMode(*gpioPtr);
-    } else {
-        throw std::runtime_error(NULL_GPIO_PTR_TO_CURRENT_PIN_MODE_STRING);
-    }
-}
-
 bool Arduino::isValidAnalogPinIdentifier(const std::string &state) const
 {
     for (auto &it : this->m_availableAnalogPins) {
-        if (state == analogPinFromNumber(it)) {
+        if (state == analogPinFromNumber(this->m_arduinoType, it)) {
             return true;
         }
     }
@@ -2757,175 +893,6 @@ std::set<int> Arduino::AVAILABLE_PINS() const
 int Arduino::NUMBER_OF_DIGITAL_PINS() const
 {
     return this->m_numberOfDigitalPins;
-}
-
-int Arduino::parseAnalogPin(const std::string &pinAlias) const
-{
-    return Arduino::staticParseAnalogPin(this->m_arduinoType, pinAlias);
-}
-
-std::string Arduino::analogPinFromNumber(int pinNumber) const
-{
-    return Arduino::staticAnalogPinFromNumber(this->m_arduinoType, pinNumber);
-}
-
-int Arduino::staticParseAnalogPin(ArduinoType arduinoType, const std::string &pinAlias)
-{
-    if (arduinoType == ArduinoType::UNO) {
-        if ((pinAlias == UNO_A0_STRING) || (pinAlias == UNO_A0_EQUIVALENT_STRING)) {
-            return 14;
-        } else if ((pinAlias == UNO_A1_STRING) || (pinAlias == UNO_A1_EQUIVALENT_STRING)) {
-            return 15;
-        } else if ((pinAlias == UNO_A2_STRING) || (pinAlias == UNO_A2_EQUIVALENT_STRING)) {
-            return 16;
-        } else if ((pinAlias == UNO_A3_STRING) || (pinAlias == UNO_A3_EQUIVALENT_STRING)) {
-            return 17;
-        } else if ((pinAlias == UNO_A4_STRING) || (pinAlias == UNO_A4_EQUIVALENT_STRING)) {
-            return 18;
-        } else if ((pinAlias == UNO_A5_STRING) || (pinAlias == UNO_A5_EQUIVALENT_STRING)) {
-            return 19;
-        } else {
-            throw std::logic_error(INVALID_ANALOG_PIN_BASE_STRING + pinAlias + UNO_INVALID_ANALOG_STRING_TAIL_STRING);
-        }
-
-    } else if (arduinoType == ArduinoType::NANO) {
-       if ((pinAlias == NANO_A0_STRING) || (pinAlias == NANO_A0_EQUIVALENT_STRING)) {
-           return 14;
-       } else if ((pinAlias == NANO_A1_STRING) || (pinAlias == NANO_A1_EQUIVALENT_STRING)) {
-           return 15;
-       } else if ((pinAlias == NANO_A2_STRING) || (pinAlias == NANO_A2_EQUIVALENT_STRING)) {
-           return 16;
-       } else if ((pinAlias == NANO_A3_STRING) || (pinAlias == NANO_A3_EQUIVALENT_STRING)) {
-           return 17;
-       } else if ((pinAlias == NANO_A4_STRING) || (pinAlias == NANO_A4_EQUIVALENT_STRING)) {
-           return 18;
-       } else if ((pinAlias == NANO_A5_STRING) || (pinAlias == NANO_A5_EQUIVALENT_STRING)) {
-           return 19;
-       } else if ((pinAlias == NANO_A6_STRING) || (pinAlias == NANO_A6_EQUIVALENT_STRING)) {
-           return 20;
-       } else if ((pinAlias == NANO_A7_STRING) || (pinAlias == NANO_A7_EQUIVALENT_STRING)) {
-           return 21;
-       } else {
-           throw std::logic_error(INVALID_ANALOG_PIN_BASE_STRING + pinAlias + NANO_INVALID_ANALOG_STRING_TAIL_STRING);
-       }
-    } else if (arduinoType == ArduinoType::MEGA) {
-        if ((pinAlias == MEGA_A0_STRING) || (pinAlias == MEGA_A0_EQUIVALENT_STRING)) {
-            return 54;
-        } else if ((pinAlias == MEGA_A1_STRING) || (pinAlias == MEGA_A1_EQUIVALENT_STRING)) {
-            return 55;
-        } else if ((pinAlias == MEGA_A2_STRING) || (pinAlias == MEGA_A2_EQUIVALENT_STRING)) {
-            return 56;
-        } else if ((pinAlias == MEGA_A3_STRING) || (pinAlias == MEGA_A3_EQUIVALENT_STRING)) {
-            return 57;
-        } else if ((pinAlias == MEGA_A4_STRING) || (pinAlias == MEGA_A4_EQUIVALENT_STRING)) {
-            return 58;
-        } else if ((pinAlias == MEGA_A5_STRING) || (pinAlias == MEGA_A5_EQUIVALENT_STRING)) {
-            return 59;
-        } else if ((pinAlias == MEGA_A6_STRING) || (pinAlias == MEGA_A6_EQUIVALENT_STRING)) {
-            return 60;
-        } else if ((pinAlias == MEGA_A7_STRING) || (pinAlias == MEGA_A7_EQUIVALENT_STRING)) {
-            return 61;
-        } else if ((pinAlias == MEGA_A8_STRING) || (pinAlias == MEGA_A8_EQUIVALENT_STRING)) {
-            return 62;
-        } else if ((pinAlias == MEGA_A9_STRING) || (pinAlias == MEGA_A9_EQUIVALENT_STRING)) {
-            return 63;
-        } else if ((pinAlias == MEGA_A10_STRING) || (pinAlias == MEGA_A10_EQUIVALENT_STRING)) {
-            return 64;
-        } else if ((pinAlias == MEGA_A11_STRING) || (pinAlias == MEGA_A11_EQUIVALENT_STRING)) {
-            return 65;
-        } else if ((pinAlias == MEGA_A12_STRING) || (pinAlias == MEGA_A12_EQUIVALENT_STRING)) {
-            return 66;
-        } else if ((pinAlias == MEGA_A13_STRING) || (pinAlias == MEGA_A13_EQUIVALENT_STRING)) {
-            return 67;
-        } else if ((pinAlias == MEGA_A14_STRING) || (pinAlias == MEGA_A14_EQUIVALENT_STRING)) {
-            return 68;
-        } else if ((pinAlias == MEGA_A15_STRING) || (pinAlias == MEGA_A15_EQUIVALENT_STRING)) {
-            return 69;
-        } else {
-            throw std::logic_error(INVALID_ANALOG_PIN_BASE_STRING + pinAlias + MEGA_INVALID_ANALOG_STRING_TAIL_STRING);
-        }
-    } else {
-        throw std::runtime_error("");
-    }
-}
-
-std::string Arduino::staticAnalogPinFromNumber(ArduinoType arduinoType, int pinNumber)
-{
-    if (arduinoType == ArduinoType::UNO) {
-        if (pinNumber == 14) {
-            return UNO_A0_STRING;
-        } else if (pinNumber == 15) {
-            return UNO_A1_STRING;
-        } else if (pinNumber == 16) {
-            return UNO_A2_STRING;
-        } else if (pinNumber == 17) {
-            return UNO_A3_STRING;
-        } else if (pinNumber == 18) {
-            return UNO_A4_STRING;
-        } else if (pinNumber == 19) {
-            return UNO_A5_STRING;
-        } else {
-            throw std::runtime_error(INVALID_ANALOG_PIN_BASE_STRING + std::to_string(pinNumber) + UNO_INVALID_ANALOG_INT_TAIL_STRING);
-        }
-    } else if (arduinoType == ArduinoType::NANO) {
-        if (pinNumber == 14) {
-            return NANO_A0_STRING;
-        } else if (pinNumber == 15) {
-            return NANO_A1_STRING;
-        } else if (pinNumber == 16) {
-            return NANO_A2_STRING;
-        } else if (pinNumber == 17) {
-            return NANO_A3_STRING;
-        } else if (pinNumber == 18) {
-            return NANO_A4_STRING;
-        } else if (pinNumber == 19) {
-            return NANO_A5_STRING;
-        } else if (pinNumber == 20) {
-            return NANO_A6_STRING;
-        } else if (pinNumber == 21) {
-            return NANO_A7_STRING;
-        } else {
-            throw std::runtime_error(INVALID_ANALOG_PIN_BASE_STRING + std::to_string(pinNumber) + NANO_INVALID_ANALOG_INT_TAIL_STRING);
-        }
-    } else if (arduinoType == ArduinoType::MEGA) {
-        if (pinNumber == 54) {
-            return MEGA_A0_STRING;
-        } else if (pinNumber == 55) {
-            return MEGA_A1_STRING;
-        } else if (pinNumber == 56) {
-            return MEGA_A2_STRING;
-        } else if (pinNumber == 57) {
-            return MEGA_A3_STRING;
-        } else if (pinNumber == 58) {
-            return MEGA_A4_STRING;
-        } else if (pinNumber == 59) {
-            return MEGA_A5_STRING;
-        } else if (pinNumber == 60) {
-            return MEGA_A6_STRING;
-        } else if (pinNumber == 61) {
-            return MEGA_A7_STRING;
-        } else if (pinNumber == 62) {
-            return MEGA_A8_STRING;
-        } else if (pinNumber == 63) {
-            return MEGA_A9_STRING;
-        } else if (pinNumber == 64) {
-            return MEGA_A10_STRING;
-        } else if (pinNumber == 65) {
-            return MEGA_A11_STRING;
-        } else if (pinNumber == 66) {
-            return MEGA_A12_STRING;
-        } else if (pinNumber == 67) {
-            return MEGA_A13_STRING;
-        } else if (pinNumber == 68) {
-            return MEGA_A14_STRING;
-        } else if (pinNumber == 69) {
-            return MEGA_A15_STRING;
-        } else {
-            throw std::runtime_error(INVALID_ANALOG_PIN_BASE_STRING + std::to_string(pinNumber) + MEGA_INVALID_ANALOG_INT_TAIL_STRING);
-        }
-    } else {
-        throw std::runtime_error("");
-    }
 }
 
 std::set<int> ArduinoUno::s_availableAnalogPins{14, 15, 16, 17, 18, 19};
