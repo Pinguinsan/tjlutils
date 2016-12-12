@@ -89,7 +89,7 @@ enum class LineEnding {
     LE_CarriageReturnLineFeed
 };
 
-class SerialPort : public std::enable_shared_from_this<SerialPort>
+class SerialPort
 {
 public:
     SerialPort(const std::string &name);
@@ -261,13 +261,13 @@ private:
     static std::pair<int, int> parseParity(Parity parity);
     static std::string parseLineEnding(LineEnding lineEnding);
 
-    static void staticWriteString(std::shared_ptr<SerialPort> serialPort, const std::string &str);
-    static void staticWriteString(std::shared_ptr<SerialPort> serialPort, const char *str);
+    static void staticWriteString(SerialPort *serialPort, const std::string &str);
+    static void staticWriteString(SerialPort *serialPort, const char *str);
 
-    static std::string staticReadString(std::shared_ptr<SerialPort> serialPort);
-    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const std::string &readUntil);
-    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, char readUntil);
-    static std::string staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const char *readUntil);
+    static std::string staticReadString(SerialPort *serialPort);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil);
+    static std::string staticReadStringUntil(SerialPort *serialPort, char readUntil);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil);
     
     static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
     static const std::vector<const char *> s_AVAILABLE_PARITY;
@@ -282,18 +282,18 @@ private:
     static const char *s_SERIAL_PORT_HELPER_LONG_NAME;
     static const char *s_SERIAL_PORT_HELPER_SHORT_NAME;
 
-    template<typename T>
+    template<typename T, typename TOps>
     static T doUserSelectParameter(const std::string &name, 
                                 const std::function<T(const std::string &)> &func,
-                                const std::vector<const char *> &availableOptions,
+                                const std::vector<TOps> &availableOptions,
                                 const char *defaultOption);
 
 };
 
-template<typename T>
+template<typename T, typename TOps>
 T SerialPort::doUserSelectParameter(const std::string &name, 
                                     const std::function<T(const std::string &)> &func,
-                                    const std::vector<const char *> &availableOptions,
+                                    const std::vector<TOps> &availableOptions,
                                     const char *defaultOption)
 {
     using namespace GeneralUtilities;
@@ -308,7 +308,7 @@ T SerialPort::doUserSelectParameter(const std::string &name,
     std::cout << "Which " << name << " should be used?" << std::endl;
     for (unsigned int selectionIndex = 1; selectionIndex <= availableOptions.size(); selectionIndex++) {
         prettyPrinter->print(toString(selectionIndex) + ".) " + toString(availableOptions.at(selectionIndex-1)));
-        if (availableOptions.at(selectionIndex-1) == defaultOption) {
+        if (static_cast<std::string>(availableOptions.at(selectionIndex-1)) == static_cast<std::string>(defaultOption)) {
             std::cout << "    ";
             prettyPrinter->println("<----DEFAULT");
         } else {

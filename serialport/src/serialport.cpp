@@ -353,66 +353,66 @@ SerialPort::SerialPort(SerialPort &&other) :
 std::future<std::string> SerialPort::asyncReadString()
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(std::shared_ptr<SerialPort>)>(&SerialPort::staticReadString),
-                                               shared_from_this())}; 
+                                               static_cast<std::string (*)(SerialPort *)>(&SerialPort::staticReadString),
+                                               this)}; 
 }
 
 std::future<std::string> SerialPort::asyncReadStringUntil(const std::string &readUntil)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(std::shared_ptr<SerialPort>, const std::string &)>(&SerialPort::staticReadStringUntil),
-                                               shared_from_this(),
+                                               static_cast<std::string (*)(SerialPort *, const std::string &)>(&SerialPort::staticReadStringUntil),
+                                               this,
                                                readUntil)}; 
 }
 
 std::future<std::string> SerialPort::asyncReadStringUntil(char readUntil)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(std::shared_ptr<SerialPort>, char)>(&SerialPort::staticReadStringUntil),
-                                               shared_from_this(),
+                                               static_cast<std::string (*)(SerialPort *, char)>(&SerialPort::staticReadStringUntil),
+                                               this,
                                                readUntil)}; 
 }
 
 std::future<std::string> SerialPort::asyncReadStringUntil(const char *readUntil)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(std::shared_ptr<SerialPort>, const char *)>(&SerialPort::staticReadStringUntil),
-                                               shared_from_this(),
+                                               static_cast<std::string (*)(SerialPort *, const char *)>(&SerialPort::staticReadStringUntil),
+                                               this,
                                                readUntil)}; 
 }
 
 void SerialPort::asyncWriteString(const std::string &str)
 {
     std::async(std::launch::async,
-               static_cast<void (*)(std::shared_ptr<SerialPort>, const std::string &)>(&SerialPort::staticWriteString), 
-               shared_from_this(), 
+               static_cast<void (*)(SerialPort *, const std::string &)>(&SerialPort::staticWriteString), 
+               this, 
                str);  
 }
 
 void SerialPort::asyncWriteString(const char *str)
 {
     std::async(std::launch::async,
-               static_cast<void (*)(std::shared_ptr<SerialPort>, const char *)>(&SerialPort::staticWriteString), 
-               shared_from_this(), 
+               static_cast<void (*)(SerialPort *, const char *)>(&SerialPort::staticWriteString), 
+               this, 
                str);  
 }
 
-void SerialPort::staticWriteString(std::shared_ptr<SerialPort> serialPort, const std::string &str)
+void SerialPort::staticWriteString(SerialPort *serialPort, const std::string &str)
 {
     serialPort->writeString(str);
 }
 
-void SerialPort::staticWriteString(std::shared_ptr<SerialPort> serialPort, const char *str)
+void SerialPort::staticWriteString(SerialPort *serialPort, const char *str)
 {
     serialPort->writeString(static_cast<std::string>(str));
 }
 
-std::string SerialPort::staticReadString(std::shared_ptr<SerialPort> serialPort)
+std::string SerialPort::staticReadString(SerialPort *serialPort)
 {
     return serialPort->readString();
 }
 
-std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const std::string &readUntil)
+std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil)
 {
     std::string returnString{""};
     std::unique_ptr<EventTimer> eventTimer{std::make_unique<EventTimer>()};
@@ -439,12 +439,12 @@ std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serial
     return returnString;
 }
 
-std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, const char *readUntil)
+std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const char *readUntil)
 {
     return SerialPort::staticReadStringUntil(serialPort, static_cast<std::string>(readUntil));
 }
 
-std::string SerialPort::staticReadStringUntil(std::shared_ptr<SerialPort> serialPort, char readUntil)
+std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, char readUntil)
 {    
     return SerialPort::staticReadStringUntil(serialPort, std::string{1, readUntil});
 }
@@ -1746,7 +1746,8 @@ std::vector<std::string> SerialPort::generateSerialPortNames()
     std::vector<std::string> returnVector;
     for (auto &it : SerialPort::s_AVAILABLE_PORT_NAMES_BASE) {
         for (int i = 0; i < 256; i++) {
-            returnVector.emplace_back(it + std::to_string(i));
+            //std::cout << std::endl;
+            returnVector.push_back(it + std::to_string(i));
         }
     }
     return returnVector;
@@ -1775,13 +1776,9 @@ bool SerialPort::isValidSerialPortName(const std::string &serialPortName)
 
 std::string SerialPort::doUserSelectSerialPortName()
 {
-    std::vector<const char *> serialPorts;
-    for (auto &it : SerialPort::availableSerialPorts()) {
-        serialPorts.push_back(it.c_str());
-    }
     return SerialPort::doUserSelectParameter<std::string>(std::string{"serial port"}, 
                                              [](const std::string &str) -> std::string { return str; },
-                                             serialPorts,
+                                             SerialPort::availableSerialPorts(),
                                              ""); 
 }
 
