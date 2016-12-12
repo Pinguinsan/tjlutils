@@ -33,13 +33,25 @@ namespace ArduinoPCStrings
     extern const char *CLEAR_ALL_CAN_MASKS_HEADER;
 #endif
 
-    extern const char *FAILSAFE_INTERIM_HEADER;
+    extern const char *INITIALIZATION_HEADER;
+
+    extern const char *HARDWARE_SERIAL_RX_PIN_TYPE;
+    extern const char *HARDWARE_SERIAL_TX_PIN_TYPE;
+    extern const char *SOFTWARE_SERIAL_RX_PIN_TYPE;
+    extern const char *SOFTWARE_SERIAL_TX_PIN_TYPE;
+
+    extern const char *ADD_SOFTWARE_SERIAL_HEADER;
+    extern const char *REMOVE_SOFTWARE_SERIAL_HEADER;
+    extern const char *ADD_HARDWARE_SERIAL_HEADER;
+    extern const char *REMOVE_HARDWARE_SERIAL_HEADER;
+
     extern const char *DIGITAL_INPUT_IDENTIFIER;
     extern const char *DIGITAL_OUTPUT_IDENTIFIER;
     extern const char *ANALOG_INPUT_IDENTIFIER;
     extern const char *ANALOG_OUTPUT_IDENTIFIER;
     extern const char *DIGITAL_INPUT_PULLUP_IDENTIFIER;
     extern const char *INVALID_HEADER;
+    extern const char *REMOVE_SOFTWARE_SERIAL_HEADER;
     extern const char *DIGITAL_READ_HEADER;
     extern const char *ANALOG_READ_HEADER;
     extern const char *DIGITAL_WRITE_HEADER;
@@ -56,7 +68,6 @@ namespace ArduinoPCStrings
     extern const char *LOAD_SYSTEM_STATE_HEADER;
     extern const char *STORE_SYSTEM_STATE_END_HEADER;
     extern const char *LOAD_SYSTEM_STATE_END_HEADER;
-    extern const char *CHANGE_SERIAL_MODE_HEADER;
 
     extern const char *HEARTBEAT_HEADER;
     extern const char *IO_REPORT_HEADER;

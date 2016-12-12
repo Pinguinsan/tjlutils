@@ -52,26 +52,26 @@ template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
 class TemplateObject : public Object<T>
 {
 public:
-    explicit TemplateObject(const T &value) : _value{value} {}
-    explicit TemplateObject(T value) : _value{value} {}
+    explicit TemplateObject(const T &value) : m_value{value} {}
+    explicit TemplateObject(T value) : m_value{value} {}
     explicit TemplateObject(std::initializer_list<T> ini) {
         assert(ini.size() == 1);
-        _value = *(ini.begin());
+        m_value = *(ini.begin());
     }
     //TemplateObject<T>& operator=(const TemplateObject<T>& other) { return *this; } //Copy constructor
     //TemplateObject<T>& operator=(TemplateObject<T>&& other) { return *this; } //Move constructor
     TemplateObject<T> &operator=(T value) {
-        this->_value = value;
+        this->m_value = value;
         return &this;
     }
 
     TemplateObject<T>& operator++() {
-        this->_value = (this->_value+1);
+        this->m_value = (this->m_value+1);
         return *this;
     }
 
     TemplateObject<T>& operator--() {
-        this->_value = (this->_value-1);
+        this->m_value = (this->m_value-1);
         return *this;
     }
 
@@ -139,70 +139,70 @@ public:
 
     /*Compound assignment operators*/
     TemplateObject<T> &operator+=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value + rhs.value();
+        this->m_value = this->m_value + rhs.value();
         return *this;
     }
 
     TemplateObject<T> &operator-=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value - rhs.value();
+        this->m_value = this->m_value - rhs.value();
         return *this;
     }
     TemplateObject<T> &operator*=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value * rhs.value();
+        this->m_value = this->m_value * rhs.value();
         return *this;
     }
     TemplateObject<T> &operator/=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value / rhs.value();
+        this->m_value = this->m_value / rhs.value();
         return *this;
     }
     TemplateObject<T> &operator%=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value % rhs.value();
+        this->m_value = this->m_value % rhs.value();
         return *this;
     }
     TemplateObject<T> &operator^=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value ^ rhs.value();
+        this->m_value = this->m_value ^ rhs.value();
         return *this;
     }
     TemplateObject<T> &operator&=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value & rhs.value();
+        this->m_value = this->m_value & rhs.value();
         return *this;
     }
     TemplateObject<T> &operator|=(const TemplateObject<T> &rhs) {
-        this->_value = this->_value | rhs.value();
+        this->m_value = this->m_value | rhs.value();
         return *this;
     }
 
     TemplateObject<T> &operator+=(const T &rhs) {
-        this->_value = this->_value + rhs;
+        this->m_value = this->m_value + rhs;
         return *this;
     }
 
     TemplateObject<T> &operator-=(const T &rhs) {
-        this->_value = this->_value - rhs;
+        this->m_value = this->m_value - rhs;
         return *this;
     }
     TemplateObject<T> &operator*=(const T &rhs) {
-        this->_value = this->_value * rhs;
+        this->m_value = this->m_value * rhs;
         return *this;
     }
     TemplateObject<T> &operator/=(const T &rhs) {
-        this->_value = this->_value / rhs;
+        this->m_value = this->m_value / rhs;
         return *this;
     }
     TemplateObject<T> &operator%=(const T &rhs) {
-        this->_value = this->_value % rhs;
+        this->m_value = this->m_value % rhs;
         return *this;
     }
     TemplateObject<T> &operator^=(const T &rhs) {
-        this->_value = this->_value ^ rhs;
+        this->m_value = this->m_value ^ rhs;
         return *this;
     }
     TemplateObject<T> &operator&=(const T &rhs) {
-        this->_value = this->_value & rhs;
+        this->m_value = this->m_value & rhs;
         return *this;
     }
     TemplateObject<T> &operator|=(const T &rhs) {
-        this->_value = this->_value | rhs;
+        this->m_value = this->m_value | rhs;
         return *this;
     }
 
@@ -210,20 +210,20 @@ public:
     std::string toString() const {
         std::string returnString;
         std::stringstream transfer;
-        transfer << this->_value;
+        transfer << this->m_value;
         transfer >> returnString;
         return returnString;
     }
 
-    T value() const { return _value; }
-    operator T() { return this->_value; }
-    void setValue(T value) { this->_value = value; }
-    void setValue(const T &value) { this->_value = value; }
-    void setValue(TemplateObject<T> object) { this->_value = object.value(); }
-    void setValue(const TemplateObject<T> &object) { this->_value = object.value(); }
-    int getHashCode() const { return (this->_value); }
+    T value() const { return m_value; }
+    operator T() { return this->m_value; }
+    void setValue(T value) { this->m_value = value; }
+    void setValue(const T &value) { this->m_value = value; }
+    void setValue(TemplateObject<T> object) { this->m_value = object.value(); }
+    void setValue(const TemplateObject<T> &object) { this->m_value = object.value(); }
+    int getHashCode() const { return (this->m_value); }
 protected:
-        T _value;
+        T m_value;
 };
 
 
@@ -232,7 +232,7 @@ class Integer : public TemplateObject<int>
     using TemplateObject<int>::TemplateObject;
 public:
     Integer(int value) : TemplateObject<int>({value}) {}
-    operator int() { return this->_value; }
+    operator int() { return this->m_value; }
 };
 
 class Long : public TemplateObject<long>
@@ -240,7 +240,7 @@ class Long : public TemplateObject<long>
     using TemplateObject<long>::TemplateObject;
 public:
     Long(long value) : TemplateObject<long>({value}) {}
-    operator long() { return this->_value; }
+    operator long() { return this->m_value; }
 };
 
 class Boolean : public TemplateObject<bool>
@@ -248,8 +248,8 @@ class Boolean : public TemplateObject<bool>
     using TemplateObject<bool>::TemplateObject;
 public:
     Boolean(bool value) : TemplateObject<bool>({value}) {}
-    operator bool() { return this->_value; }
-    std::string toString() { return (this->_value) ? "True" : "False"; }
+    operator bool() { return this->m_value; }
+    std::string toString() { return (this->m_value) ? "True" : "False"; }
 
 };
 
@@ -258,7 +258,7 @@ class Double : public TemplateObject<double>
     using TemplateObject<double>::TemplateObject;
 public:
     Double(double value) : TemplateObject<double>({value}) {}
-    operator double() { return this->_value; }
+    operator double() { return this->m_value; }
 };
 
 class Float : public TemplateObject<float>
@@ -266,7 +266,7 @@ class Float : public TemplateObject<float>
     using TemplateObject<float>::TemplateObject;
 public:
     Float(float value) : TemplateObject<float>({value}) {}
-    operator float() { return this->_value; }
+    operator float() { return this->m_value; }
 };
 
 class Character : public TemplateObject<char>
@@ -274,7 +274,7 @@ class Character : public TemplateObject<char>
     using TemplateObject<char>::TemplateObject;
 public:
     Character(char value) : TemplateObject<char>({value}) {}
-    operator char() { return this->_value; }
+    operator char() { return this->m_value; }
 };
 
 #endif //TJLUTILS_TEMPLATEOBJECTS_H

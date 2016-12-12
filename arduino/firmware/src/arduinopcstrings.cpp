@@ -34,12 +34,22 @@ namespace ArduinoPCStrings
     const char *REMOVE_NEGATIVE_CAN_MASK_HEADER{"{remncanmask"};
 #endif
 
+    const char *HARDWARE_SERIAL_RX_PIN_TYPE{"hardserialrx"};
+    const char *HARDWARE_SERIAL_TX_PIN_TYPE{"hardserialtx"};
+    const char *SOFTWARE_SERIAL_RX_PIN_TYPE{"softserialrx"};
+    const char *SOFTWARE_SERIAL_TX_PIN_TYPE{"softserialtx"};
+
+    const char *INITIALIZATION_HEADER{"{arduinopc-firmware"};
+
     const char *ARDUINO_TYPE_HEADER{"{ardtype"};
     const char *ANALOG_READ_HEADER{"{aread"};
     const char *ANALOG_WRITE_HEADER{"{awrite"};
     const char *CHANGE_A_TO_D_THRESHOLD_HEADER{"{atodchange"};
     const char *CURRENT_A_TO_D_THRESHOLD_HEADER{"{atodthresh"};
-    const char *CHANGE_SERIAL_MODE_HEADER{"{changeserial"};
+    const char *ADD_SOFTWARE_SERIAL_HEADER{"{addsoftserial"};
+    const char *REMOVE_SOFTWARE_SERIAL_HEADER{"{remsoftserial"};
+    const char *ADD_HARDWARE_SERIAL_HEADER{"{addhardserial"};
+    const char *REMOVE_HARDWARE_SERIAL_HEADER{"{remhardserial"};
     
     const char *CAN_BUS_ENABLED_HEADER{"{canbus"};
     
