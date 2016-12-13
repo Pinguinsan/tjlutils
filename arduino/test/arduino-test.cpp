@@ -15,6 +15,21 @@ int main()
     std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, SERIAL_PORT_NAME)};
     std::cout << "success" << std::endl;
     do {
+        std::cout << "Writing all pins HIGH...";
+        auto result = arduino->digitalWriteAll(1);
+        if (result.first == IOStatus::OPERATION_SUCCESS) {
+            std::cout << "success (";
+            for (auto it = result.second.begin(); it != result.second.end(); it++) {
+                std::cout << *it;
+                if (it+1 != result.second.end()) {
+                    std::cout << ", ";
+                }
+            }
+            std::cout << ")" << std::endl;
+        } else {
+            std::cout << "failed" << std::endl;
+        }
+        GeneralUtilities::delayMilliseconds(300);
         for (auto &it : pins) {
             std::cout << "Writing pin " << it << " LOW...";
             std::cout << (arduino->digitalWrite(it, 0).first == IOStatus::OPERATION_SUCCESS ? "success" : "failure") << std::endl;
@@ -55,6 +70,7 @@ int main()
             } else {
                 std::cout << "failed" << std::endl;
             }
+            GeneralUtilities::delayMilliseconds(300);
         }
     } while(true);
     return 0;
