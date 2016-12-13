@@ -256,8 +256,16 @@ namespace GeneralUtilities
     
     std::string getBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
     {
-        size_t foundPosition{findString.find(beginning)};
-        size_t foundEndPosition{findString.find(ending)};
+        size_t foundPosition{0};
+        size_t foundEndPosition{0};
+        if (beginning == ending) {
+            size_t tempFound{findString.find(beginning)};
+            foundPosition = findString.find(beginning);
+            foundEndPosition = foundPosition + (findString.substr(tempFound+1).find(ending));
+        } else {
+            foundPosition = findString.find(beginning);
+            foundEndPosition = findString.find(ending);
+        }
         if ((foundPosition == std::string::npos) || (foundEndPosition == std::string::npos)) {
             return "";
         }
