@@ -61,7 +61,7 @@ const unsigned int CAN_BUS_ENABLED_RETURN_SIZE{2};
 const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT{1000};
 const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT{1000};
 
-unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{3};
+unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{1};
 double bluetoothSendDelayMultiplier{DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
 
 const int IO_TRY_COUNT{1};

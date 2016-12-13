@@ -530,17 +530,17 @@ void handleDPrefixedString(const std::string &str)
         } else {
             printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
-    } else if (startsWith(str, DIGITAL_WRITE_HEADER)) {
-        if (checkValidRequestString(DIGITAL_WRITE_HEADER, str)) {
-            digitalWriteRequest(str.substr(static_cast<std::string>(DIGITAL_WRITE_HEADER).length()+1));
-        } else {
-            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
-        }
     } else if (startsWith(str, DIGITAL_WRITE_ALL_HEADER)) {
         if (checkValidRequestString(DIGITAL_WRITE_ALL_HEADER, str)) {
             digitalWriteAllRequest(str.substr(static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER).length()+1));
         } else {
             printTypeResult(DIGITAL_WRITE_ALL_HEADER, str, OPERATION_FAILURE);
+        }
+    } else if (startsWith(str, DIGITAL_WRITE_HEADER)) {
+        if (checkValidRequestString(DIGITAL_WRITE_HEADER, str)) {
+            digitalWriteRequest(str.substr(static_cast<std::string>(DIGITAL_WRITE_HEADER).length()+1));
+        } else {
+            printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
         }
     } else {
         printTypeResult(INVALID_HEADER, str, OPERATION_FAILURE);
@@ -1350,6 +1350,7 @@ std::string getIOTypeString(IOType ioType)
 
 int parsePin(const std::string &str)
 {
+    Serial.println("str = " + str.c_str());
     if (isValidAnalogPinIdentifier(str)) {
         return parseAnalogPin(str);
     } else if (isValidPinIdentifier(str)) {
