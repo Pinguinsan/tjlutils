@@ -134,6 +134,11 @@ namespace GeneralUtilities
 
     bool isWhitespace(const std::string &stringToCheck);
     bool isWhitespace(char charToCheck);
+
+    std::string getBetween(const std::string &beginning, const std::string &ending, const std::string &findString);
+    std::vector<std::string> getAllBetween(const std::string &beginning, const std::string &ending, const std::string &findString);
+    std::string stripBetween(const std::string &beginning, const std::string &ending, const std::string &findString);
+    std::string stripAllBetween(const std::string &beginning, const std::string &ending, const std::string &findString);
     std::string stripFromString(const std::string &stringToStrip, const std::string &whatToStrip);
     std::string stripFromString(const std::string &stringToStrip, char whatToStrip);
     std::string stripAllFromString(const std::string &stringToStrip, const std::string &whatToStrip);

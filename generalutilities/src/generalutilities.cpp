@@ -254,6 +254,53 @@ namespace GeneralUtilities
         return isWhitespace(std::string(1, charToCheck));
     }
     
+    std::string getBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
+    {
+        size_t foundPosition{findString.find(beginning)};
+        size_t foundEndPosition{findString.find(ending)};
+        if ((foundPosition == std::string::npos) || (foundEndPosition == std::string::npos)) {
+            return "";
+        }
+        return findString.substr(foundPosition+1, foundEndPosition-foundPosition-1);
+    }
+
+    std::vector<std::string> getAllBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
+    {
+        std::vector<std::string> returnVector{};
+        std::string copyString{findString};
+        do {
+            std::string gotString{getBetween(beginning, ending, copyString)};
+            if (gotString.length() != 0) {
+                returnVector.push_back(gotString);
+            }
+            copyString = copyString.substr(copyString.find(ending)+1);
+        } while (copyString != "");
+        return returnVector;
+    }
+
+    std::string stripBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
+    {
+        std::string removeString{getBetween(beginning, ending, findString)};
+        if (removeString == "") {
+            return "";
+        }
+        size_t foundPosition{findString.find(removeString)};
+        long long unsigned int offsetPosition{foundPosition + (removeString.length())};
+        return (findString.substr(0, foundPosition) + findString.substr(offsetPosition));
+    }
+
+    std::string stripAllBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
+    {
+        std::string returnString{""};
+        std::string copyString{findString};
+        while (getBetween(beginning, ending, copyString).length() != 0) {
+            std::string gotString{beginning + getBetween(beginning, ending, copyString) + ending};
+            returnString += (beginning + ending);
+            copyString = stripFromString(copyString, gotString);
+        }
+        return returnString;
+    }
+    
     std::string stripFromString(const std::string &stringToStrip, const std::string &whatToStrip)
     {
         std::string returnString{stringToStrip};
