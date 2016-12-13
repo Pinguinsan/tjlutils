@@ -156,44 +156,44 @@ static std::map<int, GPIO*> gpioPins;
 
 #if defined(ARDUINO_AVR_UNO)
     static const int AVAILABLE_ANALOG_PINS[]{A0, A1, A2, A3, A4, A5, -1};
-    static const char AVAILABLE_GENERAL_PINS[]{2, 4, 7, 8, 12, 13, -1};
+    static const int AVAILABLE_GENERAL_PINS[]{2, 4, 7, 8, 12, 13, -1};
     #define NUMBER_OF_ANALOG_PINS 6
     #define ANALOG_PIN_OFFSET 13
     #if defined(__HAVE_CAN_BUS__)
         #define NUMBER_OF_PINS 17
-        static const char AVAILABLE_PWM_PINS[]{3, 5, 6, 10, 11, -1};
+        static const int AVAILABLE_PWM_PINS[]{3, 5, 6, 10, 11, -1};
     #else
         #define NUMBER_OF_PINS 18
-        static const char AVAILABLE_PWM_PINS[]{3, 5, 6, 9, 10, 11, -1};
+        static const int AVAILABLE_PWM_PINS[]{3, 5, 6, 9, 10, 11, -1};
     #endif
 #elif defined(ARDUINO_AVR_NANO)
-    static const char AVAILABLE_ANALOG_PINS[]{A0, A1, A2, A3, A4, A5, A6, A7, -1};                                                
-    static const char AVAILABLE_GENERAL_PINS[]{2, 4, 7, 8, 12, 13, -1};
+    static const int AVAILABLE_ANALOG_PINS[]{A0, A1, A2, A3, A4, A5, A6, A7, -1};                                                
+    static const int AVAILABLE_GENERAL_PINS[]{2, 4, 7, 8, 12, 13, -1};
     #define NUMBER_OF_ANALOG_PINS 8
     #define ANALOG_PIN_OFFSET 13
     #if defined(__HAVE_CAN_BUS__)
         #define NUMBER_OF_PINS 19
-        static const char AVAILABLE_PWM_PINS[]{3, 5, 6, 10, 11, -1};
+        static const int AVAILABLE_PWM_PINS[]{3, 5, 6, 10, 11, -1};
     #else
         #define NUMBER_OF_PINS 20
-        static const char AVAILABLE_PWM_PINS[]{3, 5, 6, 9, 10, 11, -1};
+        static const int AVAILABLE_PWM_PINS[]{3, 5, 6, 9, 10, 11, -1};
     #endif
 #elif defined(ARDUINO_AVR_MEGA1280) || defined(ARDUINO_AVR_MEGA2560)
-    static const char AVAILABLE_ANALOG_PINS[]{A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, -1};
-    static const char AVAILABLE_GENERAL_PINS[]{14, 15, 16, 17, 18, 19, 20,21, 22, 23, 24, 
+    static const int AVAILABLE_ANALOG_PINS[]{A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, -1};
+    static const int AVAILABLE_GENERAL_PINS[]{14, 15, 16, 17, 18, 19, 20,21, 22, 23, 24, 
                                                   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
                                                   38, 39, 40, 41, 42, 43, 47, 48, 49, 50, 51, 52, 53,-1};            
 
-    static const char AVAILABLE_SERIAL_RX_PINS[]{10, 11, 12, 13, 14, 15, 50, 51, 52, 53,
+    static const int AVAILABLE_SERIAL_RX_PINS[]{10, 11, 12, 13, 14, 15, 50, 51, 52, 53,
                                                  A8, A9, A10, A11, A12, A13, A14, A15};                                    
     #define NUMBER_OF_ANALOG_PINS 16
     #define ANALOG_PIN_OFFSET 53
     #if defined(__HAVE_CAN_BUS__)
         #define NUMBER_OF_PINS 67
-        static const char AVAILABLE_PWM_PINS[]{2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 44, 45, 46, -1};
+        static const int AVAILABLE_PWM_PINS[]{2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 44, 45, 46, -1};
     #else
         #define NUMBER_OF_PINS 68
-        static const char AVAILABLE_PWM_PINS[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 44, 45, 46, -1};
+        static const int AVAILABLE_PWM_PINS[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 44, 45, 46, -1};
     #endif
 #endif
 
@@ -1350,8 +1350,7 @@ std::string getIOTypeString(IOType ioType)
 
 int parsePin(const std::string &str)
 {
-    Serial.println("str = " + str.c_str());
-    if (isValidAnalogPinIdentifier(str)) {
+    if (str.find("A") != std::string::npos) {
         return parseAnalogPin(str);
     } else if (isValidPinIdentifier(str)) {
         return atoi(str.c_str());
