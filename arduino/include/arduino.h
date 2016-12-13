@@ -5,27 +5,24 @@
 #include <utility>
 #include <memory>
 #include <future>
+#include <algorithm>
 #include <mutex>
+#include <set>
+#include <vector>
 
 #include <serialport.h>
 #include <generalutilities.h>
 #include <eventtimer.h>
 
-#include <string>
-#include <vector>
-#include <set>
 
 enum class ArduinoType { UNO, NANO, MEGA };
 enum IOType { DIGITAL_INPUT, DIGITAL_OUTPUT, ANALOG_INPUT, ANALOG_OUTPUT, DIGITAL_INPUT_PULLUP, UNSPECIFIED };
-enum class CanMaskType { POSITIVE, NEGATIVE, ALL };
 enum IOStatus { OPERATION_SUCCESS, OPERATION_FAILURE };
 enum IOState { PIN_NUMBER, STATE, RETURN_CODE };
 enum ArduinoTypeEnum { RETURN_STATE, OPERATION_RESULT };
 enum IOReportEnum { IO_PIN_NUMBER, IO_TYPE, IO_STATE };
-enum CanIOStatus { MESSAGE_ID, BYTE_0, BYTE_1, BYTE_2, BYTE_3, BYTE_4, BYTE_5, BYTE_6, BYTE_7 , CAN_IO_OPERATION_RESULT};
 enum CanEnabledStatus { CAN_RETURN_STATE, CAN_OPERATION_RESULT };
 enum ADThresholdReq { AD_RETURN_STATE, AD_OPERATION_RESULT };
-enum CanMask { CAN_MASK_RETURN_STATE, CAN_MASK_OPERATION_RESULT };
 
 #ifndef HIGH
     #define HIGH 0x1
@@ -35,7 +32,6 @@ enum CanMask { CAN_MASK_RETURN_STATE, CAN_MASK_OPERATION_RESULT };
     #define LOW 0x0
 #endif
 
-
 const unsigned int IO_STATE_RETURN_SIZE{3};
 const unsigned int ARDUINO_TYPE_RETURN_SIZE{2};
 const unsigned int PIN_TYPE_RETURN_SIZE{3};
@@ -44,10 +40,11 @@ const unsigned int A_TO_D_THRESHOLD_RETURN_SIZE{2};
 const unsigned int RETURN_SIZE_HIGH_LIMIT{1000};
 const int STATE_FAILURE{-1};
 const int INVALID_PIN{-1};
-const double SERIAL_TIMEOUT{1000};
+const double SERIAL_TIMEOUT{50};
 const int BLUETOOTH_RETRY_COUNT{10};
 const double BOOTLOADER_BOOT_TIME{2000};
 const double BLUETOOTH_SERIAL_SEND_DELAY{100};
+const int IO_OPERATION_SEND_DELAY{20};
 const int ANALOG_MAX{1023};
 const double VOLTAGE_MAX{5.0};
 const double ANALOG_TO_VOLTAGE_SCALE_FACTOR{0.0049};
@@ -58,8 +55,9 @@ const StopBits FIRMWARE_STOP_BITS{StopBits::ONE};
 const Parity FIRMWARE_PARITY{Parity::NONE};
 
 const unsigned int CAN_BUS_ENABLED_RETURN_SIZE{2};
-const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT{1000};
-const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT{1000};
+const unsigned int DIGITAL_WRITE_ALL_MINIMIM_RETURN_SIZE{2};
+const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT{50};
+const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT{50};
 
 unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{4};
 double bluetoothSendDelayMultiplier{DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
@@ -74,6 +72,7 @@ const char *INVALID_HEADER{"{invalid"};
 const char *DIGITAL_READ_HEADER{"{dread"};
 const char *ANALOG_READ_HEADER{"{aread"};
 const char *DIGITAL_WRITE_HEADER{"{dwrite"};
+const char *DIGITAL_WRITE_ALL_HEADER{"{dwriteall"};
 const char *ANALOG_WRITE_HEADER{"{awrite"};
 const char *SOFT_DIGITAL_READ_HEADER{"{sdread"};
 const char *SOFT_ANALOG_READ_HEADER{"{saread"};
@@ -482,6 +481,7 @@ public:
     Arduino(ArduinoType arduinoType, const std::string &serialPortName);
     std::pair<IOStatus, bool> digitalRead(int pinNumber);
     std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state);
+    std::pair<IOStatus, std::vector<int>> digitalWriteAll(bool state);
     std::pair<IOStatus, double> analogRead(int pinNumber);
     std::pair<IOStatus, int> analogReadRaw(int pinNumber);
     std::pair<IOStatus, double> analogWrite(int pinNumber, double state);

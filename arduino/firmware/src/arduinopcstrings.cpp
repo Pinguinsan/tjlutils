@@ -55,7 +55,7 @@ namespace ArduinoPCStrings
     
     const char *DIGITAL_READ_HEADER{"{dread"};
     const char *DIGITAL_WRITE_HEADER{"{dwrite"};
-    const char *DIGITAL_WRITE_ALL_HEADER{"{dwritea"};
+    const char *DIGITAL_WRITE_ALL_HEADER{"{dwriteall"};
     
     const char *HEARTBEAT_HEADER{"{heartbeat"};
     
