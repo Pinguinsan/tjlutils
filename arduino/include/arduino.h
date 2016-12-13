@@ -61,10 +61,10 @@ const unsigned int CAN_BUS_ENABLED_RETURN_SIZE{2};
 const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT{1000};
 const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT{1000};
 
-unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{1};
+unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{4};
 double bluetoothSendDelayMultiplier{DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
 
-const int IO_TRY_COUNT{1};
+const int IO_TRY_COUNT{4};
 
 const std::vector<const char *> VALID_DIGITAL_STATE_IDENTIFIERS{"1", "0", "HIGH", "high", "LOW", "low", "FALSE", "false", "TRUE", "true"};
 const std::vector<char> VALID_ANALOG_STATE_IDENTIFIERS{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
