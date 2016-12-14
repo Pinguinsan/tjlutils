@@ -1023,6 +1023,11 @@ bool SerialPort::isDSREnabled() const
     #endif
 }
 
+void SerialPort::flush()
+{
+    return this->flushTXRX();
+}
+
 void SerialPort::flushRX()
 {
     #if (defined(_WIN32) || defined(__CYGWIN__))
