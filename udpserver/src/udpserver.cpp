@@ -119,6 +119,11 @@ bool UDPServer::isListening() const
     return this->m_isListening;
 }
 
+unsigned int UDPServer::available() const
+{
+    return this->m_messageQueue.size();
+}
+
 void UDPServer::staticAsyncUdpServer()
 {
     do {

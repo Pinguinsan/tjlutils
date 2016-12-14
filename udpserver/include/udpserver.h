@@ -48,7 +48,7 @@ public:
     std::string readStringUntil(const std::string &until);
     std::string readStringUntil(const char *until);
     std::string readStringUntil(char until);
-    int available() const;
+    unsigned int available() const;
     void startListening();
     void stopListening();
     bool isListening() const;
