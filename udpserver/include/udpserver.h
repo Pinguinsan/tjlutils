@@ -1,3 +1,21 @@
+/***********************************************************************
+*    udpserver.h:                                                      *
+*    UDPServer, for receiving datagrams over a UDP port number         *
+*    Copyright (c) 2016 Tyler Lewis                                    *
+************************************************************************
+*    This is a header file for tjlutils:                               *
+*    https://github.serial/Pinguinsan/tjlutils                         *
+*    This file may be distributed with the entire tjlutils library,    *
+*    but may also be distributed as a standalone file                  *
+*    The source code is released under the GNU LGPL                    *
+*    This file holds the declarations of a UDPServer class             *
+*    It is used to receive datagrams over a specified UDP port number  *
+*                                                                      *
+*    You should have received a copy of the GNU Lesser General         *
+*    Public license along with libraryprojects                         *
+*    If not, see <http://www.gnu.org/licenses/>                        *
+***********************************************************************/
+
 #ifndef TJLUTILS_UDPSERVER_H
 #define TJLUTILS_UDPSERVER_H
 
@@ -34,8 +52,10 @@ public:
     void startListening();
     void stopListening();
     bool isListening() const;
-
-    void timeout() const;
+    
+    unsigned int timeout() const;
+    void setPortNumber(uint16_t portNumber);
+    uint16_t portNumber() const;
     void setTimeout(unsigned int timeout);
     void flush();
 
@@ -55,7 +75,7 @@ private:
     void initialize();
     void staticAsyncUdpServer();
 
-    static const constexpr uint16_t s_DEFAULT_PORT{8888};
+    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr uint16_t s_BROADCAST{1};
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};

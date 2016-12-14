@@ -114,6 +114,7 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     removeFile "$ui/prettyprinter.h"
     removeFile "$ui/arduino.h"
     removeFile "$ui/udpserver.h"
+    removeFile "$ui/udpclient.h"
 
     if [[ -z "$cygwinCheck" ]]; then
         removeFile "$ul/libtjlutils.so"
@@ -163,6 +164,8 @@ else
     linkFile "$ogt/arduino/include/arduino.h" "$ui/"
 
     linkFile "$ogt/udpserver/include/udpserver.h" "$ui/"
+    
+    linkFile "$ogt/udpclient/include/udpclient.h" "$ui/"
 
     linkFile "$ogt/common/tjlutils.h" "$ui/"
 

@@ -1,7 +1,25 @@
+/***********************************************************************
+*    udpserver.cpp:                                                    *
+*    UDPServer, for receiving datagrams over a UDP port number         *
+*    Copyright (c) 2016 Tyler Lewis                                    *
+************************************************************************
+*    This is a header file for tjlutils:                               *
+*    https://github.serial/Pinguinsan/tjlutils                         *
+*    This file may be distributed with the entire tjlutils library,    *
+*    but may also be distributed as a standalone file                  *
+*    The source code is released under the GNU LGPL                    *
+*    This file holds the implementation of a UDPServer class           *
+*    It is used to receive datagrams over a specified UDP port number  *
+*                                                                      *
+*    You should have received a copy of the GNU Lesser General         *
+*    Public license along with libraryprojects                         *
+*    If not, see <http://www.gnu.org/licenses/>                        *
+***********************************************************************/
+
 #include "udpserver.h"
 
 UDPServer::UDPServer() :
-    UDPServer{UDPServer::s_DEFAULT_PORT}
+    UDPServer{UDPServer::s_DEFAULT_PORT_NUMBER}
 {
 
 }
@@ -15,6 +33,7 @@ UDPServer::UDPServer(uint16_t portNumber) :
     m_shutEmDown{false}
 {
     if (!this->isValidPortNumber(this->m_portNumber)) {
+        this->m_portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<int16_t>::max()) 
                                  + "("
@@ -29,10 +48,33 @@ bool constexpr UDPServer::isValidPortNumber(int portNumber)
     return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
 }
 
+void UDPServer::setPortNumber(uint16_t portNumber)
+{
+    if (!this->isValidPortNumber(this->m_portNumber)) {
+        throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
+                                 std::to_string(std::numeric_limits<int16_t>::max()) 
+                                 + "("
+                                 + std::to_string(this->m_portNumber) 
+                                 + ")");
+    }
+    this->initialize();
+}
+
 void UDPServer::setTimeout(unsigned int timeout)
 {
     this->m_timeout = timeout;
 }
+
+unsigned int UDPServer::timeout() const
+{
+    return this->m_timeout;
+}
+
+uint16_t UDPServer::portNumber() const
+{
+    return this->m_portNumber;
+}
+
 
 void UDPServer::flush()
 {

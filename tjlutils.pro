@@ -26,6 +26,7 @@ INCLUDEPATH += systemcommand/include/ \
                prettyprinter/include/ \
                arduino/include/ \
                udpserver/include/ \
+               udpclient/include \
                common/
 
 SOURCES += systemcommand/src/systemcommand.cpp \
@@ -38,7 +39,8 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            serialport/src/serialport.cpp \
            eventtimer/src/eventtimer.cpp \
            arduino/src/arduino.cpp \
-           udpserver/src/udpserver.cpp
+           udpserver/src/udpserver.cpp \
+           udpclient/src/udpclient.cpp \
            prettyprinter/src/prettyprinter.cpp
 
 HEADERS += systemcommand/include/systemcommand.h \
@@ -53,7 +55,8 @@ HEADERS += systemcommand/include/systemcommand.h \
            eventtimer/include/eventtimer.h \
            prettyprinter/include/prettyprinter \
            arduino/include/arduino.h \
-           udpserver/include/udpserver \
+           udpserver/include/udpserver.h \
+           udpclient/include/updclient.h \
            templateobjects/templateobjects.h \
            common/tjlutils.h            
 
