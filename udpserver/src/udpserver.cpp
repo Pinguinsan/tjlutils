@@ -26,6 +26,8 @@ UDPServer::UDPServer() :
 
 UDPServer::UDPServer(uint16_t portNumber) :
     m_portNumber{portNumber},
+    m_socketAddress{},
+    m_receivingSocketAddress{},
     m_broadcast{UDPServer::s_BROADCAST},
     m_isListening{false},
     m_setSocketResult{0},
@@ -58,6 +60,7 @@ void UDPServer::setPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->initialize();
+    std::cout << "Initialized" << std::endl;
 }
 
 void UDPServer::setTimeout(unsigned int timeout)
@@ -104,10 +107,12 @@ void UDPServer::initialize()
 
 void UDPServer::startListening()
 {
-    this->m_isListening = true;
-    (void)std::async(std::launch::async, 
-                     &UDPServer::staticAsyncUdpServer, 
-                     this);
+    if (!this->m_isListening) {
+        this->m_isListening = true;
+        this->m_asyncFuture = std::async(std::launch::async, 
+                                         &UDPServer::staticAsyncUdpServer, 
+                                         this);
+    }
 }
 
 void UDPServer::stopListening()
@@ -141,7 +146,6 @@ void UDPServer::staticAsyncUdpServer()
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
             std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
-            ioMutexLock.lock();
             for (auto it : receivedString) {
                 this->m_messageQueue.push_back(it);
             }

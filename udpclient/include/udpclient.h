@@ -60,7 +60,7 @@ public:
 private:
     std::string m_hostName;
     uint16_t m_portNumber;
-    sockaddr_in m_socketAddress;
+    sockaddr_in m_listenAddress;
     sockaddr_storage m_destinationAddress;
     unsigned int m_timeout;
     int m_udpSocketIndex;

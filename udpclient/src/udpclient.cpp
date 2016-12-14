@@ -40,7 +40,7 @@ UDPClient::UDPClient(const std::string &hostName) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     m_hostName{hostName},
     m_portNumber{portNumber},
-    m_socketAddress{},
+    m_listenAddress{},
     m_destinationAddress{},
     m_udpSocketIndex{},
     m_timeout{UDPClient::s_DEFAULT_TIMEOUT}
@@ -97,8 +97,8 @@ void UDPClient::initialize()
 {
     using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
-    this->m_socketAddress.sin_family = AF_INET;
-    if (bind(this->m_udpSocketIndex, (sockaddr*)&this->m_socketAddress, sizeof(this->m_socketAddress)) != 0) {
+    this->m_listenAddress.sin_family = AF_INET;
+    if (bind(this->m_udpSocketIndex, (sockaddr*)&this->m_listenAddress, sizeof(this->m_listenAddress)) != 0) {
        throw std::runtime_error("ERROR: An error condition occurred during binding of socket (error code " + std::to_string(errno) + ")");
     }
 
@@ -127,13 +127,13 @@ int UDPClient::resolveAddressHelper(const std::string &hostName, int family, con
 
 ssize_t UDPClient::writeString(const std::string &str)
 {
-    
     return ( sendto(this->m_udpSocketIndex, 
                     str.c_str(), 
                     static_cast<size_t>(str.length()),
                     0,
-                    (sockaddr*)&this->m_socketAddress,
-                    sizeof(this->m_socketAddress)) );
+                    (sockaddr*)&this->m_destinationAddress,
+                    sizeof(this->m_destinationAddress)) );
+    
     /*
     ssize_t bytesWritten{0};
     for (auto &it : str) {
@@ -149,8 +149,8 @@ ssize_t UDPClient::writeByte(char toSend)
     return ( sendto(this->m_udpSocketIndex, str.c_str(), 
              static_cast<size_t>(str.length()), 
              0, 
-             (sockaddr*)&this->m_socketAddress, 
-             sizeof(this->m_socketAddress)) );
+             (sockaddr*)&this->m_destinationAddress, 
+             sizeof(this->m_destinationAddress)) );
 }
 
 bool constexpr UDPClient::isValidPortNumber(int portNumber)

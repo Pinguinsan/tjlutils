@@ -71,6 +71,7 @@ private:
     std::deque<char> m_messageQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
+    std::future<void> m_asyncFuture;
     
     void initialize();
     void staticAsyncUdpServer();

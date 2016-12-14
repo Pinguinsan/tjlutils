@@ -3,11 +3,11 @@
 #include <iostream>
 #include <string>
 #include <udpserver.h>
-
 int main()
 {
     UDPServer udpServer{8888};
     udpServer.startListening();
+    
     do {
         if (udpServer.available()) {
             std::cout << "Rx << " << udpServer.readString() << std::endl;
@@ -16,7 +16,6 @@ int main()
     return 0;
 
 }
-
 /*
 
 #include <iostream>
