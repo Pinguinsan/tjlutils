@@ -23,6 +23,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/prettyprinter/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/arduino/include/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/udpserver/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/common/")
 
@@ -39,6 +40,7 @@ set (SERIALPORT_SOURCES ${SOURCE_BASE}/serialport/src/serialport.cpp)
 set (EVENTTIMER_SOURCES ${SOURCE_BASE}/eventtimer/src/eventtimer.cpp)
 set (PRETTYPRINTER_SOURCES ${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp)
 set (ARDUINO_SOURCES ${SOURCE_BASE}/arduino/src/arduino.cpp)
+set (UDPSERVER_SOURCES ${SOURCE_BASE}/udpserver/src/udpserver.cpp)
 
 add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${PYTHONCRYPTO_SOURCES}
@@ -50,7 +52,8 @@ add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${SERIALPORT_SOURCES}
                             ${EVENTTIMER_SOURCES}
                             ${PRETTYPRINTER_SOURCES}
-                            ${ARDUINO_SOURCES})
+                            ${ARDUINO_SOURCES}
+                            ${UDPSERVER_SOURCES})
                         
 add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${PYTHONCRYPTO_SOURCES}
@@ -62,6 +65,7 @@ add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${SERIALPORT_SOURCES}
                                   ${EVENTTIMER_SOURCES}
                                   ${PRETTYPRINTER_SOURCES}
-                                  ${ARDUINO_SOURCES})
+                                  ${ARDUINO_SOURCES}
+                                  ${UDPSERVER_SOURCES})
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)

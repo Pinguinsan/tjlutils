@@ -28,34 +28,103 @@ ogt="/opt/GitHub/tjlutils"
 olt="/opt/LibraryBuilds/tjlutils"
 ub="/usr/bin"
 
+function showSuccess() {
+    echo "success"
+}
+
+function showFailure() {
+    echo "failure"
+}
+
+function removeFile() {
+    echo -n "Removing $1..."
+    rm -f "$1"
+    if [[ "$?" -ne "0" ]]; then
+        showFailure
+        return 1
+    else 
+        showSuccess
+        return 0
+    fi
+}
+
+function linkFile() {
+    echo -n "Linking $1 to $2..."
+    ln -s -f "$1" "$2"
+    if [[ "$?" -ne "0" ]]; then
+        showFailure
+        return 1
+    else 
+        showSuccess
+        return 0
+    fi
+}
+
+function changeDirectory() {
+    echo -n "Entering directory to $1..."
+    cd "$1"
+    if [[ "$?" -ne "0" ]]; then
+        showFailure
+        return 1
+    else 
+        showSuccess
+        return 0
+    fi
+}
+
+function runCmake() {
+    echo -n "Running cmake from source directory $1..."
+    cmake "$1"
+    if [[ "$?" -ne "0" ]]; then
+        showFailure
+        return 1
+    else 
+        showSuccess
+        return 0
+    fi
+}
+
+function runMake() {
+    echo -n "Running make..."
+    make
+    if [[ "$?" -ne "0" ]]; then
+        showFailure
+        return 1
+    else 
+        showSuccess
+        return 0
+    fi
+}
+
 if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninstall" || "$1" == "uninstall" ]]; then
     
-    rm -rf "$olt"
-    rm -f "$ui/tjlutils.h"
-    rm -f "$ui/systecommand.h"
-    rm -f "$ui/generalutilities.h"
-    rm -f "$ui/fileutilities.h"
-    rm -f "$ui/mathutilities.h"
-    rm -f "$ui/datetime.h"
-    rm -f "$ui/pythoncrypto.h"
-    rm -f "$ui/crypto.h"
-    rm -f "$ui/hash.h"
-    rm -f "$ui/templateobjects.h"
-    rm -f "$ui/serialport.h"
-    rm -f "$ui/eventtimer.h"
-    rm -f "$ui/prettyprinter.h"
-    rm -f "$ui/arduino.h"
-    rm -f "$ui/canmessage.h"
-    rm -f "$ui/candatapacket.h"
+    removeFile "$olt"
+    removeFile "$ui/tjlutils.h"
+    removeFile "$ui/systecommand.h"
+    removeFile "$ui/generalutilities.h"
+    removeFile "$ui/fileutilities.h"
+    removeFile "$ui/mathutilities.h"
+    removeFile "$ui/datetime.h"
+    removeFile "$ui/pythoncrypto.h"
+    removeFile "$ui/crypto.h"
+    removeFile "$ui/hash.h"
+    removeFile "$ui/templateobjects.h"
+    removeFile "$ui/serialport.h"
+    removeFile "$ui/eventtimer.h"
+    removeFile "$ui/prettyprinter.h"
+    removeFile "$ui/arduino.h"
+    removeFile "$ui/udpserver.h"
 
     if [[ -z "$cygwinCheck" ]]; then
-        rm -f "$ul/libtjlutils.so"
-        rm -f "$ub/EnumerateSerial.exe"
+        removeFile "$ul/libtjlutils.so"
+        removeFile "$ub/EnumerateSerial.exe"
     else
-        rm -f "$ul/cygtjlutils.dll"
+        removeFile "$ul/cygtjlutils.dll"
     fi
 
-    rm -f "$ul/libtjlutils.a"
+    removeFile "$ul/libtjlutils.a"
+
+    echo "tjlutils uninstalled successfully"
 
 elif [[ "$1" == "-h" || "$1" == "--h" || "$1" == "-help" || "$1" == "--help" || "$1" == help ]]; then
 
@@ -64,67 +133,49 @@ elif [[ "$1" == "-h" || "$1" == "--h" || "$1" == "-help" || "$1" == "--help" || 
 
 else
     
-    #rm -rf "$olt"
-    #mkdir "$olt"
-    cd "$olt" || exit 1
-    cmake "$ogt" || exit 1
-    make || exit 1
+    changeDirectory "$olt" || exit 1
+    runCmake "$ogt" || exit 1
+    runMake || exit 1
 
-    rm -f "$ui/systemcommand.h"
-    ln -s "$ogt/systemcommand/include/systemcommand.h" "$ui/"
+    linkFile "$ogt/systemcommand/include/systemcommand.h" "$ui/"
     
-    rm -f "$ui/generalutilities.h"
-    ln -s "$ogt/generalutilities/include/generalutilities.h" "$ui/"
+    linkFile "$ogt/generalutilities/include/generalutilities.h" "$ui/"
 
-    rm -f "$ui/fileutilities.h"
-    ln -s "$ogt/fileutilities/include/fileutilities.h" "$ui/"
+    linkFile "$ogt/fileutilities/include/fileutilities.h" "$ui/"
     
-    rm -f "$ui/mathutilities.h"
-    ln -s "$ogt/mathutilities/include/mathutilities.h" "$ui/"
+    linkFile "$ogt/mathutilities/include/mathutilities.h" "$ui/"
     
-    rm -f "$ui/datetime.h"
-    ln -s "$ogt/datetime/include/datetime.h" "$ui/"
+    linkFile "$ogt/datetime/include/datetime.h" "$ui/"
     
-    rm -f "$ui/pythoncrypto.h"
-    ln -s "$ogt/pythoncrypto/include/pythoncrypto.h" "$ui/"
+    linkFile "$ogt/pythoncrypto/include/pythoncrypto.h" "$ui/"
    
-    rm -f "$ui/crypto.h"
-    rm -f "$ui/hash.h"
-    ln -s "$ogt/crypto/include/crypto.h" "$ui/"
-    ln -s "$ogt/crypto/include/hash.h" "$ui/"
+    linkFile "$ogt/crypto/include/crypto.h" "$ui/"
+    linkFile "$ogt/crypto/include/hash.h" "$ui/"
     
-    rm -f "$ui/serialport.h"
-    ln -s "$ogt/serialport/include/serialport.h" "$ui/"
+    linkFile "$ogt/serialport/include/serialport.h" "$ui/"
 
-    rm -f "$ui/eventtimer.h"
-    ln -s "$ogt/eventtimer/include/eventtimer.h" "$ui/"
+    linkFile "$ogt/eventtimer/include/eventtimer.h" "$ui/"
 
-    rm -f "$ui/prettyprinter.h"
-    ln -s "$ogt/prettyprinter/include/prettyprinter.h" "$ui/"
+    linkFile "$ogt/prettyprinter/include/prettyprinter.h" "$ui/"
 
-    rm -f "$ui/templateobjects.h"
-    ln -s "$ogt/templateobjects/templateobjects.h" "$ui/"
+    linkFile "$ogt/templateobjects/templateobjects.h" "$ui/"
 
-    rm -f "$ui/arduino.h"
-    rm -f "$ui/canmessage.h"
-    rm -f "$ui/candatapacket.h"
-    ln -s "$ogt/arduino/include/arduino.h" "$ui/"
+    linkFile "$ogt/arduino/include/arduino.h" "$ui/"
 
-    rm -f "$ui/tjlutils.h"
-    ln -s "$ogt/common/tjlutils.h" "$ui/"
+    linkFile "$ogt/udpserver/include/udpserver.h" "$ui/"
+
+    linkFile "$ogt/common/tjlutils.h" "$ui/"
 
 
     if [[ -z "$cygwinCheck" ]]; then
-        rm -f "$ul/libtjlutils.so"
-        ln -s "$olt/libtjlutils.so" "$ul/"
+        linkFile "$olt/libtjlutils.so" "$ul/"
 
-        rm -f "$ub/EnumerateSerial.exe"
-        ln -s "$ogt/serialport/cs-helper/EnumerateSerial.exe" "$ub/"
+        linkFile "$ogt/serialport/cs-helper/EnumerateSerial.exe" "$ub/"
     else
-        rm -f "$ul/cygtjlutils.dll"
-        ln -s "$olt/cygtjlutils.dll" "$ul/"
+        linkFile "$olt/cygtjlutils.dll" "$ul/"
     fi
 
-    rm -f "$ul/libtjlutils.a"
-    ln -s "$olt/libtjlutils.a" "$ul/"
+    linkFile "$olt/libtjlutils.a" "$ul/"
+
+    echo "tjlutils installed successfully"
 fi
