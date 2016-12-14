@@ -1,18 +1,25 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <serialport.h>
+#include <tstream.h>
 #include <generalutilities.h>
 #include <arduino.h>
 
 int main()
 {
-    //std::string serialPortName{SerialPort::doUserSelectSerialPortName()};
+    std::string serialPortName{SerialPort::doUserSelectSerialPortName()};
     //std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::NANO, serialPortName)};
 
     std::vector<int> pins{2, 3, 4, 5, 6};
-    const std::string SERIAL_PORT_NAME{"/dev/ttyACM0"};
-    std::cout << "Creating Arduino object using serial port " << std::quoted(SERIAL_PORT_NAME) << "..."; 
-    std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, SERIAL_PORT_NAME)};
+    //const std::string SERIAL_PORT_NAME{"/dev/ttyACM0"};
+    std::shared_ptr<TStream> serialPort{std::make_shared<SerialPort>(serialPortName,
+                                                                        Arduino::FIRMWARE_BAUD_RATE,
+                                                                        Arduino::FIRMWARE_DATA_BITS,
+                                                                        Arduino::FIRMWARE_STOP_BITS,
+                                                                        Arduino::FIRMWARE_PARITY)};
+    std::cout << "Creating Arduino object using serial port " << std::quoted(serialPortName) << "..."; 
+    std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, serialPort)};
     std::cout << "success" << std::endl;
     do {
         std::cout << "Writing all pins HIGH...";

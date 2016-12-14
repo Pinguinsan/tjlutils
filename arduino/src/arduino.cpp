@@ -1,7 +1,15 @@
 #include "arduino.h"
 
+const BaudRate Arduino::FIRMWARE_BAUD_RATE{BaudRate::BAUD115200};
+const DataBits Arduino::FIRMWARE_DATA_BITS{DataBits::EIGHT};
+const StopBits Arduino::FIRMWARE_STOP_BITS{StopBits::ONE};
+const Parity Arduino::FIRMWARE_PARITY{Parity::NONE};
+const int Arduino::ANALOG_MAX{1023};
+const double Arduino::VOLTAGE_MAX{5.0};
+
 Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<TStream> tStream) :
     m_arduinoType{arduinoType},
+    m_ioStream{tStream},
     m_streamSendDelay{DEFAULT_IO_STREAM_SEND_DELAY}
 {
     try {

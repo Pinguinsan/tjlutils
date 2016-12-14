@@ -33,6 +33,173 @@ enum ADThresholdReq { AD_RETURN_STATE, AD_OPERATION_RESULT };
     #define LOW 0x0
 #endif
 
+
+class ArduinoUno;
+class ArduinoNano;
+class ArduinoMega;
+class GPIO;
+class IOReport;
+class SerialReport;
+
+class Arduino
+{
+public:
+    Arduino(ArduinoType arduinoType, std::shared_ptr<TStream> ioStream);
+    std::pair<IOStatus, bool> digitalRead(int pinNumber);
+    std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state);
+    std::pair<IOStatus, std::vector<int>> digitalWriteAll(bool state);
+    std::pair<IOStatus, double> analogRead(int pinNumber);
+    std::pair<IOStatus, int> analogReadRaw(int pinNumber);
+    std::pair<IOStatus, double> analogWrite(int pinNumber, double state);
+    std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state);
+    std::pair<IOStatus, bool> softDigitalRead(int pinNumber);
+    std::pair<IOStatus, double> softAnalogRead(int pinNumber);
+    std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber);
+    std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType);
+    std::pair<IOStatus, IOType> currentPinMode(int pinNumber);
+    std::pair<IOStatus, bool> canCapability();
+    std::pair<IOStatus, std::string> firmwareVersion();
+    std::pair<IOStatus, std::string> arduinoTypeString();
+    std::pair<IOStatus, int> analogToDigitalThreshold();
+    std::pair<IOStatus, int> setAnalogToDigitalThreshold(int threshold);
+    SerialReport serialReportRequest(const std::string &delimiter);
+    IOReport ioReportRequest();
+
+    std::string serialPortName() const;
+
+    std::set<int> AVAILABLE_ANALOG_PINS() const;
+    std::set<int> AVAILABLE_PWM_PINS() const;
+    std::set<int> AVAILABLE_PINS() const;
+    int NUMBER_OF_DIGITAL_PINS() const;
+    ArduinoType arduinoType() const;
+    
+    std::string identifier() const;
+    std::string longName() const;
+
+    void setStreamSendDelay(unsigned int streamSendDelay);
+    unsigned int streamSendDelay() const;
+
+    void assignPinsAndIdentifiers();
+
+    static const BaudRate FIRMWARE_BAUD_RATE;
+    static const DataBits FIRMWARE_DATA_BITS;
+    static const StopBits FIRMWARE_STOP_BITS;
+    static const Parity FIRMWARE_PARITY;
+    static const int ANALOG_MAX;
+    static const double VOLTAGE_MAX;
+    
+private:
+    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
+    std::shared_ptr<TStream> m_ioStream;
+    std::mutex m_ioMutex;
+    ArduinoType m_arduinoType;
+    std::string m_identifier;
+    std::string m_longName;
+    std::set<int> m_availablePins;
+    std::set<int> m_availablePwmPins;
+    std::set<int> m_availableAnalogPins;
+    int m_numberOfDigitalPins;
+    unsigned int m_streamSendDelay;
+
+    bool isValidAnalogPinIdentifier(const std::string &state) const;
+    bool isValidDigitalStateIdentifier(const std::string &state) const;
+    bool isValidAnalogStateIdentifier(const std::string &state) const;
+    bool isValidAnalogRawStateIdentifier(const std::string &state) const;
+
+    bool isValidDigitalOutputPin(int pinNumber) const;
+    bool isValidDigitalInputPin(int pinNumber) const;
+    bool isValidAnalogOutputPin(int pinNumber) const;
+    bool isValidAnalogInputPin(int pinNumber) const;
+
+    std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, double delay);
+    std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, double delay); 
+};
+
+class ArduinoUno
+{
+public:
+    ArduinoUno() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+class ArduinoNano
+{
+public:
+    ArduinoNano() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+class ArduinoMega
+{
+public:
+    ArduinoMega() = delete;
+    virtual void doStuff() = 0;
+    static std::set<int> s_availableAnalogPins;
+    static std::set<int> s_availablePwmPins;
+    static std::set<int> s_availablePins;
+    static const char *IDENTIFIER;
+    static const char *LONG_NAME;
+    static int s_numberOfDigitalPins;
+};
+
+class GPIO
+{
+public:
+    GPIO(int pinNumber, IOType ioType) :
+        m_pinNumber{pinNumber},
+        m_ioType{ioType} { }
+    int pinNumber() const { return this->m_pinNumber; }
+    IOType ioType() const { return this->m_ioType; }
+    void setIOType(IOType ioType) { this->m_ioType = ioType; }
+    friend bool operator==(const GPIO &lhs, const GPIO &rhs) { return (lhs.pinNumber() == rhs.pinNumber()); }
+
+private:
+    int m_pinNumber;
+    IOType m_ioType;
+};
+
+class IOReport
+{
+public:
+    void addDigitalInputResult(const std::pair<int, bool> &result) { this->m_digitalInputResults.emplace_back(result); }
+    void addDigitalOutputResult(const std::pair<int, bool> &result) { this->m_digitalOutputResults.emplace_back(result); }
+    void addAnalogInputResult(const std::pair<int, int> &result) { this->m_analogInputResults.emplace_back(result); }
+    void addAnalogOutputResult(const std::pair<int, int> &result) { this->m_analogOutputResults.emplace_back(result); }
+
+    std::vector<std::pair<int, bool>> digitalInputResults() const { return this->m_digitalInputResults; }
+    std::vector<std::pair<int, bool>> digitalOutputResults() const { return this->m_digitalOutputResults; }
+    std::vector<std::pair<int, int>> analogInputResults() const { return this->m_analogInputResults; }
+    std::vector<std::pair<int, int>> analogOutputResults() const { return this->m_analogOutputResults; }
+
+private:
+    std::vector<std::pair<int, bool>> m_digitalInputResults;
+    std::vector<std::pair<int, bool>> m_digitalOutputResults;
+    std::vector<std::pair<int, int>> m_analogInputResults;
+    std::vector<std::pair<int, int>> m_analogOutputResults;
+};
+
+class SerialReport
+{
+public:
+    void addSerialResult(const std::string &result) { this->m_serialResults.emplace_back(result); }
+    std::vector<std::string> serialResults() const { return this->m_serialResults; }
+
+private:
+    std::vector<std::string> m_serialResults;
+};
+
 const unsigned int IO_STATE_RETURN_SIZE{3};
 const unsigned int ARDUINO_TYPE_RETURN_SIZE{2};
 const unsigned int PIN_TYPE_RETURN_SIZE{3};
@@ -46,14 +213,8 @@ const int BLUETOOTH_RETRY_COUNT{10};
 const double BOOTLOADER_BOOT_TIME{2000};
 const double BLUETOOTH_SERIAL_SEND_DELAY{100};
 const int DEFAULT_IO_STREAM_SEND_DELAY{20};
-const int ANALOG_MAX{1023};
-const double VOLTAGE_MAX{5.0};
 const double ANALOG_TO_VOLTAGE_SCALE_FACTOR{0.0049};
 const double DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER{4.8};
-const BaudRate FIRMWARE_BAUD{BaudRate::BAUD115200};
-const DataBits FIRMWARE_DATA_BITS{DataBits::EIGHT};
-const StopBits FIRMWARE_STOP_BITS{StopBits::ONE};
-const Parity FIRMWARE_PARITY{Parity::NONE};
 
 const unsigned int CAN_BUS_ENABLED_RETURN_SIZE{2};
 const unsigned int DIGITAL_WRITE_ALL_MINIMIM_RETURN_SIZE{2};
@@ -206,8 +367,8 @@ double parseToAnalogState(const std::string &state)
 
     try {
         double temp{std::stod(state.c_str())};
-        if (temp > VOLTAGE_MAX) {
-            temp = VOLTAGE_MAX;
+        if (temp > Arduino::VOLTAGE_MAX) {
+            temp = Arduino::VOLTAGE_MAX;
         }
         return temp;
     } catch (std::exception &e) {
@@ -219,8 +380,8 @@ int parseToAnalogStateRaw(const std::string &state)
 {
     try {
         int temp{std::stoi(state.c_str())};
-        if (temp > ANALOG_MAX) {
-            temp = ANALOG_MAX;
+        if (temp > Arduino::ANALOG_MAX) {
+            temp = Arduino::ANALOG_MAX;
         }
         return temp;
     } catch (std::exception &e) {
@@ -467,165 +628,5 @@ std::string analogPinFromNumber(ArduinoType arduinoType, int pinNumber)
         throw std::runtime_error("");
     }
 }
-
-
-class ArduinoUno;
-class ArduinoNano;
-class ArduinoMega;
-class GPIO;
-class IOReport;
-class SerialReport;
-
-class Arduino
-{
-public:
-    Arduino(ArduinoType arduinoType, std::shared_ptr<TStream> ioStream);
-    std::pair<IOStatus, bool> digitalRead(int pinNumber);
-    std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state);
-    std::pair<IOStatus, std::vector<int>> digitalWriteAll(bool state);
-    std::pair<IOStatus, double> analogRead(int pinNumber);
-    std::pair<IOStatus, int> analogReadRaw(int pinNumber);
-    std::pair<IOStatus, double> analogWrite(int pinNumber, double state);
-    std::pair<IOStatus, int> analogWriteRaw(int pinNumber, int state);
-    std::pair<IOStatus, bool> softDigitalRead(int pinNumber);
-    std::pair<IOStatus, double> softAnalogRead(int pinNumber);
-    std::pair<IOStatus, int> softAnalogReadRaw(int pinNumber);
-    std::pair<IOStatus, IOType> pinMode(int pinNumber, IOType ioType);
-    std::pair<IOStatus, IOType> currentPinMode(int pinNumber);
-    std::pair<IOStatus, bool> canCapability();
-    std::pair<IOStatus, std::string> firmwareVersion();
-    std::pair<IOStatus, std::string> arduinoTypeString();
-    std::pair<IOStatus, int> analogToDigitalThreshold();
-    std::pair<IOStatus, int> setAnalogToDigitalThreshold(int threshold);
-    SerialReport serialReportRequest(const std::string &delimiter);
-    IOReport ioReportRequest();
-
-    std::string serialPortName() const;
-
-    std::set<int> AVAILABLE_ANALOG_PINS() const;
-    std::set<int> AVAILABLE_PWM_PINS() const;
-    std::set<int> AVAILABLE_PINS() const;
-    int NUMBER_OF_DIGITAL_PINS() const;
-    ArduinoType arduinoType() const;
-    
-    std::string identifier() const;
-    std::string longName() const;
-
-    void setStreamSendDelay(unsigned int streamSendDelay);
-    unsigned int streamSendDelay() const;
-
-    void assignPinsAndIdentifiers();
-    
-private:
-    std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
-    std::shared_ptr<TStream> m_ioStream;
-    std::mutex m_ioMutex;
-    ArduinoType m_arduinoType;
-    std::string m_identifier;
-    std::string m_longName;
-    std::set<int> m_availablePins;
-    std::set<int> m_availablePwmPins;
-    std::set<int> m_availableAnalogPins;
-    int m_numberOfDigitalPins;
-    unsigned int m_streamSendDelay;
-
-    bool isValidAnalogPinIdentifier(const std::string &state) const;
-    bool isValidDigitalStateIdentifier(const std::string &state) const;
-    bool isValidAnalogStateIdentifier(const std::string &state) const;
-    bool isValidAnalogRawStateIdentifier(const std::string &state) const;
-
-    bool isValidDigitalOutputPin(int pinNumber) const;
-    bool isValidDigitalInputPin(int pinNumber) const;
-    bool isValidAnalogOutputPin(int pinNumber) const;
-    bool isValidAnalogInputPin(int pinNumber) const;
-
-    std::vector<std::string> genericIOTask(const std::string &stringToSend, const std::string &header, double delay);
-    std::vector<std::string> genericIOReportTask(const std::string &stringToSend, const std::string &header, const std::string &endHeader, double delay); 
-};
-
-class ArduinoUno
-{
-public:
-    ArduinoUno() = delete;
-    virtual void doStuff() = 0;
-    static std::set<int> s_availableAnalogPins;
-    static std::set<int> s_availablePwmPins;
-    static std::set<int> s_availablePins;
-    static const char *IDENTIFIER;
-    static const char *LONG_NAME;
-    static int s_numberOfDigitalPins;
-};
-
-class ArduinoNano
-{
-public:
-    ArduinoNano() = delete;
-    virtual void doStuff() = 0;
-    static std::set<int> s_availableAnalogPins;
-    static std::set<int> s_availablePwmPins;
-    static std::set<int> s_availablePins;
-    static const char *IDENTIFIER;
-    static const char *LONG_NAME;
-    static int s_numberOfDigitalPins;
-};
-
-class ArduinoMega
-{
-public:
-    ArduinoMega() = delete;
-    virtual void doStuff() = 0;
-    static std::set<int> s_availableAnalogPins;
-    static std::set<int> s_availablePwmPins;
-    static std::set<int> s_availablePins;
-    static const char *IDENTIFIER;
-    static const char *LONG_NAME;
-    static int s_numberOfDigitalPins;
-};
-
-class GPIO
-{
-public:
-    GPIO(int pinNumber, IOType ioType) :
-        m_pinNumber{pinNumber},
-        m_ioType{ioType} { }
-    int pinNumber() const { return this->m_pinNumber; }
-    IOType ioType() const { return this->m_ioType; }
-    void setIOType(IOType ioType) { this->m_ioType = ioType; }
-    friend bool operator==(const GPIO &lhs, const GPIO &rhs) { return (lhs.pinNumber() == rhs.pinNumber()); }
-
-private:
-    int m_pinNumber;
-    IOType m_ioType;
-};
-
-class IOReport
-{
-public:
-    void addDigitalInputResult(const std::pair<int, bool> &result) { this->m_digitalInputResults.emplace_back(result); }
-    void addDigitalOutputResult(const std::pair<int, bool> &result) { this->m_digitalOutputResults.emplace_back(result); }
-    void addAnalogInputResult(const std::pair<int, int> &result) { this->m_analogInputResults.emplace_back(result); }
-    void addAnalogOutputResult(const std::pair<int, int> &result) { this->m_analogOutputResults.emplace_back(result); }
-
-    std::vector<std::pair<int, bool>> digitalInputResults() const { return this->m_digitalInputResults; }
-    std::vector<std::pair<int, bool>> digitalOutputResults() const { return this->m_digitalOutputResults; }
-    std::vector<std::pair<int, int>> analogInputResults() const { return this->m_analogInputResults; }
-    std::vector<std::pair<int, int>> analogOutputResults() const { return this->m_analogOutputResults; }
-
-private:
-    std::vector<std::pair<int, bool>> m_digitalInputResults;
-    std::vector<std::pair<int, bool>> m_digitalOutputResults;
-    std::vector<std::pair<int, int>> m_analogInputResults;
-    std::vector<std::pair<int, int>> m_analogOutputResults;
-};
-
-class SerialReport
-{
-public:
-    void addSerialResult(const std::string &result) { this->m_serialResults.emplace_back(result); }
-    std::vector<std::string> serialResults() const { return this->m_serialResults; }
-
-private:
-    std::vector<std::string> m_serialResults;
-};
 
 #endif
