@@ -98,6 +98,12 @@ void UDPDuplex::setClientTimeout(unsigned int timeout)
     this->m_udpClient->setTimeout(timeout);
 }
 
+void UDPDuplex::setTimeout(unsigned int timeout)
+{
+    this->m_udpClient->setTimeout(timeout);
+    this->m_udpServer->setTimeout(timeout);
+}
+
 uint16_t UDPDuplex::clientPortNumber() const
 {
     return this->m_udpClient->portNumber();

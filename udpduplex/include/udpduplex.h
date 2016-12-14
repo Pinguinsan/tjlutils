@@ -82,12 +82,13 @@ public:
     void setServerTimeout(unsigned int timeout);
     void flush();
 
-    /*Both*/
+    /*Both - TStream interface compliance*/
     void openPort();
     void closePort();
     bool isOpen() const;
     unsigned int timeout() const;
     std::string portName() const;
+    void setTimeout(unsigned int timeout);
 
 
 private:
