@@ -25,7 +25,7 @@
 class TStream
 {
 public:
-    virtual ~TStream() = 0;
+    virtual ~TStream() { }
 
     virtual void setTimeout(unsigned int timeout) = 0;
     virtual unsigned int timeout() const = 0;
