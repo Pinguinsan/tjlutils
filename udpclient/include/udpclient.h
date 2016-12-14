@@ -48,7 +48,7 @@ public:
     UDPClient(const std::string &hostName);
     UDPClient(const std::string &hostName, uint16_t portNumber);
 
-    unsigned int writeString(const std::string &str);
+    ssize_t writeString(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
     unsigned timeout() const;

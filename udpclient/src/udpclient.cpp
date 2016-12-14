@@ -125,13 +125,22 @@ int UDPClient::resolveAddressHelper(const std::string &hostName, int family, con
     return result;
 }
 
-unsigned int UDPClient::writeString(const std::string &str)
+ssize_t UDPClient::writeString(const std::string &str)
 {
-    unsigned int bytesWritten{0};
+    
+    return ( sendto(this->m_udpSocketIndex, 
+                    str.c_str(), 
+                    static_cast<size_t>(str.length()),
+                    0,
+                    (sockaddr*)&this->m_socketAddress,
+                    sizeof(this->m_socketAddress)) );
+    /*
+    ssize_t bytesWritten{0};
     for (auto &it : str) {
-        bytesWritten += (this->writeByte(it));
+        bytesWritten += this->writeByte(it);
     }
     return bytesWritten;
+    */
 }
 
 ssize_t UDPClient::writeByte(char toSend)

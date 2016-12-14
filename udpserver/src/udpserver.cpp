@@ -84,6 +84,8 @@ void UDPServer::flush()
 
 void UDPServer::initialize()
 {
+
+
     this->m_setSocketResult = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (this->m_setSocketResult == -1) {
         throw std::runtime_error("ERROR: An error condition occurred while setting UDP socket");
@@ -140,7 +142,7 @@ void UDPServer::staticAsyncUdpServer()
         if (receivedString.length() > 0) {
             std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
             ioMutexLock.lock();
-            for (auto &it : receivedString) {
+            for (auto it : receivedString) {
                 this->m_messageQueue.push_back(it);
             }
             ioMutexLock.unlock();
@@ -167,7 +169,7 @@ std::string UDPServer::readString()
         return "";
     }
     std::string stringToReturn{""};
-    for (auto &it : this->m_messageQueue) {
+    for (auto it : this->m_messageQueue) {
         stringToReturn += it;
     }
     this->m_messageQueue.clear();
