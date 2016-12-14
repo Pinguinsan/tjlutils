@@ -9,10 +9,11 @@
 #include <mutex>
 #include <set>
 #include <vector>
+#include "serialport.h"
 
-#include <serialport.h>
-#include <generalutilities.h>
-#include <eventtimer.h>
+#include "generalutilities.h"
+#include "eventtimer.h"
+#include "tstream.h"
 
 
 enum class ArduinoType { UNO, NANO, MEGA };
@@ -44,7 +45,7 @@ const double SERIAL_TIMEOUT{50};
 const int BLUETOOTH_RETRY_COUNT{10};
 const double BOOTLOADER_BOOT_TIME{2000};
 const double BLUETOOTH_SERIAL_SEND_DELAY{100};
-const int IO_OPERATION_SEND_DELAY{20};
+const int DEFAULT_IO_STREAM_SEND_DELAY{20};
 const int ANALOG_MAX{1023};
 const double VOLTAGE_MAX{5.0};
 const double ANALOG_TO_VOLTAGE_SCALE_FACTOR{0.0049};
@@ -478,7 +479,7 @@ class SerialReport;
 class Arduino
 {
 public:
-    Arduino(ArduinoType arduinoType, const std::string &serialPortName);
+    Arduino(ArduinoType arduinoType, std::shared_ptr<TStream> ioStream);
     std::pair<IOStatus, bool> digitalRead(int pinNumber);
     std::pair<IOStatus, bool> digitalWrite(int pinNumber, bool state);
     std::pair<IOStatus, std::vector<int>> digitalWriteAll(bool state);
@@ -510,11 +511,14 @@ public:
     std::string identifier() const;
     std::string longName() const;
 
+    void setStreamSendDelay(unsigned int streamSendDelay);
+    unsigned int streamSendDelay() const;
+
     void assignPinsAndIdentifiers();
     
 private:
     std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
-    std::unique_ptr<SerialPort> m_serialPort;
+    std::shared_ptr<TStream> m_ioStream;
     std::mutex m_ioMutex;
     ArduinoType m_arduinoType;
     std::string m_identifier;
@@ -523,6 +527,7 @@ private:
     std::set<int> m_availablePwmPins;
     std::set<int> m_availableAnalogPins;
     int m_numberOfDigitalPins;
+    unsigned int m_streamSendDelay;
 
     bool isValidAnalogPinIdentifier(const std::string &state) const;
     bool isValidDigitalStateIdentifier(const std::string &state) const;

@@ -59,6 +59,10 @@ public:
     void setTimeout(unsigned int timeout);
     void flush();
 
+    void openPort();
+    void closePort();
+    bool isOpen() const;
+
 
 private:
     sockaddr_in m_socketAddress;

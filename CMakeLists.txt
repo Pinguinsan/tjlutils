@@ -25,6 +25,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/arduino/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpserver/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpclient/include/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/udpduplex/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/common/")
 
@@ -43,6 +44,7 @@ set (PRETTYPRINTER_SOURCES ${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp)
 set (ARDUINO_SOURCES ${SOURCE_BASE}/arduino/src/arduino.cpp)
 set (UDPSERVER_SOURCES ${SOURCE_BASE}/udpserver/src/udpserver.cpp)
 set (UDPCLIENT_SOURCES ${SOURCE_BASE}/udpclient/src/udpclient.cpp)
+set (UDPDUPLEX_SOURCES ${SOURCE_BASE}/udpduplex/src/udpduplex.cpp)
 
 add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${PYTHONCRYPTO_SOURCES}
@@ -56,7 +58,8 @@ add_library(tjlutils SHARED ${SYSTEMCOMMAND_SOURCES}
                             ${PRETTYPRINTER_SOURCES}
                             ${ARDUINO_SOURCES}
                             ${UDPSERVER_SOURCES}
-                            ${UDPCLIENT_SOURCES})
+                            ${UDPCLIENT_SOURCES}
+                            ${UDPDUPLEX_SOURCES})
                         
 add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${PYTHONCRYPTO_SOURCES}
@@ -70,6 +73,7 @@ add_library(tjlutilsstatic STATIC ${SYSTEMCOMMAND_SOURCES}
                                   ${PRETTYPRINTER_SOURCES}
                                   ${ARDUINO_SOURCES}
                                   ${UDPSERVER_SOURCES}
-                                  ${UDPCLIENT_SOURCES})
+                                  ${UDPCLIENT_SOURCES}
+                                  ${UDPDUPLEX_SOURCES})
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)

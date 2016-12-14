@@ -48,6 +48,7 @@
 #include "generalutilities.h"
 #include "prettyprinter.h"
 #include "eventtimer.h"
+#include "tstream.h"
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
@@ -89,7 +90,7 @@ enum class LineEnding {
     LE_CarriageReturnLineFeed
 };
 
-class SerialPort
+class SerialPort : public TStream
 {
 public:
     SerialPort(const std::string &name);
@@ -122,10 +123,10 @@ public:
     std::string readStringUntil(const std::string &readUntil);
     std::string readStringUntil(char readUntil);
     std::string readStringUntil(const char *readUntil);
-    void writeString(const std::string &str);
-    void writeString(const char *str);
-    void asyncWriteString(const std::string &str);
-    void asyncWriteString(const char *str);
+    ssize_t writeString(const std::string &str);
+    ssize_t writeString(const char *str);
+    ssize_t asyncWriteString(const std::string &str);
+    ssize_t asyncWriteString(const char *str);
     std::future<std::string> asyncReadString();
     std::future<std::string> asyncReadStringUntil(const std::string &readUntil);
     std::future<std::string> asyncReadStringUntil(char readUntil);
@@ -137,6 +138,7 @@ public:
     void disableDTR();
     void enableRTS();
     void disableRTS();
+    void flush();
     void flushRX();
     void flushTX();
     void flushRXTX();
@@ -148,7 +150,7 @@ public:
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
     void setLineEnding(LineEnding lineEnding);
-    void setTimeout(long long int timeout);
+    void setTimeout(unsigned int timeout);
     void setRetryCount(int retryCount);
     
     void setMaximumReadSize(int maximumReadSize);
@@ -160,7 +162,7 @@ public:
     StopBits stopBits() const;
     DataBits dataBits() const;
     Parity parity() const;
-    long long int timeout() const;
+    unsigned int timeout() const;
     LineEnding lineEnding() const;
     int retryCount() const;
     bool isOpen() const;
@@ -210,7 +212,7 @@ public:
     static std::vector<const char *> availableLineEndings();
     static bool isValidSerialPortName(const std::string &serialPortName);
 
-    static const int DEFAULT_TIMEOUT;
+    static const unsigned int DEFAULT_TIMEOUT;
     static const int DEFAULT_RETRY_COUNT;
 
     static std::string doUserSelectSerialPortName();
@@ -249,9 +251,9 @@ private:
     static std::pair<int, std::string> getPortNameAndNumber(const std::string &name);
     static std::vector<std::string> generateSerialPortNames();
 
-    void writeCString(const char *str);
-    int writeByte(unsigned char byteToSend);
-    int writeBufferedBytes(unsigned char *buffer, int bufferSize);
+    ssize_t writeCString(const char *str);
+    ssize_t writeByte(char byteToSend);
+    ssize_t writeBufferedBytes(unsigned char *buffer, int bufferSize);
     unsigned char timedRead();
     unsigned char rawRead();
 
@@ -261,8 +263,8 @@ private:
     static std::pair<int, int> parseParity(Parity parity);
     static std::string parseLineEnding(LineEnding lineEnding);
 
-    static void staticWriteString(SerialPort *serialPort, const std::string &str);
-    static void staticWriteString(SerialPort *serialPort, const char *str);
+    static ssize_t staticWriteString(SerialPort *serialPort, const std::string &str);
+    static ssize_t staticWriteString(SerialPort *serialPort, const char *str);
 
     static std::string staticReadString(SerialPort *serialPort);
     static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil);

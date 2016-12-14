@@ -27,6 +27,7 @@ INCLUDEPATH += systemcommand/include/ \
                arduino/include/ \
                udpserver/include/ \
                udpclient/include \
+               udpduplex/include \
                common/
 
 SOURCES += systemcommand/src/systemcommand.cpp \
@@ -41,6 +42,7 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            arduino/src/arduino.cpp \
            udpserver/src/udpserver.cpp \
            udpclient/src/udpclient.cpp \
+           udpduplex/src/udpduplex.cpp \
            prettyprinter/src/prettyprinter.cpp
 
 HEADERS += systemcommand/include/systemcommand.h \
@@ -57,6 +59,7 @@ HEADERS += systemcommand/include/systemcommand.h \
            arduino/include/arduino.h \
            udpserver/include/udpserver.h \
            udpclient/include/updclient.h \
+           udpduplex/include/udpduplex.h \
            templateobjects/templateobjects.h \
            common/tjlutils.h            
 

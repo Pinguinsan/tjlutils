@@ -180,11 +180,35 @@ std::string UDPServer::readString()
     return stringToReturn;
 }
 
-std::string UDPServer::readStringUntil(char until) { return this->readStringUntil(std::string{1, until}); }
-std::string UDPServer::readStringUntil(const char *until) { return this->readStringUntil(static_cast<std::string>(until)); }
+void UDPServer::openPort()
+{
+    this->startListening();
+}
+
+void UDPServer::closePort()
+{
+    this->stopListening();
+}
+
+bool UDPServer::isOpen() const
+{
+    return this->m_isListening;
+}
+
+std::string UDPServer::readStringUntil(char until) 
+{ 
+    return this->readStringUntil(std::string{1, until});
+}
+
+std::string UDPServer::readStringUntil(const char *until) 
+{ 
+    return this->readStringUntil(static_cast<std::string>(until)); 
+}
+
 std::string UDPServer::readStringUntil(const std::string &until)
 {
     using namespace GeneralUtilities;
+
     std::string returnString{""};
     EventTimer eventTimer;
     eventTimer.start();

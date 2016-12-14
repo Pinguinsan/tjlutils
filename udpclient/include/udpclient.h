@@ -48,14 +48,19 @@ public:
     UDPClient(const std::string &hostName);
     UDPClient(const std::string &hostName, uint16_t portNumber);
 
+    ssize_t writeByte(char toSend);
+    ssize_t writeString(const char *str);
     ssize_t writeString(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
-    unsigned timeout() const;
+    unsigned int  timeout() const;
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
     void setTimeout(unsigned int timeout);
 
+    void openPort();
+    void closePort();
+    bool isOpen() const;
 
 private:
     std::string m_hostName;
@@ -68,7 +73,6 @@ private:
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
 
     void initialize();
-    ssize_t writeByte(char toSend);
     
     static const char *s_DEFAULT_HOST_NAME;
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
@@ -76,8 +80,5 @@ private:
 
     static constexpr bool isValidPortNumber(int portNumber);
 };
-
-//Loopback
-const char *UDPClient::s_DEFAULT_HOST_NAME{"127.0.0.1"};
 
 #endif //TJLUTILS_UDPCLIENT_H

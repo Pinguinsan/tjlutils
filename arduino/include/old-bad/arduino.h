@@ -11,6 +11,7 @@
 #include "serialport.h"
 #include "generalutilities.h"
 #include "eventtimer.h"
+#include "tstream.h"
 
 enum class ArduinoType { UNO, NANO, MEGA };
 enum IOType { DIGITAL_INPUT, DIGITAL_OUTPUT, ANALOG_INPUT, ANALOG_OUTPUT, DIGITAL_INPUT_PULLUP, UNSPECIFIED };

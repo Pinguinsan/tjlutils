@@ -23,7 +23,7 @@ const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
 const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_None};
-const int SerialPort::DEFAULT_TIMEOUT{100};
+const unsigned int SerialPort::DEFAULT_TIMEOUT{100};
 const int SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
@@ -381,30 +381,30 @@ std::future<std::string> SerialPort::asyncReadStringUntil(const char *readUntil)
                                                readUntil)}; 
 }
 
-void SerialPort::asyncWriteString(const std::string &str)
+ssize_t SerialPort::asyncWriteString(const std::string &str)
 {
     std::async(std::launch::async,
-               static_cast<void (*)(SerialPort *, const std::string &)>(&SerialPort::staticWriteString), 
+               static_cast<ssize_t (*)(SerialPort *, const std::string &)>(&SerialPort::staticWriteString), 
                this, 
                str);  
 }
 
-void SerialPort::asyncWriteString(const char *str)
+ssize_t SerialPort::asyncWriteString(const char *str)
 {
     std::async(std::launch::async,
-               static_cast<void (*)(SerialPort *, const char *)>(&SerialPort::staticWriteString), 
+               static_cast<ssize_t (*)(SerialPort *, const char *)>(&SerialPort::staticWriteString), 
                this, 
                str);  
 }
 
-void SerialPort::staticWriteString(SerialPort *serialPort, const std::string &str)
+ssize_t SerialPort::staticWriteString(SerialPort *serialPort, const std::string &str)
 {
-    serialPort->writeString(str);
+    return serialPort->writeString(str);
 }
 
-void SerialPort::staticWriteString(SerialPort *serialPort, const char *str)
+ssize_t SerialPort::staticWriteString(SerialPort *serialPort, const char *str)
 {
-    serialPort->writeString(static_cast<std::string>(str));
+    return serialPort->writeString(static_cast<std::string>(str));
 }
 
 std::string SerialPort::staticReadString(SerialPort *serialPort)
@@ -867,7 +867,7 @@ std::string SerialPort::readStringUntil(const std::string &readUntil)
     return returnString;
 }
 
-int SerialPort::writeByte(unsigned char byteToSend)
+ssize_t SerialPort::writeByte(char byteToSend)
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     long int writtenBytes{0};
@@ -882,7 +882,7 @@ int SerialPort::writeByte(unsigned char byteToSend)
 #endif
 }
 
-int SerialPort::writeBufferedBytes(unsigned char *buffer, int bufferSize)
+ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, int bufferSize)
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     long int writtenBytes;
@@ -1121,14 +1121,16 @@ bool SerialPort::isOpen() const
     return this->m_isOpen;
 }
 
-void SerialPort::writeCString(const char *str)
+ssize_t SerialPort::writeCString(const char *str)
 {
+    ssize_t writtenBytes{0};
     while(*str != 0) {
-        this->writeByte(*(str++));
+        writtenBytes += (this->writeByte(*(str++)));
     }
+    return writtenBytes;
 }
 
-void SerialPort::writeString(const std::string &str)
+ssize_t SerialPort::writeString(const std::string &str)
 {
     using namespace GeneralUtilities;
     std::string copyString{str};
@@ -1138,7 +1140,7 @@ void SerialPort::writeString(const std::string &str)
     return this->writeCString(copyString.c_str());
 }
 
-void SerialPort::writeString(const char *str)
+ssize_t SerialPort::writeString(const char *str)
 {
     return this->writeString(static_cast<std::string>(str));
 }
@@ -1236,7 +1238,7 @@ LineEnding SerialPort::lineEnding() const
     return SerialPort::parseLineEndingFromRaw(this->m_lineEnding);
 }
 
-long long int SerialPort::timeout() const
+unsigned int SerialPort::timeout() const
 {
     return this->m_timeout;
 }
@@ -1246,7 +1248,7 @@ int SerialPort::retryCount() const
     return this->m_retryCount;
 }
 
-void SerialPort::setTimeout(long long int timeout) {
+void SerialPort::setTimeout(unsigned int timeout) {
     if (timeout < 0) {
         throw std::runtime_error("ERROR: Serial timeout cannot be negative (" + std::to_string(timeout) + " < 0)");
     } else {

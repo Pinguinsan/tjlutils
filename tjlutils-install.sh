@@ -139,34 +139,21 @@ else
     runMake || exit 1
 
     linkFile "$ogt/systemcommand/include/systemcommand.h" "$ui/"
-    
     linkFile "$ogt/generalutilities/include/generalutilities.h" "$ui/"
-
     linkFile "$ogt/fileutilities/include/fileutilities.h" "$ui/"
-    
     linkFile "$ogt/mathutilities/include/mathutilities.h" "$ui/"
-    
     linkFile "$ogt/datetime/include/datetime.h" "$ui/"
-    
     linkFile "$ogt/pythoncrypto/include/pythoncrypto.h" "$ui/"
-   
     linkFile "$ogt/crypto/include/crypto.h" "$ui/"
     linkFile "$ogt/crypto/include/hash.h" "$ui/"
-    
     linkFile "$ogt/serialport/include/serialport.h" "$ui/"
-
     linkFile "$ogt/eventtimer/include/eventtimer.h" "$ui/"
-
     linkFile "$ogt/prettyprinter/include/prettyprinter.h" "$ui/"
-
     linkFile "$ogt/templateobjects/templateobjects.h" "$ui/"
-
     linkFile "$ogt/arduino/include/arduino.h" "$ui/"
-
     linkFile "$ogt/udpserver/include/udpserver.h" "$ui/"
-    
     linkFile "$ogt/udpclient/include/udpclient.h" "$ui/"
-
+    linkFile "$ogt/udpduplex/include/udpduplex.h" "$ui/"
     linkFile "$ogt/common/tjlutils.h" "$ui/"
 
 

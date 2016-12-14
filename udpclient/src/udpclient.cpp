@@ -19,6 +19,9 @@
 
 #include "udpclient.h"
 
+//Loopback
+const char *UDPClient::s_DEFAULT_HOST_NAME{"127.0.0.1"};
+
 UDPClient::UDPClient() :
     UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME), UDPClient::s_DEFAULT_PORT_NUMBER)
 {
@@ -83,6 +86,26 @@ void UDPClient::setHostName(const std::string &hostName)
     this->initialize();
 }
 
+void UDPClient::openPort()
+{
+    
+}
+
+void UDPClient::closePort()
+{
+
+}
+
+bool UDPClient::isOpen() const
+{
+    return true;
+}
+
+std::string UDPClient::hostName() const
+{
+    return this->m_hostName;
+}
+
 uint16_t UDPClient::portNumber() const
 {
     return this->m_portNumber;
@@ -125,32 +148,24 @@ int UDPClient::resolveAddressHelper(const std::string &hostName, int family, con
     return result;
 }
 
-ssize_t UDPClient::writeString(const std::string &str)
-{
-    return ( sendto(this->m_udpSocketIndex, 
-                    str.c_str(), 
-                    static_cast<size_t>(str.length()),
-                    0,
-                    (sockaddr*)&this->m_destinationAddress,
-                    sizeof(this->m_destinationAddress)) );
-    
-    /*
-    ssize_t bytesWritten{0};
-    for (auto &it : str) {
-        bytesWritten += this->writeByte(it);
-    }
-    return bytesWritten;
-    */
+ssize_t UDPClient::writeByte(char toSend) 
+{ 
+    return this->writeString(std::string{1, toSend}); 
 }
 
-ssize_t UDPClient::writeByte(char toSend)
+ssize_t UDPClient::writeString(const char *str) 
+{ 
+    return this->writeString(static_cast<std::string>(str)); 
+}
+
+ssize_t UDPClient::writeString(const std::string &str)
 {
-    std::string str{1, toSend};
-    return ( sendto(this->m_udpSocketIndex, str.c_str(), 
-             static_cast<size_t>(str.length()), 
-             0, 
-             (sockaddr*)&this->m_destinationAddress, 
-             sizeof(this->m_destinationAddress)) );
+    return (sendto(this->m_udpSocketIndex, 
+                   str.c_str(), 
+                   static_cast<size_t>(str.length()),
+                   0,
+                   (sockaddr*)&this->m_destinationAddress,
+                   sizeof(this->m_destinationAddress)) );
 }
 
 bool constexpr UDPClient::isValidPortNumber(int portNumber)
