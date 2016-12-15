@@ -10,7 +10,6 @@
 ##########################################
 
 function cleanUp() {
-    removeFile "$olt"
     removeFile "$ui/tjlutils.h"
     removeFile "$ui/systecommand.h"
     removeFile "$ui/generalutilities.h"

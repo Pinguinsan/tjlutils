@@ -37,9 +37,9 @@ UDPServer::UDPServer(uint16_t portNumber) :
     if (!this->isValidPortNumber(this->m_portNumber)) {
         this->m_portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max())
                                  + "("
-                                 + std::to_string(this->m_portNumber) 
+                                 + std::to_string(this->m_portNumber)
                                  + ")");
     }
     this->initialize();
@@ -54,9 +54,9 @@ void UDPServer::setPortNumber(uint16_t portNumber)
 {
     if (!this->isValidPortNumber(this->m_portNumber)) {
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max())
                                  + "("
-                                 + std::to_string(this->m_portNumber) 
+                                 + std::to_string(this->m_portNumber)
                                  + ")");
     }
     this->initialize();}
@@ -90,7 +90,7 @@ void UDPServer::initialize()
     if (this->m_setSocketResult == -1) {
        throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
-    
+
     setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_BROADCAST, &this->m_broadcast, sizeof(this->m_broadcast));
     memset(&this->m_socketAddress, 0, sizeof(this->m_socketAddress));
     this->m_socketAddress.sin_family = AF_INET;
@@ -106,10 +106,11 @@ void UDPServer::startListening()
 {
     if (!this->m_isListening) {
         this->m_isListening = true;
-        this->m_asyncFuture = std::async(std::launch::async, 
-                                         &UDPServer::staticAsyncUdpServer, 
+        this->m_asyncFuture = std::async(std::launch::async,
+                                         &UDPServer::staticAsyncUdpServer,
                                          this);
     }
+
 }
 
 void UDPServer::stopListening()
@@ -118,7 +119,7 @@ void UDPServer::stopListening()
     this->m_isListening = false;
 }
 
-bool UDPServer::isListening() const 
+bool UDPServer::isListening() const
 {
     return this->m_isListening;
 }
@@ -129,18 +130,21 @@ unsigned int UDPServer::available() const
 }
 
 void UDPServer::staticAsyncUdpServer()
-{  
+{
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     do {
-        std::string receivedString{""};
         char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
+        std::string receivedString{""};
         unsigned int socketSize{sizeof(sockaddr)};
-        recvfrom(this->m_setSocketResult, 
-                 lowLevelReceiveBuffer, 
-                 sizeof(lowLevelReceiveBuffer)-1, 
-                 0, 
-                 (sockaddr *)&this->m_receivingSocketAddress, 
-                 &socketSize);
+        ssize_t returnValue{recvfrom(this->m_setSocketResult,
+                        lowLevelReceiveBuffer,
+                        sizeof(lowLevelReceiveBuffer)-1,
+                        MSG_DONTWAIT,
+                        (sockaddr *)&this->m_receivingSocketAddress,
+                        &socketSize)};
+        //if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
+        //    continue;
+        //}
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
             ioMutexLock.lock();
@@ -151,8 +155,8 @@ void UDPServer::staticAsyncUdpServer()
                 this->m_messageQueue.push_back(it);
             }
             ioMutexLock.unlock();
-            
-        }        
+
+        }
     } while (!this->m_shutEmDown);
 }
 
@@ -197,14 +201,14 @@ bool UDPServer::isOpen() const
     return this->m_isListening;
 }
 
-std::string UDPServer::readStringUntil(char until) 
-{ 
+std::string UDPServer::readStringUntil(char until)
+{
     return this->readStringUntil(std::string{1, until});
 }
 
-std::string UDPServer::readStringUntil(const char *until) 
-{ 
-    return this->readStringUntil(static_cast<std::string>(until)); 
+std::string UDPServer::readStringUntil(const char *until)
+{
+    return this->readStringUntil(static_cast<std::string>(until));
 }
 
 std::string UDPServer::readStringUntil(const std::string &until)
