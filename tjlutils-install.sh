@@ -9,6 +9,26 @@
 #
 ##########################################
 
+function cleanUp() {
+    removeFile "$olt"
+    removeFile "$ui/tjlutils.h"
+    removeFile "$ui/systecommand.h"
+    removeFile "$ui/generalutilities.h"
+    removeFile "$ui/fileutilities.h"
+    removeFile "$ui/mathutilities.h"
+    removeFile "$ui/datetime.h"
+    removeFile "$ui/pythoncrypto.h"
+    removeFile "$ui/crypto.h"
+    removeFile "$ui/hash.h"
+    removeFile "$ui/templateobjects.h"
+    removeFile "$ui/serialport.h"
+    removeFile "$ui/eventtimer.h"
+    removeFile "$ui/prettyprinter.h"
+    removeFile "$ui/arduino.h"
+    removeFile "$ui/udpserver.h"
+    removeFile "$ui/udpclient.h"
+}
+
 function displayHelp() {
     echo "Usage: tjlutils-install.sh [--install/--uninstall]"
 }
@@ -34,6 +54,7 @@ function showSuccess() {
 
 function showFailure() {
     echo "failure"
+    cleanUp
 }
 
 function removeFile() {
@@ -133,10 +154,6 @@ elif [[ "$1" == "-h" || "$1" == "--h" || "$1" == "-help" || "$1" == "--help" || 
     exit 0
 
 else
-    
-    changeDirectory "$olt" || exit 1
-    runCmake "$ogt" || exit 1
-    runMake || exit 1
 
     linkFile "$ogt/systemcommand/include/systemcommand.h" "$ui/"
     linkFile "$ogt/generalutilities/include/generalutilities.h" "$ui/"
@@ -155,7 +172,10 @@ else
     linkFile "$ogt/udpclient/include/udpclient.h" "$ui/"
     linkFile "$ogt/udpduplex/include/udpduplex.h" "$ui/"
     linkFile "$ogt/common/tjlutils.h" "$ui/"
-
+    
+    changeDirectory "$olt" || exit 1
+    runCmake "$ogt" || exit 1
+    runMake || exit 1
 
     if [[ -z "$cygwinCheck" ]]; then
         linkFile "$olt/libtjlutils.so" "$ul/"

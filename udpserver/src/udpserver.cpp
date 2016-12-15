@@ -79,7 +79,7 @@ uint16_t UDPServer::portNumber() const
 
 void UDPServer::flush()
 {
-    std::unique_lock<std::mutex> ioLock{this->m_ioMutex};
+    std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
     this->m_messageQueue.clear();
 }
 
@@ -129,7 +129,8 @@ unsigned int UDPServer::available() const
 }
 
 void UDPServer::staticAsyncUdpServer()
-{
+{  
+    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     do {
         std::string receivedString{""};
         char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
@@ -142,7 +143,7 @@ void UDPServer::staticAsyncUdpServer()
                  &socketSize);
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
-            std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
+            ioMutexLock.lock();
             for (auto it : receivedString) {
                 if (this->m_messageQueue.size() >= UDPServer::s_MAXIMUM_BUFFER_SIZE) {
                     this->m_messageQueue.pop_front();
@@ -150,13 +151,14 @@ void UDPServer::staticAsyncUdpServer()
                 this->m_messageQueue.push_back(it);
             }
             ioMutexLock.unlock();
+            
         }        
     } while (!this->m_shutEmDown);
 }
 
 char UDPServer::readByte()
 {
-    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_messageQueue.size() == 0) {
         return 0;
     } else {
@@ -168,7 +170,7 @@ char UDPServer::readByte()
 
 std::string UDPServer::readString()
 {
-    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_messageQueue.size() == 0) {
         return "";
     }
