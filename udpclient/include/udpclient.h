@@ -25,6 +25,7 @@
 #include <memory>
 #include <limits>
 #include <cerrno>
+#include <vector>
 #include <memory.h>
 
 #include <net/if.h>
@@ -39,6 +40,7 @@
 #include <signal.h>
 
 #include <generalutilities.h>
+#include <tstream.h>
 
 class UDPClient
 {
@@ -57,10 +59,21 @@ public:
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
     void setTimeout(unsigned int timeout);
+    LineEnding lineEnding() const;
+    void setLineEnding(LineEnding lineEnding);
 
     void openPort();
     void closePort();
     bool isOpen() const;
+
+    static const char *s_DEFAULT_HOST_NAME;
+    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
+    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
+
+    static std::string parseLineEnding(LineEnding lineEnding);
+    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
+    static std::string lineEndingToString(LineEnding lineEnding);
+
 
 private:
     std::string m_hostName;
@@ -69,16 +82,22 @@ private:
     sockaddr_storage m_destinationAddress;
     unsigned int m_timeout;
     int m_udpSocketIndex;
+    std::string m_lineEnding;
     
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
 
     void initialize();
     
-    static const char *s_DEFAULT_HOST_NAME;
-    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
-    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
-
     static constexpr bool isValidPortNumber(int portNumber);
+
+
+    static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;
+    static const std::vector<const char *> s_NO_LINE_ENDING_IDENTIFIERS;
+    static const std::vector<const char *> s_CARRIAGE_RETURN_IDENTIFIERS;
+    static const std::vector<const char *> s_LINE_FEED_IDENTIFIERS;
+    static const std::vector<const char *> s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS;
+
+
 };
 
 #endif //TJLUTILS_UDPCLIENT_H

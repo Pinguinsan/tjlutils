@@ -83,13 +83,6 @@ enum class BaudRate { BAUD50, BAUD75, BAUD110, BAUD134, BAUD150,
                       BAUD3000000, BAUD3500000, BAUD4000000 };
 #endif
 
-enum class LineEnding {
-    LE_None,
-    LE_CarriageReturn,
-    LE_LineFeed,
-    LE_CarriageReturnLineFeed
-};
-
 class SerialPort : public TStream
 {
 public:

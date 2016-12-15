@@ -63,6 +63,8 @@ public:
     void closePort();
     bool isOpen() const;
 
+    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
+    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
 
 private:
     sockaddr_in m_socketAddress;
@@ -80,11 +82,9 @@ private:
     void initialize();
     void staticAsyncUdpServer();
 
-    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr uint16_t s_BROADCAST{1};
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
-    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
 
     static constexpr bool isValidPortNumber(int portNumber);
 };

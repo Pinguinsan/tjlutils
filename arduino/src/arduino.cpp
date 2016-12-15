@@ -97,13 +97,16 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
     this->m_ioStream->writeString(stringToSend);
     GeneralUtilities::delayMilliseconds(delay);
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
+    EventTimer eventTimer;
+    eventTimer.start();
     do {
         std::string str{this->m_ioStream->readStringUntil("}")};
         if (str != "") {
             *returnString = str;
             break;
         }
-    } while (true);
+        eventTimer.update();
+    } while (eventTimer.totalMilliseconds() < this->m_ioStream->timeout());
     this->m_ioStream->setTimeout(tempTimeout);
     if (GeneralUtilities::startsWith(*returnString, header) && GeneralUtilities::endsWith(*returnString, '}')) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
@@ -124,13 +127,16 @@ std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringT
     this->m_ioStream->writeString(stringToSend);
     GeneralUtilities::delayMilliseconds(delay);
     std::unique_ptr<std::string> returnString{std::make_unique<std::string>("")};
+    EventTimer eventTimer;
+    eventTimer.start();
     do {
         std::string str{this->m_ioStream->readStringUntil("}")};
         if (str != "") {
             *returnString = str;
             break;
         }
-    } while (true);
+        eventTimer.update();
+    } while (eventTimer.totalMilliseconds() < this->m_ioStream->timeout());
     if (GeneralUtilities::startsWith(*returnString, header) && GeneralUtilities::endsWith(*returnString, endHeader)) {
         *returnString = returnString->substr(static_cast<std::string>(header).length() + 1);
         *returnString = returnString->substr(0, returnString->length()-1);

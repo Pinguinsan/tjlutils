@@ -22,6 +22,13 @@
 #include <iostream>
 #include <string>
 
+enum class LineEnding {
+    LE_None,
+    LE_CarriageReturn,
+    LE_LineFeed,
+    LE_CarriageReturnLineFeed
+};
+
 class TStream
 {
 public:
@@ -29,6 +36,8 @@ public:
 
     virtual void setTimeout(unsigned int timeout) = 0;
     virtual unsigned int timeout() const = 0;
+    LineEnding lineEnding() const;
+    void setLineEnding(LineEnding lineEnding);
 
     virtual ssize_t writeString(const std::string &str) = 0;
     virtual ssize_t writeString(const char *str) = 0;

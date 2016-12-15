@@ -22,7 +22,7 @@
 
 
 //Loopback
-const char *UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME{"127.0.0.1"};
+const char *UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME{UDPClient::s_DEFAULT_HOST_NAME};
 
 UDPDuplex::UDPDuplex() :
     UDPDuplex(UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME, UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER)
@@ -64,6 +64,16 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
 
     this->m_udpClient = std::make_unique<UDPClient>(clientHostName, clientPortNumber);
     this->m_udpServer = std::make_unique<UDPServer>(serverPortNumber);
+}
+
+LineEnding UDPDuplex::lineEnding() const
+{
+    return this->m_udpClient->lineEnding();
+}
+
+void UDPDuplex::setLineEnding(LineEnding lineEnding)
+{
+    this->m_udpClient->setLineEnding(lineEnding);
 }
 
 void UDPDuplex::openPort()
@@ -218,4 +228,19 @@ bool UDPDuplex::isListening() const
 bool constexpr UDPDuplex::isValidPortNumber(int portNumber)
 {
     return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
+}
+
+std::string UDPDuplex::parseLineEnding(LineEnding lineEnding)
+{
+    return UDPClient::parseLineEnding(lineEnding);
+}
+
+LineEnding UDPDuplex::parseLineEndingFromRaw(const std::string &lineEnding)
+{
+    return UDPClient::parseLineEndingFromRaw(lineEnding);
+}
+
+std::string UDPDuplex::lineEndingToString(LineEnding lineEnding)
+{
+    return UDPClient::lineEndingToString(lineEnding);
 }

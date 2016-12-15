@@ -22,6 +22,13 @@
 //Loopback
 const char *UDPClient::s_DEFAULT_HOST_NAME{"127.0.0.1"};
 
+const std::vector<const char *> UDPClient::s_AVAILABLE_LINE_ENDINGS{"None", "CR", "LF", "CRLF"};
+const std::vector<const char *> UDPClient::s_NO_LINE_ENDING_IDENTIFIERS{"n", "no", "none", "noline", "nolineending", "nolineendings"};
+const std::vector<const char *> UDPClient::s_CARRIAGE_RETURN_IDENTIFIERS{"return", "carriagereturn", "carriage-return", "cr", "creturn"};
+const std::vector<const char *> UDPClient::s_LINE_FEED_IDENTIFIERS{"feed", "line", "linefeed", "line-feed", "lf", "f", "lfeed"};
+const std::vector<const char *> UDPClient::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS{"carriagereturnlinefeed", "crlf", "lfcr", "lfeedcreturn", "line-feed-carriage-return", "carriage-return-line-feed"};
+
+
 UDPClient::UDPClient() :
     UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME), UDPClient::s_DEFAULT_PORT_NUMBER)
 {
@@ -46,7 +53,8 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     m_listenAddress{},
     m_destinationAddress{},
     m_udpSocketIndex{},
-    m_timeout{UDPClient::s_DEFAULT_TIMEOUT}
+    m_timeout{UDPClient::s_DEFAULT_TIMEOUT},
+    m_lineEnding{""}
 {
     if (!this->isValidPortNumber(this->m_portNumber)) {
         this->m_portNumber = UDPClient::s_DEFAULT_PORT_NUMBER;
@@ -71,6 +79,16 @@ void UDPClient::setPortNumber(uint16_t portNumber)
     this->initialize();
 }
 
+void UDPClient::setLineEnding(LineEnding lineEnding)
+{
+    this->m_lineEnding = parseLineEnding(lineEnding);
+}
+
+LineEnding UDPClient::lineEnding() const
+{
+    return UDPClient::parseLineEndingFromRaw(this->m_lineEnding);
+}
+
 void UDPClient::setTimeout(unsigned int timeout)
 {
     this->m_timeout = timeout;
@@ -80,7 +98,7 @@ void UDPClient::setHostName(const std::string &hostName)
 {
     using namespace GeneralUtilities;
     if (resolveAddressHelper (this->m_hostName, AF_INET, std::to_string(this->m_portNumber), &this->m_destinationAddress) != 0) {
-       throw std::runtime_error("ERROR: Error condition occurred while resolving address " + tQuoted(this->m_hostName) + ", with an error code of " + std::to_string(errno));
+       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->m_hostName));
     }
     this->m_hostName = hostName;
     this->initialize();
@@ -122,12 +140,12 @@ void UDPClient::initialize()
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
     this->m_listenAddress.sin_family = AF_INET;
     if (bind(this->m_udpSocketIndex, (sockaddr*)&this->m_listenAddress, sizeof(this->m_listenAddress)) != 0) {
-       throw std::runtime_error("ERROR: An error condition occurred during binding of socket (error code " + std::to_string(errno) + ")");
+       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex));
     }
 
 
     if (resolveAddressHelper (this->m_hostName, AF_INET, std::to_string(this->m_portNumber), &this->m_destinationAddress) != 0) {
-       throw std::runtime_error("ERROR: And error condition occurred while resolving address " + tQuoted(this->m_hostName) + ", with an error code of " + std::to_string(errno));
+       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->m_hostName));
     }
 
 }
@@ -160,6 +178,11 @@ ssize_t UDPClient::writeString(const char *str)
 
 ssize_t UDPClient::writeString(const std::string &str)
 {
+    using namespace GeneralUtilities;
+    std::string copyString{str};
+    if (!endsWith(copyString, this->m_lineEnding)) {
+        copyString += this->m_lineEnding;
+    }
     return (sendto(this->m_udpSocketIndex, 
                    str.c_str(), 
                    static_cast<size_t>(str.length()),
@@ -171,4 +194,64 @@ ssize_t UDPClient::writeString(const std::string &str)
 bool constexpr UDPClient::isValidPortNumber(int portNumber)
 {
     return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
+}
+
+
+std::string UDPClient::parseLineEnding(LineEnding lineEnding)
+{
+    if (lineEnding == LineEnding::LE_CarriageReturn) {
+        return "\r";
+    } else if (lineEnding == LineEnding::LE_LineFeed) {
+        return "\n";
+    } else if (lineEnding == LineEnding::LE_CarriageReturnLineFeed) {
+        return "\r\n";
+    } else if (lineEnding == LineEnding::LE_None) {
+        return "";
+    } else {
+        throw std::runtime_error("Unknown line ending passed to parseLineEnding(LineEnding): ");
+    }
+}
+
+LineEnding UDPClient::parseLineEndingFromRaw(const std::string &lineEnding)
+{
+    std::string copyString{lineEnding};
+    std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
+    for (auto &it : UDPClient::s_NO_LINE_ENDING_IDENTIFIERS) {
+        std::string tempString{static_cast<std::string>(it)};
+        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
+            return LineEnding::LE_None;
+        }
+    }
+    for (auto &it : UDPClient::s_CARRIAGE_RETURN_IDENTIFIERS) {
+        std::string tempString{static_cast<std::string>(it)};
+        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
+            return LineEnding::LE_CarriageReturn;
+        }
+    }
+    for (auto &it : UDPClient::s_LINE_FEED_IDENTIFIERS) {
+        std::string tempString{static_cast<std::string>(it)};
+        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
+            return LineEnding::LE_LineFeed;
+        }
+    }
+    for (auto &it : UDPClient::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS) {
+        std::string tempString{static_cast<std::string>(it)};
+        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
+            return LineEnding::LE_CarriageReturnLineFeed;
+        }
+    }
+    throw std::runtime_error("Invalid line ending passed to parseLineEndingFromRaw(const std::string &): " + lineEnding);
+}
+
+std::string UDPClient::lineEndingToString(LineEnding lineEnding)
+{
+    if (lineEnding == LineEnding::LE_CarriageReturn) {
+        return "\r";
+    } else if (lineEnding == LineEnding::LE_LineFeed) {
+        return "\n";
+    } else if (lineEnding == LineEnding::LE_CarriageReturnLineFeed) {
+        return "\r\n";
+    } else {
+        return "";
+    }
 }

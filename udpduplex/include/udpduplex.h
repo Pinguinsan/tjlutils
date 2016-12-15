@@ -90,14 +90,11 @@ public:
     std::string portName() const;
     void setTimeout(unsigned int timeout);
 
-
-private:
-    std::unique_ptr<UDPServer> m_udpServer;
-    std::unique_ptr<UDPClient> m_udpClient;
-    
-    int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
-
-    void initialize();
+    static std::string parseLineEnding(LineEnding lineEnding);
+    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
+    static std::string lineEndingToString(LineEnding lineEnding);
+    void setLineEnding(LineEnding lineEnding);
+    LineEnding lineEnding() const;
     
     static const char *s_DEFAULT_CLIENT_HOST_NAME;
 
@@ -106,6 +103,14 @@ private:
 
     static const constexpr uint16_t s_DEFAULT_SERVER_PORT_NUMBER{8888};
     static const constexpr unsigned int s_DEFAULT_SERVER_TIMEOUT{100};
+
+private:
+    std::unique_ptr<UDPServer> m_udpServer;
+    std::unique_ptr<UDPClient> m_udpClient;
+    
+    int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
+
+    void initialize();
 
     static constexpr bool isValidPortNumber(int portNumber);
 };
