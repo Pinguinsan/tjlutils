@@ -59,7 +59,7 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         if (!this->isValidPortNumber(serverPortNumber)) {
             throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                    std::to_string(std::numeric_limits<int16_t>::max()) 
+                                    std::to_string(std::numeric_limits<uint16_t>::max()) 
                                     + "("
                                     + std::to_string(serverPortNumber) 
                                     + ")");
@@ -71,7 +71,7 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
     if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         if (!this->isValidPortNumber(clientPortNumber)) {
             throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                    std::to_string(std::numeric_limits<int16_t>::max()) 
+                                    std::to_string(std::numeric_limits<uint16_t>::max()) 
                                     + "("
                                     + std::to_string(clientPortNumber) 
                                     + ")");
@@ -363,7 +363,7 @@ UDPObjectType UDPDuplex::udpObjectType() const
 
 bool constexpr UDPDuplex::isValidPortNumber(int portNumber)
 {
-    return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
+    return ((portNumber > 0) && (portNumber < std::numeric_limits<uint16_t>::max()));
 }
 
 std::string UDPDuplex::parseLineEnding(LineEnding lineEnding)
