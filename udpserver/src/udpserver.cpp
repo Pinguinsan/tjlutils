@@ -59,9 +59,7 @@ void UDPServer::setPortNumber(uint16_t portNumber)
                                  + std::to_string(this->m_portNumber) 
                                  + ")");
     }
-    this->initialize();
-    std::cout << "Initialized" << std::endl;
-}
+    this->initialize();}
 
 void UDPServer::setTimeout(unsigned int timeout)
 {
