@@ -147,6 +147,9 @@ void UDPServer::staticAsyncUdpServer()
         if (receivedString.length() > 0) {
             std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex};
             for (auto it : receivedString) {
+                if (this->m_messageQueue.size() >= UDPServer::s_MAXIMUM_BUFFER_SIZE) {
+                    this->m_messageQueue.pop_front();
+                }
                 this->m_messageQueue.push_back(it);
             }
             ioMutexLock.unlock();
