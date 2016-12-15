@@ -87,11 +87,10 @@ void UDPServer::flush()
 
 void UDPServer::initialize()
 {
-
-
+    using namespace GeneralUtilities;
     this->m_setSocketResult = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (this->m_setSocketResult == -1) {
-        throw std::runtime_error("ERROR: An error condition occurred while setting UDP socket");
+       throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
     
     setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_BROADCAST, &this->m_broadcast, sizeof(this->m_broadcast));
@@ -101,7 +100,7 @@ void UDPServer::initialize()
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
 
     if (::bind(this->m_setSocketResult, (sockaddr *)&this->m_socketAddress, sizeof(sockaddr)) == -1) {
-        throw std::runtime_error("ERROR: An error condition occurred while binding UDP socket");
+       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 }
 

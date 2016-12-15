@@ -43,14 +43,20 @@
 #include <udpserver.h>
 #include <tstream.h>
 
+enum class UDPObjectType {
+    UDP_DUPLEX,
+    UDP_SERVER,
+    UDP_CLIENT
+};
+
 class UDPDuplex : public TStream
 {
 public:
-    UDPDuplex();
-    UDPDuplex(uint16_t clientPortNumber);
-    UDPDuplex(const std::string &clientHostName);
-    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber);
-    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber);
+    UDPDuplex(UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
+    UDPDuplex(uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
+    UDPDuplex(const std::string &clientHostName, UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
+    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
+    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
 
     /*Client/Sender*/
     ssize_t writeByte(char toSend);
@@ -95,6 +101,8 @@ public:
     static std::string lineEndingToString(LineEnding lineEnding);
     void setLineEnding(LineEnding lineEnding);
     LineEnding lineEnding() const;
+
+    UDPObjectType udpObjectType() const;
     
     static const char *s_DEFAULT_CLIENT_HOST_NAME;
 
@@ -107,6 +115,7 @@ public:
 private:
     std::unique_ptr<UDPServer> m_udpServer;
     std::unique_ptr<UDPClient> m_udpClient;
+    UDPObjectType m_udpObjectType;
     
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
 
