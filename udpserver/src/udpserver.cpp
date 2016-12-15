@@ -37,7 +37,7 @@ UDPServer::UDPServer(uint16_t portNumber) :
     if (!this->isValidPortNumber(this->m_portNumber)) {
         this->m_portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<int16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
                                  + std::to_string(this->m_portNumber) 
                                  + ")");
@@ -47,14 +47,14 @@ UDPServer::UDPServer(uint16_t portNumber) :
 
 bool constexpr UDPServer::isValidPortNumber(int portNumber)
 {
-    return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
+    return ((portNumber > 0) && (portNumber < std::numeric_limits<uint16_t>::max()));
 }
 
 void UDPServer::setPortNumber(uint16_t portNumber)
 {
     if (!this->isValidPortNumber(this->m_portNumber)) {
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<int16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
                                  + std::to_string(this->m_portNumber) 
                                  + ")");

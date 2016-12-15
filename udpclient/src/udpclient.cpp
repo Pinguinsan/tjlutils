@@ -59,7 +59,7 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     if (!this->isValidPortNumber(this->m_portNumber)) {
         this->m_portNumber = UDPClient::s_DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<int16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
                                  + std::to_string(this->m_portNumber) 
                                  + ")");
@@ -71,7 +71,7 @@ void UDPClient::setPortNumber(uint16_t portNumber)
 {
     if (!isValidPortNumber(portNumber)) {
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<int16_t>::max()) 
+                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
                                  + std::to_string(this->m_portNumber) 
                                  + ")");
@@ -193,7 +193,7 @@ ssize_t UDPClient::writeString(const std::string &str)
 
 bool constexpr UDPClient::isValidPortNumber(int portNumber)
 {
-    return ((portNumber > 0) && (portNumber < std::numeric_limits<int16_t>::max()));
+    return ((portNumber > 0) && (portNumber < std::numeric_limits<uint16_t>::max()));
 }
 
 
