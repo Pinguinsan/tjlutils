@@ -1,11 +1,20 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <limits>
 #include <serialport.h>
 #include <udpduplex.h>
 #include <tstream.h>
 #include <generalutilities.h>
 #include <arduino.h>
+
+
+template <typename T>
+bool alwaysTrue(T param)
+{
+    (void)param;
+    return true;
+}
 
 int main()
 {
@@ -26,6 +35,11 @@ int main()
     std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
     uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
     uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
+    uint32_t delayBetween{GeneralUtilities::doUserEnterNumericParameter("On-Off Delay",
+                                                                        static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
+                                                                        std::numeric_limits<uint32_t>::min(),
+                                                                        std::numeric_limits<uint32_t>::max())};
+            
     std::cout << "Using ClientHostName = " << clientHostName << std::endl;
     std::cout << "Using ClientPortNumber = " << clientPortNumber << std::endl;
     std::cout << "Using ServerPortNumber = " << serverPortNumber << std::endl << std::endl;
@@ -52,17 +66,17 @@ int main()
         } else {
             std::cout << "failed" << std::endl;
         }
-        GeneralUtilities::delayMilliseconds(1000);
+        GeneralUtilities::delayMilliseconds(delayBetween);
         for (auto &it : pins) {
             std::cout << "Writing pin " << it << " LOW...";
             std::cout << (arduino->digitalWrite(it, 0).first == IOStatus::OPERATION_SUCCESS ? "success" : "failure") << std::endl;
 
-            GeneralUtilities::delayMilliseconds(1000);
+            GeneralUtilities::delayMilliseconds(delayBetween);
             
             std::cout << "Writing pin " << it << " HIGH...";
             std::cout << (arduino->digitalWrite(it, 1).first == IOStatus::OPERATION_SUCCESS ? "success" : "failure") << std::endl;
             
-            GeneralUtilities::delayMilliseconds(1000);
+            GeneralUtilities::delayMilliseconds(delayBetween);
         }
         for (int i = 0; i < 3; i++) {
             if (i != 0) {
@@ -80,7 +94,7 @@ int main()
                 } else {
                     std::cout << "failed" << std::endl;
                 }
-                GeneralUtilities::delayMilliseconds(1000);
+                GeneralUtilities::delayMilliseconds(delayBetween);
             }
             std::cout << "Writing all pins LOW...";
             result = arduino->digitalWriteAll(0);
@@ -96,7 +110,7 @@ int main()
             } else {
                 std::cout << "failed" << std::endl;
             }
-            GeneralUtilities::delayMilliseconds(1000);
+            GeneralUtilities::delayMilliseconds(delayBetween);
         }
     } while(true);
     return 0;
