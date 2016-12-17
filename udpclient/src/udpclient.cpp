@@ -196,7 +196,11 @@ ssize_t UDPClient::writeString(const std::string &str)
             return bytesWritten;
         }
     } while (retryCount++ < UDPClient::s_SEND_RETRY_COUNT);
-    this->initialize();
+    try {
+        this->initialize();
+    } catch (std::exception &e) {
+        (void)e;
+    }
     return 0;
 }
 

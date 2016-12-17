@@ -544,7 +544,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
     for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -552,7 +551,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -560,7 +558,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -571,7 +568,6 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
-            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
