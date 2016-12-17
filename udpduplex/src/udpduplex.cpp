@@ -245,12 +245,26 @@ std::string UDPDuplex::portName() const
     }
 }
 
-void UDPDuplex::flush()
+void UDPDuplex::flushRXTX()
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
-        this->m_udpServer->flush();
+        this->m_udpServer->flushRXTX();
     }
 } 
+
+void UDPDuplex::flushRX()
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        this->m_udpServer->flushRX();
+    }
+}
+
+void UDPDuplex::flushTX()
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        this->m_udpServer->flushTX();
+    }
+}  
 
 ssize_t UDPDuplex::writeByte(char toSend) 
 { 

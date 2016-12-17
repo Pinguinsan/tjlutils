@@ -36,6 +36,7 @@
 
 #include <generalutilities.h>
 #include <eventtimer.h>
+#include <tstream.h>
 
 class UDPServer
 {
@@ -44,9 +45,9 @@ public:
     UDPServer(uint16_t port);
 
     char readByte();
-    std::string readString(int maximumReadSize = NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
+    std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
     unsigned int available() const;
     void startListening();
@@ -57,7 +58,9 @@ public:
     void setPortNumber(uint16_t portNumber);
     uint16_t portNumber() const;
     void setTimeout(unsigned int timeout);
-    void flush();
+    void flushRXTX();
+    void flushRX();
+    void flushTX();
 
     void openPort();
     void closePort();
@@ -89,7 +92,6 @@ private:
     void initialize();
     void staticAsyncUdpServer();
 
-    static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
     static const constexpr uint16_t s_BROADCAST{1};
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};

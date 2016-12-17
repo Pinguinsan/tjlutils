@@ -77,10 +77,20 @@ uint16_t UDPServer::portNumber() const
 }
 
 
-void UDPServer::flush()
+void UDPServer::flushRXTX()
 {
     std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
     this->m_messageQueue.clear();
+}
+
+void UDPServer::flushRX()
+{
+    return this->flushRXTX();
+}
+
+void UDPServer::flushTX()
+{
+    return this->flushRXTX();
 }
 
 void UDPServer::initialize()
@@ -97,7 +107,7 @@ void UDPServer::initialize()
     this->m_socketAddress.sin_port = htons(this->m_portNumber);
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
 
-    if (::bind(this->m_setSocketResult, (sockaddr *)&this->m_socketAddress, sizeof(sockaddr)) == -1) {
+    if (bind(this->m_setSocketResult, (sockaddr *)&this->m_socketAddress, sizeof(sockaddr)) == -1) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 }

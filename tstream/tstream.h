@@ -47,12 +47,23 @@ public:
     virtual void closePort() = 0;
 
     virtual std::string portName() const = 0;
-    virtual void flush() = 0;
+    virtual void flushRX() = 0;
+    virtual void flushTX() = 0;
+    virtual void flushRXTX() = 0;
 
-    virtual std::string readString() = 0;
-    virtual std::string readStringUntil(const std::string &until) = 0;
-    virtual std::string readStringUntil(const char *until) = 0;
+    virtual std::string peek();
+    virtual char peekByte();
+
+    virtual void putBack(const std::string &str) = 0;
+    virtual void putBack(const char *str) = 0;
+    virtual void putBack(char back) = 0;
+
+    virtual std::string readString(int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
+    virtual std::string readStringUntil(const std::string &until, int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
+    virtual std::string readStringUntil(const char *until, int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
     virtual std::string readStringUntil(char until) = 0;
+
+    static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
 };
 
 #endif

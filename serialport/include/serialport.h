@@ -103,6 +103,13 @@ public:
     SerialPort(const std::string &name, StopBits stopBits, Parity parity);
     SerialPort(const std::string &name, Parity parity);
 
+    std::string peek();
+    char peekByte();
+
+    void putBack(const std::string &str);
+    void putBack(const char *str);
+    void putBack(char back);
+
     SerialPort(SerialPort &&other);
     friend bool operator==(const SerialPort &lhs, const SerialPort &rhs);
 
@@ -112,18 +119,18 @@ public:
     void openPort();
     void closePort();
     unsigned char readByte();
-    std::string readString();
-    std::string readStringUntil(const std::string &readUntil);
+    std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char readUntil);
-    std::string readStringUntil(const char *readUntil);
     ssize_t writeString(const std::string &str);
     ssize_t writeString(const char *str);
     ssize_t asyncWriteString(const std::string &str);
     ssize_t asyncWriteString(const char *str);
-    std::future<std::string> asyncReadString();
-    std::future<std::string> asyncReadStringUntil(const std::string &readUntil);
+    std::future<std::string> asyncReadString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::future<std::string> asyncReadStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::future<std::string> asyncReadStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(char readUntil);
-    std::future<std::string> asyncReadStringUntil(const char *readUntil);
     bool isDCDEnabled() const;
     bool isCTSEnabled() const;
     bool isDSREnabled() const;
@@ -145,9 +152,6 @@ public:
     void setLineEnding(LineEnding lineEnding);
     void setTimeout(unsigned int timeout);
     void setRetryCount(int retryCount);
-    
-    void setMaximumReadSize(int maximumReadSize);
-    int maximumReadSize() const;
 
     std::string portName() const;
     int portNumber() const;
@@ -259,10 +263,10 @@ private:
     static ssize_t staticWriteString(SerialPort *serialPort, const std::string &str);
     static ssize_t staticWriteString(SerialPort *serialPort, const char *str);
 
-    static std::string staticReadString(SerialPort *serialPort);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil);
+    static std::string staticReadString(SerialPort *serialPort, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     static std::string staticReadStringUntil(SerialPort *serialPort, char readUntil);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil);
     
     static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
     static const std::vector<const char *> s_AVAILABLE_PARITY;
