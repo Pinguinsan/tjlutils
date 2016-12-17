@@ -160,6 +160,22 @@ void UDPServer::staticAsyncUdpServer()
     } while (!this->m_shutEmDown);
 }
 
+std::string UDPServer::peek()
+{
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    std::string returnString{""};
+    for (auto &it : this->m_messageQueue) {
+        returnString += it;
+    }
+    return returnString;
+}
+
+char UDPServer::peekByte()
+{
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    return this->m_messageQueue.front();
+}
+
 char UDPServer::readByte()
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
@@ -172,15 +188,25 @@ char UDPServer::readByte()
     }
 }
 
-std::string UDPServer::readString()
+std::string UDPServer::readString(int maximumReadSize)
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_messageQueue.size() == 0) {
         return "";
     }
     std::string stringToReturn{""};
-    for (auto it : this->m_messageQueue) {
-        stringToReturn += it;
+    if (maximumReadSize < 0) {
+        for (auto it : this->m_messageQueue) {
+            stringToReturn += it;
+        }
+    } else {
+        int readCount{0};
+        for (auto &it : this->m_messageQueue) {
+            stringToReturn += it;
+            if (readCount++ > maximumReadSize) {
+                break;
+            }
+        }
     }
     this->m_messageQueue.clear();
     return stringToReturn;
@@ -206,25 +232,52 @@ std::string UDPServer::readStringUntil(char until)
     return this->readStringUntil(std::string{1, until});
 }
 
-std::string UDPServer::readStringUntil(const char *until)
+std::string UDPServer::readStringUntil(const char *until, int maximumReadSize)
 {
-    return this->readStringUntil(static_cast<std::string>(until));
+    return this->readStringUntil(static_cast<std::string>(until), maximumReadSize);
 }
 
-std::string UDPServer::readStringUntil(const std::string &until)
+std::string UDPServer::readStringUntil(const std::string &until, int maximumReadSize)
 {
     using namespace GeneralUtilities;
-
     std::string returnString{""};
     EventTimer eventTimer;
     eventTimer.start();
+    int readCount{0};
     do {
-        char byteRead{0};
-        byteRead = this->readByte();
-        if (byteRead != 0) {
-            returnString += byteRead;
+        std::string tempString{""};
+        tempString = this->readString();
+        if ((returnString.size() + tempString.size()) > maximumReadSize) {
+            int amountToAdd = (returnString.size() + tempString.size()) - maximumReadSize;
+            this->putBack(tempString.substr(amountToAdd));
+            returnString += tempString.substr(0, amountToAdd);
+            break;
+        } else {
+            readCount += tempString.size();
+            returnString += tempString;
         }
         eventTimer.update();
     } while (!endsWith(returnString, until) && (eventTimer.totalTime() < this->m_timeout));
     return returnString;
+}
+
+void UDPServer::putBack(char back)
+{
+    return UDPServer::putBack(std::string{1, back});
+}
+
+void UDPServer::putBack(const char *str)
+{
+    return UDPServer::putBack(static_cast<std::string>(str));
+}
+
+void UDPServer::putBack(const std::string &str)
+{   
+    if (str.length() == 0) {
+        return;
+    } 
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    for (auto it = str.rbegin(); it != str.rend(); it++) {
+        this->m_messageQueue.push_front(*it);
+    }
 }

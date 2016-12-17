@@ -73,14 +73,20 @@ public:
 
     /*Host/Server*/
     char readByte();
-    std::string readString();
-    std::string readStringUntil(const std::string &until);
-    std::string readStringUntil(const char *until);
+    std::string readString(int maximumReadSize = NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
     unsigned int available() const;
     void startListening();
     void stopListening();
     bool isListening() const;
+    void putBack(const std::string &str);
+    void putBack(const char *str);
+    void putBack(char back);
+
+    std::string peek();
+    char peekByte();
     
     unsigned int serverTimeout() const;
     void setServerPortNumber(uint16_t portNumber);
@@ -122,6 +128,7 @@ private:
     void initialize();
 
     static constexpr bool isValidPortNumber(int portNumber);
+    static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
 };
 
 #endif //TJLUTILS_UDPDUPLEX_H

@@ -21,11 +21,12 @@ int main()
                                                                         Arduino::FIRMWARE_PARITY)};
     */
     std::vector<int> pins{2, 3, 4, 5, 6};
-    std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>("127.0.0.1", 8888, 8887)};
+    std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>("pinguinsan1224.asuscomm.com", 62002, 8888)};
     std::cout << "Creating Arduino object using serial port " << std::quoted(serialPort->portName()) << "..."; 
     std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, serialPort)};
     std::cout << "success" << std::endl;
-    arduino->setStreamSendDelay(125);
+    arduino->setIOTryCount(1);
+    arduino->setStreamSendDelay(1000);
     serialPort->openPort();
     std::cout << "Hello" << std::endl;
     do {

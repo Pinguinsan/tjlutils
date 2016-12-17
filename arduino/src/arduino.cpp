@@ -6,15 +6,19 @@ const StopBits Arduino::FIRMWARE_STOP_BITS{StopBits::ONE};
 const Parity Arduino::FIRMWARE_PARITY{Parity::NONE};
 const int Arduino::ANALOG_MAX{1023};
 const double Arduino::VOLTAGE_MAX{5.0};
+const unsigned int Arduino::DEFAULT_IO_TRY_COUNT{3};
 
 Arduino::Arduino(ArduinoType arduinoType, std::shared_ptr<TStream> tStream) :
     m_arduinoType{arduinoType},
     m_ioStream{tStream},
-    m_streamSendDelay{DEFAULT_IO_STREAM_SEND_DELAY}
+    m_streamSendDelay{DEFAULT_IO_STREAM_SEND_DELAY},
+    m_ioTryCount{DEFAULT_IO_TRY_COUNT}
 {
     try {
-        this->m_ioStream->openPort();
-        GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
+        if (!this->m_ioStream->isOpen()) {
+            this->m_ioStream->openPort();
+            GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
+        }
     } catch (std::exception &e) {
         throw e;
     }
@@ -75,14 +79,28 @@ std::string Arduino::longName() const
     return this->m_longName;
 }
 
+unsigned int Arduino::streamSendDelay() const
+{
+    return this->m_streamSendDelay;
+}
+
+unsigned int Arduino::ioTryCount() const
+{
+    return this->m_ioTryCount;
+}
+
 void Arduino::setStreamSendDelay(unsigned int streamSendDelay)
 {
     this->m_streamSendDelay = streamSendDelay;
 }
 
-unsigned int Arduino::streamSendDelay() const
+
+void Arduino::setIOTryCount(unsigned int ioTryCount)
 {
-    return this->m_streamSendDelay;
+    if (ioTryCount < 1) {
+        throw std::runtime_error(IO_TRY_COUNT_TOO_LOW_STRING + std::to_string(ioTryCount) + " < 1) ");
+    }
+    this->m_ioTryCount = ioTryCount;
 }
 
 std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend, const std::string &header, double delay)
@@ -149,17 +167,17 @@ std::vector<std::string> Arduino::genericIOReportTask(const std::string &stringT
 std::pair<IOStatus, std::string> Arduino::arduinoTypeString()
 {
     std::string stringToSend{static_cast<std::string>(ARDUINO_TYPE_HEADER) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ARDUINO_TYPE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
             }
         }
         if (states.at(ArduinoTypeEnum::OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
@@ -173,17 +191,17 @@ std::pair<IOStatus, std::string> Arduino::arduinoTypeString()
 std::pair<IOStatus, std::string> Arduino::firmwareVersion()
 {
     std::string stringToSend{static_cast<std::string>(FIRMWARE_VERSION_HEADER) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(FIRMWARE_VERSION_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
             }
         }
         if (states.at(ArduinoTypeEnum::OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
             } else {
                 continue;
@@ -197,15 +215,15 @@ std::pair<IOStatus, std::string> Arduino::firmwareVersion()
 std::pair<IOStatus, bool> Arduino::canCapability()
 {
     std::string stringToSend{static_cast<std::string>(CAN_BUS_ENABLED_HEADER) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CAN_BUS_ENABLED_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != CAN_BUS_ENABLED_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             }
         }
         if (states.at(CanEnabledStatus::CAN_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             }
         }
@@ -213,7 +231,7 @@ std::pair<IOStatus, bool> Arduino::canCapability()
             return std::make_pair(IOStatus::OPERATION_SUCCESS, (std::stoi(states.at(CanEnabledStatus::CAN_RETURN_STATE)) == 1));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -226,17 +244,17 @@ std::pair<IOStatus, bool> Arduino::canCapability()
 std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
 {
     std::string stringToSend{static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(ADThresholdReq::AD_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -246,7 +264,7 @@ std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -259,7 +277,7 @@ std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
 IOReport Arduino::ioReportRequest()
 {
     std::string stringToSend{static_cast<std::string>(IO_REPORT_HEADER) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> allStates{genericIOReportTask(stringToSend, 
                                                                static_cast<std::string>(IO_REPORT_HEADER), 
                                                                static_cast<std::string>(IO_REPORT_END_HEADER) + "}", 
@@ -275,7 +293,7 @@ IOReport Arduino::ioReportRequest()
                 continue;
             }
             if ((states.size() != IO_REPORT_RETURN_SIZE) && (states.size() != 0)) {
-                if (i+1 == IO_TRY_COUNT) {
+                if (i+1 == this->m_ioTryCount) {
                     throw std::runtime_error(IO_REPORT_INVALID_DATA_STRING);
                 } else {
                     break;
@@ -361,24 +379,24 @@ SerialReport Arduino::serialReportRequest(const std::string &delimiter)
 std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
 {
     std::string stringToSend{static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER) + ":" + std::to_string(threshold) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(threshold) != states.at(ADThresholdReq::AD_RETURN_STATE)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(ADThresholdReq::AD_OPERATION_RESULT) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -388,7 +406,7 @@ std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -402,24 +420,24 @@ std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
 std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType)
 {
     std::string stringToSend{static_cast<std::string>(PIN_TYPE_CHANGE_HEADER) + ":" + std::to_string(pinNumber) + ":" + parseIOType(ioType) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_CHANGE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -429,7 +447,7 @@ std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, parseIOTypeFromString(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -443,24 +461,24 @@ std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType)
 std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(PIN_TYPE_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != PIN_TYPE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -470,7 +488,7 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, parseIOTypeFromString(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
             } else {
                 continue;
@@ -483,24 +501,24 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber)
 std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + "}" };
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -510,7 +528,7 @@ std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -523,24 +541,24 @@ std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
 std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
 {
     std::string stringToSend{static_cast<std::string>(DIGITAL_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + "}" };
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -550,7 +568,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
                 continue;
@@ -564,25 +582,25 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
 {
     std::vector<int> writtenPins;
     std::string stringToSend{static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER) + ":" + std::to_string(state) + "}" };
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         writtenPins = std::vector<int>{};
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() == 0) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
                 continue;
             }
         }
         if (states.size() < DIGITAL_WRITE_ALL_MINIMIM_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
                 continue;
             }
         }
         if (*(states.end()-1) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
                 continue;
@@ -590,7 +608,7 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
         }
         states.pop_back();
         if (*(states.end()-1) != std::to_string(state)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
                 continue;
@@ -605,7 +623,7 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, writtenPins);
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
                 continue;
@@ -618,24 +636,24 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
 std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_DIGITAL_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -645,7 +663,7 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -658,24 +676,24 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
 std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -685,7 +703,7 @@ std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -698,24 +716,24 @@ std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
 std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -725,7 +743,7 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -738,24 +756,24 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
 std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -765,7 +783,7 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -778,24 +796,24 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
 std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -804,7 +822,7 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
         try {
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -817,24 +835,24 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
 std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(voltageToAnalog(pinNumber)) + ":" + std::to_string(state) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -844,7 +862,7 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stod(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
             } else {
                 continue;
@@ -857,24 +875,24 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
 std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + "}"};
-    for (int i = 0; i < IO_TRY_COUNT; i++) {
+    for (int i = 0; i < this->m_ioTryCount; i++) {
         std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;
@@ -884,7 +902,7 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
-            if (i+1 == IO_TRY_COUNT) {
+            if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
             } else {
                 continue;

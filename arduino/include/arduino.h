@@ -76,6 +76,9 @@ public:
     std::string identifier() const;
     std::string longName() const;
 
+    void setIOTryCount(unsigned int ioTryCount);
+    unsigned int ioTryCount() const;
+
     void setStreamSendDelay(unsigned int streamSendDelay);
     unsigned int streamSendDelay() const;
 
@@ -87,6 +90,7 @@ public:
     static const Parity FIRMWARE_PARITY;
     static const int ANALOG_MAX;
     static const double VOLTAGE_MAX;
+    static const unsigned int DEFAULT_IO_TRY_COUNT;
     
 private:
     std::map<int, std::shared_ptr<GPIO>> m_gpioPins;
@@ -100,6 +104,7 @@ private:
     std::set<int> m_availableAnalogPins;
     int m_numberOfDigitalPins;
     unsigned int m_streamSendDelay;
+    unsigned int m_ioTryCount;
 
     bool isValidAnalogPinIdentifier(const std::string &state) const;
     bool isValidDigitalStateIdentifier(const std::string &state) const;
@@ -221,7 +226,7 @@ const unsigned int DIGITAL_WRITE_ALL_MINIMIM_RETURN_SIZE{2};
 const unsigned int SERIAL_REPORT_REQUEST_TIME_LIMIT{50};
 const unsigned int SERIAL_REPORT_OVERALL_TIME_LIMIT{50};
 
-unsigned int s_SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{4};
+unsigned int SERIAL_PORT_TRY_COUNT_HIGH_LIMIT{4};
 double bluetoothSendDelayMultiplier{DEFAULT_BLUETOOTH_SEND_DELAY_MULTIPLIER};
 
 const int IO_TRY_COUNT{4};
@@ -316,23 +321,24 @@ const char *ANALOG_INPUT_IDENTIFIER{"ain"};
 const char *ANALOG_OUTPUT_IDENTIFIER{"aout"};
 const char *DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
 const char *OPERATION_FAILURE_STRING{"-1"};
-const char *IO_REPORT_INVALID_DATA_STRING{"ioReportRequest(int) timed out or received invalid data"};
+const char *IO_REPORT_INVALID_DATA_STRING{"Arduino::ioReportRequest(int) timed out or received invalid data"};
 
 const char *BLUETOOTH_SERIAL_IDENTIFIER{"rfcomm"};
 const char *INVALID_PIN_ALIAS_STRING{"Invalid pin alias: "};
 const char *INVALID_GPIO_PIN_STRING{"Invalid gpio pin: "};
 const char *INVALID_PIN_NUMBER_STRING{"Invalid pin number: "};
 const char *INVALID_ANALOG_PIN_BASE_STRING{"Invalid analog pin: "};
-const char *INVALID_ANALOG_PIN_TAIL_STRING{" passed to analogPinFromNumber(int)"};
-const char *INVALID_ANALOG_PIN_TO_INT_TAIL_STRING{" passed to parseAnalogPin(ArduinoType, const std::string &"};
-const char *UNSPECIFIED_IO_TYPE_TO_PARSE_IO_TYPE_STRING{"Unspecified IOType passed to parseIOType(IOType)"};
+const char *INVALID_ANALOG_PIN_TAIL_STRING{" passed to Arduino::analogPinFromNumber(int)"};
+const char *INVALID_ANALOG_PIN_TO_INT_TAIL_STRING{" passed to Arduino::parseAnalogPin(ArduinoType, const std::string &"};
+const char *UNSPECIFIED_IO_TYPE_TO_PARSE_IO_TYPE_STRING{"Unspecified IOType passed to Arduino::parseIOType(IOType)"};
 const char *INVALID_IO_TYPE_BASE_STRING{"Invalid IOType: "};
-const char *INVALID_IO_TYPE_TAIL_STRING{" passed to parseIOTypeFromString(const std::string &)"};
-const char *INVALID_STATE_TO_PARSE_TO_DIGITAL_STATE_STRING{"Invalid state passed to parseToDigitalState(const std::string &): "};
-const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_STRING{"Invalid state passed to parseToAnalogState(const std::string &): "};
-const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_RAW_STRING{"Invalid state passed to parseToAnalogStateRaw(const std::string &): "};
+const char *INVALID_IO_TYPE_TAIL_STRING{" passed to Arduino::parseIOTypeFromString(const std::string &)"};
+const char *INVALID_STATE_TO_PARSE_TO_DIGITAL_STATE_STRING{"Invalid state passed to Arduino::parseToDigitalState(const std::string &): "};
+const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_STRING{"Invalid state passed to Arduino::parseToAnalogState(const std::string &): "};
+const char *INVALID_STATE_TO_PARSE_TO_ANALOG_STATE_RAW_STRING{"Invalid state passed to Arduino::parseToAnalogStateRaw(const std::string &): "};
 const char *FIRMWARE_VERSION_UNKNOWN_STRING{" unknown"};
 const char *FIRMWARE_VERSION_BASE_STRING{"firmware version "};
+const char *IO_TRY_COUNT_TOO_LOW_STRING{"Invalid  IO try count passed to Arduino::setIOTryCount(unsigned int), value must be greater than 0 ("};
 
 int voltageToAnalog(double state)
 {

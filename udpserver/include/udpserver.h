@@ -44,9 +44,9 @@ public:
     UDPServer(uint16_t port);
 
     char readByte();
-    std::string readString();
-    std::string readStringUntil(const std::string &until);
-    std::string readStringUntil(const char *until);
+    std::string readString(int maximumReadSize = NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *until, int maximumReadSize = NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
     unsigned int available() const;
     void startListening();
@@ -62,6 +62,13 @@ public:
     void openPort();
     void closePort();
     bool isOpen() const;
+
+    void putBack(const std::string &str);
+    void putBack(const char *str);
+    void putBack(char back);
+
+    std::string peek();
+    char peekByte();
 
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
@@ -82,6 +89,7 @@ private:
     void initialize();
     void staticAsyncUdpServer();
 
+    static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
     static const constexpr uint16_t s_BROADCAST{1};
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
