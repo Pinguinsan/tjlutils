@@ -594,7 +594,7 @@ namespace GeneralUtilities
         std::string userOption{""};
         while (true) {
             userOption = "";
-            std::cout << "Please enter a number to use for " << tQuoted(name) << " between (inclusive) " << lowLimit << " and " << highLimit << ", or press CTRL+C to quit: ";
+            std::cout << "Enter a number to use for " << tQuoted(name) << " between (inclusive) " << lowLimit << " and " << highLimit << ", or press CTRL+C to quit: ";
             std::getline(std::cin, userOption);
             if (userOption == "") {
                 continue;
@@ -603,18 +603,18 @@ namespace GeneralUtilities
             try {
                 userEntry = std::stoi(userOption);
                 if (userEntry < lowLimit) {
-                    std::cout << tQuoted(userEntry) << " is less than the minimum value for " << name << " (" << name << " < " << lowLimit << std::endl;
+                    std::cout << tQuoted(userEntry) << " is less than the minimum value for " << name << " (" << name << " < " << lowLimit << std::endl << std::endl;
                     continue;
                 } else if (userEntry > highLimit) {
-                    std::cout << tQuoted(userEntry) << " is greater than the maximum value for " << name << " (" << name << " > " << highLimit << std::endl;
+                    std::cout << tQuoted(userEntry) << " is greater than the maximum value for " << name << " (" << name << " > " << highLimit << std::endl << std::endl;
                     continue;
                 } else if (!validator(userEntry)) {
-                    std::cout << tQuoted(userEntry) << " is an invalid " << name << std::endl;
+                    std::cout << tQuoted(userEntry) << " is an invalid " << name << std::endl << std::endl;
                     continue;
                 }
                 return userEntry;
             } catch (std::exception &e) {
-                std::cout << tQuoted(userOption) << " is not a number" << std::endl;
+                std::cout << tQuoted(userOption) << " is not a number" << std::endl << std::endl;
             }
         }
     }
@@ -633,7 +633,6 @@ namespace GeneralUtilities
             return func(availableOptions.at(0));
         }
         unsigned int quitOption{0};
-        std::cout << "Which " << name << " should be used?" << std::endl;
         for (unsigned int selectionIndex = 1; selectionIndex <= availableOptions.size(); selectionIndex++) {
             std::cout << selectionIndex << ".) " << availableOptions.at(selectionIndex-1);
             if (static_cast<std::string>(availableOptions.at(selectionIndex-1)) == static_cast<std::string>(defaultOption)) {
@@ -647,7 +646,7 @@ namespace GeneralUtilities
         std::string userOption{""};
         while (true) {
             userOption = "";
-            std::cout << "Please select " << name << " from the above options" << std::endl;
+            std::cout << "Select a " << name << " from the above options, or press CTRL+C to quit: ";
             std::getline(std::cin, userOption);
             if (userOption == "") {
                 return func(defaultOption);
@@ -657,19 +656,19 @@ namespace GeneralUtilities
             try {
                 userOptionIndex = std::stoi(userOption);
                 if (userOptionIndex > availableOptions.size()+1) {
-                    std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+                    std::cout << tQuoted(userOption) << " wasn't one of the selections, please a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
                     continue;
                 }
                 if (userOptionIndex == quitOption) {
                     userSelectedQuit = true;
-                    throw std::invalid_argument("User selected quit option");
+                    throw std::invalid_argument("In GeneralUtilities::doUserSelectParameter(): User selected quit option");
                 }
                 return func(availableOptions.at(userOptionIndex-1));
             } catch (std::exception &e) {
                 if (userSelectedQuit) {
                     throw e;
                 }
-                std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+                std::cout << tQuoted(userOption) << " wasn't one of the selections, enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
             }
         }
     }

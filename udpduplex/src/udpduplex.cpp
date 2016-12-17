@@ -33,6 +33,15 @@ UDPDuplex::UDPDuplex(UDPObjectType udpObjectType) :
 
 }
 
+UDPDuplex::UDPDuplex(uint16_t serverPortNumber, UDPObjectType udpObjectType) :
+    UDPDuplex(UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME, 
+              UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, 
+              serverPortNumber,
+              m_udpObjectType)
+{
+
+}
+
 UDPDuplex::UDPDuplex(const std::string &clientHostname, UDPObjectType m_udpObjectType) :
     UDPDuplex(clientHostname, 
               UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, 
@@ -461,7 +470,7 @@ UDPObjectType UDPDuplex::doUserSelectUDPObjectType()
 
 }
 
-std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex()
+std::shared_ptr<UDPDuplex> UDPDuplex::doUserSelectUDPDuplex()
 {
     std::shared_ptr<UDPDuplex> udpDuplex{nullptr};
     UDPObjectType udpObjectType{UDPDuplex::doUserSelectUDPObjectType()};

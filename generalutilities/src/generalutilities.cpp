@@ -647,12 +647,12 @@ namespace GeneralUtilities
             }
             try {
                 if (!validator(userOption)) {
-                    std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+                    std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl << std::endl;
                     continue;
                 }
                 return userOption;
             } catch (std::exception &e) {
-                std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+                std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl << std::endl;
             }
         }
     }
