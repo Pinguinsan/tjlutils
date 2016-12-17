@@ -51,8 +51,8 @@ public:
     virtual void flushTX() = 0;
     virtual void flushRXTX() = 0;
 
-    virtual std::string peek();
-    virtual char peekByte();
+    virtual std::string peek() = 0;
+    virtual char peekByte() = 0;
 
     virtual void putBack(const std::string &str) = 0;
     virtual void putBack(const char *str) = 0;
