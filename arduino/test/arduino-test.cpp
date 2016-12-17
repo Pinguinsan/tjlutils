@@ -22,7 +22,14 @@ int main()
     */
     std::vector<int> pins{2, 3, 4, 5, 6};
     //std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>("pinguinsan1224.asuscomm.com", 62002, 8888)};
-    std::shared_ptr<TStream> serialPort{UDPDuplex::doUserSelectUDPDuplex()};
+    //std::shared_ptr<TStream> serialPort{UDPDuplex::doUserSelectUDPDuplex()};
+    std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
+    uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
+    uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
+    std::cout << "Using ClientHostName = " << clientHostName << std::endl;
+    std::cout << "Using ClientPortNumber = " << clientPortNumber << std::endl;
+    std::cout << "Using ServerPortNumber = " << serverPortNumber << std::endl << std::endl;
+    std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, UDPObjectType::UDP_DUPLEX)};
     std::cout << "Creating Arduino object using serial port " << std::quoted(serialPort->portName()) << "..."; 
     std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, serialPort)};
     std::cout << "success" << std::endl;

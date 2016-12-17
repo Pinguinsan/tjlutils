@@ -275,7 +275,7 @@ uint16_t UDPClient::doUserSelectPortNumber()
 {
     return GeneralUtilities::doUserEnterNumericParameter("Client Port Number",
                                                          static_cast<std::function<bool(uint16_t)>>(UDPClient::isValidPortNumber),
-                                                         std::numeric_limits<uint16_t>::min()-1,
+                                                         std::numeric_limits<uint16_t>::min()+1,
                                                          std::numeric_limits<uint16_t>::max());
 }
 
