@@ -46,15 +46,16 @@ int main()
                                                                         std::numeric_limits<uint32_t>::max())};
             
     
+    uint32_t arduinoStreamDelay{GeneralUtilities::doUserEnterNumericParameter("Arduino Stream Delay",
+                                                                        static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
+                                                                        std::numeric_limits<uint32_t>::min()+1,
+                                                                        std::numeric_limits<uint32_t>::max())};
+
     uint32_t arduinoIOTryCount{GeneralUtilities::doUserEnterNumericParameter("Arduino IO Try Count",
                                                                         static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
                                                                         std::numeric_limits<uint32_t>::min()+1,
                                                                         std::numeric_limits<uint32_t>::max())};
             
-    uint32_t arduinoStreamDelay{GeneralUtilities::doUserEnterNumericParameter("Arduino Stream Delay",
-                                                                        static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
-                                                                        std::numeric_limits<uint32_t>::min()+1,
-                                                                        std::numeric_limits<uint32_t>::max())};
 
     std::unique_ptr<PrettyPrinter> prettyPrinter{std::make_unique<PrettyPrinter>()};
 
