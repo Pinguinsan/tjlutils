@@ -73,12 +73,12 @@ int main()
     std::cout << "Using DelayBetween=";
     prettyPrinter->println(delayBetween);
     
-    std::cout << "Using ArduinoIOTryCount=";
-    prettyPrinter->println(arduinoIOTryCount);
-    
     std::cout << "Using ArduinoStreamDelay=";
     prettyPrinter->println(arduinoStreamDelay);
     prettyPrinter->println();
+    
+    std::cout << "Using ArduinoIOTryCount=";
+    prettyPrinter->println(arduinoIOTryCount);
     
     std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, UDPObjectType::UDP_DUPLEX)};
     std::cout << "Creating Arduino object using serial port " << std::quoted(serialPort->portName()) << "..."; 
