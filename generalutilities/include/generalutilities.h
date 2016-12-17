@@ -591,7 +591,6 @@ namespace GeneralUtilities
                                   TLow lowLimit,
                                   THigh highLimit)
     {
-        using namespace GeneralUtilities;
         std::string userOption{""};
         while (true) {
             userOption = "";
@@ -620,28 +619,7 @@ namespace GeneralUtilities
         }
     }
 
-    std::string doUserEnterStringParameter(const std::string &name, const std::function<bool(std::string)> &validator)
-    {
-        using namespace GeneralUtilities;
-        std::string userOption{""};
-        while (true) {
-            userOption = "";
-            std::cout << "Please enter a string to use for " << tQuoted(name) << ", or press CTRL+C to quit: ";
-            std::getline(std::cin, userOption);
-            if (userOption == "") {
-                continue;
-            }
-            try {
-                if (!validator(userOption)) {
-                    std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
-                    continue;
-                }
-                return userOption;
-            } catch (std::exception &e) {
-                std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
-            }
-        }
-    }
+    std::string doUserEnterStringParameter(const std::string &name, const std::function<bool(std::string)> &validator);
 
     template<typename T, typename TOps>
     T doUserSelectParameter(const std::string &name, 
@@ -649,7 +627,6 @@ namespace GeneralUtilities
                             const std::vector<TOps> &availableOptions,
                             const char *defaultOption)
     {
-        using namespace GeneralUtilities;
         if (availableOptions.size() == 0) {
             throw std::runtime_error("No " + name + " are available");
         } else if (availableOptions.size() == 1) {

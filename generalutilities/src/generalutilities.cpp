@@ -635,4 +635,27 @@ namespace GeneralUtilities
         return ("(" + static_cast<std::string>(convert) + ")");
     }
 
+    std::string doUserEnterStringParameter(const std::string &name, const std::function<bool(std::string)> &validator)
+    {
+        std::string userOption{""};
+        while (true) {
+            userOption = "";
+            std::cout << "Please enter a string to use for " << tQuoted(name) << ", or press CTRL+C to quit: ";
+            std::getline(std::cin, userOption);
+            if (userOption == "") {
+                continue;
+            }
+            try {
+                if (!validator(userOption)) {
+                    std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+                    continue;
+                }
+                return userOption;
+            } catch (std::exception &e) {
+                std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+            }
+        }
+    }
+
+
 }
