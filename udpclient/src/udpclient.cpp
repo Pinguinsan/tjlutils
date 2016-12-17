@@ -183,13 +183,21 @@ ssize_t UDPClient::writeString(const std::string &str)
     if (!endsWith(copyString, this->m_lineEnding)) {
         copyString += this->m_lineEnding;
     }
-    ssize_t bytesWritten{sendto(this->m_udpSocketIndex, 
-                        copyString.c_str(), 
-                        static_cast<size_t>(copyString.length()),
-                        0,
-                        (sockaddr*)&this->m_destinationAddress,
-                        sizeof(this->m_destinationAddress)) };
-    return bytesWritten;
+    unsigned int retryCount{0};
+    do {
+        ssize_t bytesWritten{sendto(this->m_udpSocketIndex, 
+                            copyString.c_str(), 
+                            strlen(copyString.c_str()),
+                            MSG_DONTWAIT,
+                            (sockaddr*)&this->m_destinationAddress,
+                            sizeof(this->m_destinationAddress)) };
+        if ((bytesWritten != -1) && (errno != EAGAIN) && (errno != EWOULDBLOCK))  {
+            this->initialize();
+            return bytesWritten;
+        }
+    } while (retryCount++ < UDPClient::s_SEND_RETRY_COUNT);
+    this->initialize();
+    return 0;
 }
 
 bool constexpr UDPClient::isValidPortNumber(int portNumber)

@@ -110,7 +110,6 @@ void UDPServer::startListening()
                                          &UDPServer::staticAsyncUdpServer,
                                          this);
     }
-
 }
 
 void UDPServer::stopListening()
@@ -134,17 +133,18 @@ void UDPServer::staticAsyncUdpServer()
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     do {
         char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
+        memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
         unsigned int socketSize{sizeof(sockaddr)};
         ssize_t returnValue{recvfrom(this->m_setSocketResult,
-                        lowLevelReceiveBuffer,
-                        sizeof(lowLevelReceiveBuffer)-1,
-                        MSG_DONTWAIT,
-                        (sockaddr *)&this->m_receivingSocketAddress,
-                        &socketSize)};
-        //if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
-        //    continue;
-        //}
+                            lowLevelReceiveBuffer,
+                            sizeof(lowLevelReceiveBuffer)-1,
+                            0,
+                            (sockaddr *)&this->m_receivingSocketAddress,
+                            &socketSize)};
+        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
+            continue;
+        }
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
             ioMutexLock.lock();

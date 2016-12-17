@@ -69,6 +69,8 @@ public:
     static const char *s_DEFAULT_HOST_NAME;
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
+    static const constexpr unsigned int s_SEND_RETRY_COUNT{3};
+
 
     static std::string parseLineEnding(LineEnding lineEnding);
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
@@ -89,8 +91,6 @@ private:
     void initialize();
     
     static constexpr bool isValidPortNumber(int portNumber);
-
-
     static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;
     static const std::vector<const char *> s_NO_LINE_ENDING_IDENTIFIERS;
     static const std::vector<const char *> s_CARRIAGE_RETURN_IDENTIFIERS;
