@@ -23,15 +23,15 @@ int main()
     //std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::NANO, serialPortName)};
 
     //const std::string SERIAL_PORT_NAME{"/dev/ttyACM0"};
-    std::shared_ptr<TStream> serialPort{std::make_shared<SerialPort>(serialPortName,
+    //std::shared_ptr<TStream> serialPort{std::make_shared<SerialPort>(serialPortName,
                                                                         Arduino::FIRMWARE_BAUD_RATE,
                                                                         Arduino::FIRMWARE_DATA_BITS,
                                                                         Arduino::FIRMWARE_STOP_BITS,
                                                                         Arduino::FIRMWARE_PARITY)};
-    */
+    
+    
+    */    
     std::vector<int> pins{2, 3, 4, 5, 6};
-    //std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>("pinguinsan1224.asuscomm.com", 62002, 8888)};
-    //std::shared_ptr<TStream> serialPort{UDPDuplex::doUserSelectUDPDuplex()};
     std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
     uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
     uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
@@ -40,17 +40,31 @@ int main()
                                                                         std::numeric_limits<uint32_t>::min(),
                                                                         std::numeric_limits<uint32_t>::max())};
             
-    std::cout << "Using ClientHostName = " << clientHostName << std::endl;
-    std::cout << "Using ClientPortNumber = " << clientPortNumber << std::endl;
-    std::cout << "Using ServerPortNumber = " << serverPortNumber << std::endl << std::endl;
+    
+    uint32_t arduinoIOTryCount{GeneralUtilities::doUserEnterNumericParameter("Arduino IO Try Count",
+                                                                        static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
+                                                                        std::numeric_limits<uint32_t>::min()+1,
+                                                                        std::numeric_limits<uint32_t>::max())};
+            
+    uint32_t arduinoStreamDelay{GeneralUtilities::doUserEnterNumericParameter("Arduino Stream Delay",
+                                                                        static_cast<std::function<bool(uint32_t)>>(alwaysTrue<uint32_t>),
+                                                                        std::numeric_limits<uint32_t>::min()+1,
+                                                                        std::numeric_limits<uint32_t>::max())};
+
+    std::cout << "Using ClientHostName=" << clientHostName << std::endl;
+    std::cout << "Using ClientPortNumber=" << clientPortNumber << std::endl;
+    std::cout << "Using ServerPortNumber=" << serverPortNumber << std::endl;
+    std::cout << "Using DelayBetween=" << delayBetween << std::endl;
+    std::cout << "Using ArduinoIOTryCount=" << arduinoIOTryCount << std::endl;
+    std::cout << "Using ArduinoStreamDelay=" << arduinoStreamDelay << std::endl << std::endl;
+    //std::shared_ptr<TStream> serialPort{SerialPort::doUserSelectSerialPort()};
     std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, UDPObjectType::UDP_DUPLEX)};
     std::cout << "Creating Arduino object using serial port " << std::quoted(serialPort->portName()) << "..."; 
     std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, serialPort)};
     std::cout << "success" << std::endl;
-    arduino->setIOTryCount(1);
-    arduino->setStreamSendDelay(1000);
+    arduino->setIOTryCount(arduinoIOTryCount);
+    arduino->setStreamSendDelay(arduinoStreamDelay);
     serialPort->openPort();
-    std::cout << "Hello" << std::endl;
     do {
         std::cout << "Writing all pins HIGH...";
         auto result = arduino->digitalWriteAll(1);
@@ -94,7 +108,7 @@ int main()
                 } else {
                     std::cout << "failed" << std::endl;
                 }
-                GeneralUtilities::delayMilliseconds(delayBetween);
+                GeneralUtilities::delayMilliseconds(delayBetween*2);
             }
             std::cout << "Writing all pins LOW...";
             result = arduino->digitalWriteAll(0);
@@ -110,7 +124,7 @@ int main()
             } else {
                 std::cout << "failed" << std::endl;
             }
-            GeneralUtilities::delayMilliseconds(delayBetween);
+            GeneralUtilities::delayMilliseconds(delayBetween*2);
         }
     } while(true);
     return 0;
