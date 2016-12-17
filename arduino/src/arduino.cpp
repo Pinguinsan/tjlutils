@@ -168,7 +168,7 @@ std::pair<IOStatus, std::string> Arduino::arduinoTypeString()
 {
     std::string stringToSend{static_cast<std::string>(ARDUINO_TYPE_HEADER) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ARDUINO_TYPE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ARDUINO_TYPE_HEADER), this->m_streamSendDelay)};
         if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
@@ -192,7 +192,7 @@ std::pair<IOStatus, std::string> Arduino::firmwareVersion()
 {
     std::string stringToSend{static_cast<std::string>(FIRMWARE_VERSION_HEADER) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(FIRMWARE_VERSION_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(FIRMWARE_VERSION_HEADER), this->m_streamSendDelay)};
         if (states.size() != ARDUINO_TYPE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, "");
@@ -216,7 +216,7 @@ std::pair<IOStatus, bool> Arduino::canCapability()
 {
     std::string stringToSend{static_cast<std::string>(CAN_BUS_ENABLED_HEADER) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CAN_BUS_ENABLED_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CAN_BUS_ENABLED_HEADER), this->m_streamSendDelay)};
         if (states.size() != CAN_BUS_ENABLED_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
@@ -245,7 +245,7 @@ std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
 {
     std::string stringToSend{static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CURRENT_A_TO_D_THRESHOLD_HEADER), this->m_streamSendDelay)};
         if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -380,7 +380,7 @@ std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
 {
     std::string stringToSend{static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER) + ":" + std::to_string(threshold) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(CHANGE_A_TO_D_THRESHOLD_HEADER), this->m_streamSendDelay)};
         if (states.size() != A_TO_D_THRESHOLD_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -421,7 +421,7 @@ std::pair<IOStatus, IOType> Arduino::pinMode(int pinNumber, IOType ioType)
 {
     std::string stringToSend{static_cast<std::string>(PIN_TYPE_CHANGE_HEADER) + ":" + std::to_string(pinNumber) + ":" + parseIOType(ioType) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_CHANGE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_CHANGE_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
@@ -462,7 +462,7 @@ std::pair<IOStatus, IOType> Arduino::currentPinMode(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(PIN_TYPE_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(PIN_TYPE_HEADER), this->m_streamSendDelay)};
         if (states.size() != PIN_TYPE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, IOType::UNSPECIFIED);
@@ -502,7 +502,7 @@ std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + "}" };
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
@@ -542,8 +542,9 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
 {
     std::string stringToSend{static_cast<std::string>(DIGITAL_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + "}" };
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
+            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -551,6 +552,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             }
         }
         if (std::to_string(pinNumber) != states.at(IOState::PIN_NUMBER)) {
+            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -558,6 +560,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             }
         }
         if (states.at(IOState::RETURN_CODE) == OPERATION_FAILURE_STRING) {
+            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -568,6 +571,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
+            std::cout << "Failure" << std::endl;
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, false);
             } else {
@@ -584,7 +588,7 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
     std::string stringToSend{static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER) + ":" + std::to_string(state) + "}" };
     for (int i = 0; i < this->m_ioTryCount; i++) {
         writtenPins = std::vector<int>{};
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(DIGITAL_WRITE_ALL_HEADER), this->m_streamSendDelay)};
         if (states.size() == 0) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
@@ -607,7 +611,7 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
             }
         }
         states.pop_back();
-        if (*(states.end()-1) != std::to_string(state)) {
+        if (*(states.end()-1) != (state ? "1" : "0")) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, std::vector<int>{});
             } else {
@@ -637,7 +641,7 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_DIGITAL_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_DIGITAL_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_DIGITAL_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -677,7 +681,7 @@ std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
@@ -717,7 +721,7 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -757,7 +761,7 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
@@ -797,7 +801,7 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
 {
     std::string stringToSend{static_cast<std::string>(SOFT_ANALOG_READ_HEADER) + ":" + std::to_string(pinNumber) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(SOFT_ANALOG_READ_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -836,7 +840,7 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(voltageToAnalog(pinNumber)) + ":" + std::to_string(state) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0.00);
@@ -876,7 +880,7 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state)
 {
     std::string stringToSend{static_cast<std::string>(ANALOG_WRITE_HEADER) + ":" + std::to_string(pinNumber) + ":" + std::to_string(state) + "}"};
     for (int i = 0; i < this->m_ioTryCount; i++) {
-        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), DEFAULT_IO_STREAM_SEND_DELAY)};
+        std::vector<std::string> states{genericIOTask(stringToSend, static_cast<std::string>(ANALOG_WRITE_HEADER), this->m_streamSendDelay)};
         if (states.size() != IO_STATE_RETURN_SIZE) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
