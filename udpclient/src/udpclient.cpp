@@ -264,3 +264,25 @@ std::string UDPClient::lineEndingToString(LineEnding lineEnding)
         return "";
     }
 }
+
+std::string UDPClient::doUserSelectHostName()
+{
+    return GeneralUtilities::doUserEnterStringParameter("Client Host Name", [](std::string str) -> bool { return true; });
+                                                        //TODO: Add validation for host name
+} 
+
+uint16_t UDPClient::doUserSelectPortNumber()
+{
+    return GeneralUtilities::doUserEnterNumericParameter("Client Port Number",
+                                                         static_cast<std::function<bool(uint16_t)>>(UDPClient::isValidPortNumber),
+                                                         std::numeric_limits<uint16_t>::min()-1,
+                                                         std::numeric_limits<uint16_t>::max());
+}
+
+std::shared_ptr<UDPClient> UDPClient::doUserSelectUDPClient()
+{
+    uint16_t portNumber{UDPClient::doUserSelectPortNumber()};
+    std::string hostName{UDPClient::doUserSelectHostName()};
+    std::shared_ptr<UDPClient> udpClient{std::make_shared<UDPClient>(hostName, portNumber)};
+    return udpClient;
+}

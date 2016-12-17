@@ -281,69 +281,6 @@ private:
     static const char *s_SERIAL_PORT_HELPER_LONG_NAME;
     static const char *s_SERIAL_PORT_HELPER_SHORT_NAME;
 
-    template<typename T, typename TOps>
-    static T doUserSelectParameter(const std::string &name, 
-                                const std::function<T(const std::string &)> &func,
-                                const std::vector<TOps> &availableOptions,
-                                const char *defaultOption);
-
 };
-
-template<typename T, typename TOps>
-T SerialPort::doUserSelectParameter(const std::string &name, 
-                                    const std::function<T(const std::string &)> &func,
-                                    const std::vector<TOps> &availableOptions,
-                                    const char *defaultOption)
-{
-    using namespace GeneralUtilities;
-    std::shared_ptr<PrettyPrinter> prettyPrinter{std::make_shared<PrettyPrinter>()};
-    if (availableOptions.size() == 0) {
-        throw std::runtime_error("No " + name + " are available");
-    } else if (availableOptions.size() == 1) {
-        return func(availableOptions.at(0));
-    }
-    prettyPrinter->setForegroundColor(ForegroundColor::FG_YELLOW);
-    unsigned int quitOption{0};
-    std::cout << "Which " << name << " should be used?" << std::endl;
-    for (unsigned int selectionIndex = 1; selectionIndex <= availableOptions.size(); selectionIndex++) {
-        prettyPrinter->print(toString(selectionIndex) + ".) " + toString(availableOptions.at(selectionIndex-1)));
-        if (static_cast<std::string>(availableOptions.at(selectionIndex-1)) == static_cast<std::string>(defaultOption)) {
-            std::cout << "    ";
-            prettyPrinter->println("<----DEFAULT");
-        } else {
-            prettyPrinter->println("");
-        }
-        quitOption = selectionIndex + 1;
-    }
-    prettyPrinter->println(toString(quitOption) + ".) Quit\n");
-    std::string userOption{""};
-    while (true) {
-        userOption = "";
-        std::cout << "Please select serial port from above options: ";
-        std::getline(std::cin, userOption);
-        if (userOption == "") {
-            return func(defaultOption);
-        }
-        unsigned int userOptionIndex{0};
-        bool userSelectedQuit{false};
-        try {
-            userOptionIndex = std::stoi(userOption);
-            if (userOptionIndex > availableOptions.size()+1) {
-                std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
-                continue;
-            }
-            if (userOptionIndex == quitOption) {
-                userSelectedQuit = true;
-                throw std::invalid_argument("User selected quit option");
-            }
-            return func(availableOptions.at(userOptionIndex-1));
-        } catch (std::exception &e) {
-            if (userSelectedQuit) {
-                throw e;
-            }
-            std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
-        }
-    }
-}
 
 #endif //TJLUTILS_SERIALPORT_H

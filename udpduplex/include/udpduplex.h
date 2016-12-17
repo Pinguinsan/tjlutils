@@ -109,10 +109,20 @@ public:
     static std::string parseLineEnding(LineEnding lineEnding);
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
     static std::string lineEndingToString(LineEnding lineEnding);
+    
+    static UDPObjectType parseUDPObjectTypeFromRaw(const std::string &udpObjectType);
+    static std::string udpObjectTypeToString(UDPObjectType udpObjectType);
+    
     void setLineEnding(LineEnding lineEnding);
     LineEnding lineEnding() const;
 
     UDPObjectType udpObjectType() const;
+
+    static uint16_t doUserSelectClientPortNumber();
+    static std::string doUserSelectClientHostName();
+    static uint16_t doUserSelectServerPortNumber();
+    static UDPObjectType doUserSelectUDPObjectType();
+    static std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex();
     
     static const char *s_DEFAULT_CLIENT_HOST_NAME;
 

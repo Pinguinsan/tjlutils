@@ -1789,7 +1789,7 @@ bool SerialPort::isValidSerialPortName(const std::string &serialPortName)
 
 std::string SerialPort::doUserSelectSerialPortName()
 {
-    return SerialPort::doUserSelectParameter<std::string>(std::string{"serial port"}, 
+    return GeneralUtilities::doUserSelectParameter<std::string>(std::string{"serial port"}, 
                                              [](const std::string &str) -> std::string { return str; },
                                              SerialPort::availableSerialPorts(),
                                              ""); 
@@ -1798,15 +1798,15 @@ std::string SerialPort::doUserSelectSerialPortName()
 BaudRate SerialPort::doUserSelectBaudRate()
 {
     std::function<BaudRate(const std::string &)> tempFunc{static_cast<BaudRate (*)(const std::string &)>(&SerialPort::parseBaudRateFromRaw)};
-    return SerialPort::doUserSelectParameter<BaudRate>(std::string{"baud rate"}, 
-                                             tempFunc,
-                                             SerialPort::availableBaudRates(),
-                                             SerialPort::DEFAULT_BAUD_RATE_STRING.c_str());
+    return GeneralUtilities::doUserSelectParameter<BaudRate>(std::string{"baud rate"}, 
+                                                        tempFunc,
+                                                        SerialPort::availableBaudRates(),
+                                                        SerialPort::DEFAULT_BAUD_RATE_STRING.c_str());
 }
 
 StopBits SerialPort::doUserSelectStopBits()
 {
-    return SerialPort::doUserSelectParameter<StopBits>(std::string{"stop bits"}, 
+    return GeneralUtilities::doUserSelectParameter<StopBits>(std::string{"stop bits"}, 
                                              static_cast<StopBits (*)(const std::string &)>(&SerialPort::parseStopBitsFromRaw),
                                              SerialPort::availableStopBits(),
                                              SerialPort::DEFAULT_STOP_BITS_STRING.c_str());
@@ -1814,7 +1814,7 @@ StopBits SerialPort::doUserSelectStopBits()
 
 DataBits SerialPort::doUserSelectDataBits()
 {
-    return SerialPort::doUserSelectParameter<DataBits>(std::string{"data bits"}, 
+    return GeneralUtilities::doUserSelectParameter<DataBits>(std::string{"data bits"}, 
                                              static_cast<DataBits (*)(const std::string &)>(&SerialPort::parseDataBitsFromRaw),
                                              SerialPort::availableDataBits(),
                                              SerialPort::DEFAULT_DATA_BITS_STRING.c_str());
@@ -1822,7 +1822,7 @@ DataBits SerialPort::doUserSelectDataBits()
 
 Parity SerialPort::doUserSelectParity()
 {
-    return SerialPort::doUserSelectParameter<Parity>(std::string{"parity"}, 
+    return GeneralUtilities::doUserSelectParameter<Parity>(std::string{"parity"}, 
                                              static_cast<Parity (*)(const std::string &)>(&SerialPort::parseParityFromRaw),
                                              SerialPort::availableParity(),
                                              SerialPort::DEFAULT_PARITY_STRING.c_str());
@@ -1830,7 +1830,7 @@ Parity SerialPort::doUserSelectParity()
 
 LineEnding SerialPort::doUserSelectLineEndings()
 {
-    return SerialPort::doUserSelectParameter<LineEnding>(std::string{"line endings"},
+    return GeneralUtilities::doUserSelectParameter<LineEnding>(std::string{"line endings"},
                                              static_cast<LineEnding (*)(const std::string &)>(&SerialPort::parseLineEndingFromRaw),
                                              SerialPort::availableLineEndings(),
                                              SerialPort::DEFAULT_LINE_ENDING_STRING.c_str());

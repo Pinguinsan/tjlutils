@@ -73,6 +73,9 @@ public:
     std::string peek();
     char peekByte();
 
+    static uint16_t doUserSelectPortNumber();
+    static std::shared_ptr<UDPServer> doUserSelectUDPServer();
+
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
 
@@ -97,6 +100,7 @@ private:
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
 
     static constexpr bool isValidPortNumber(int portNumber);
+
 };
 
 #endif //TJLUTILS_UDPSERVER_H

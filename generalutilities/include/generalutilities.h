@@ -583,6 +583,120 @@ namespace GeneralUtilities
         }
         return copyString;
     }
+
+    
+    template <typename T, typename TLow, typename THigh>
+    T doUserEnterNumericParameter(const std::string &name, 
+                                  const std::function<bool(T)> &validator,
+                                  TLow lowLimit,
+                                  THigh highLimit)
+    {
+        using namespace GeneralUtilities;
+        std::string userOption{""};
+        while (true) {
+            userOption = "";
+            std::cout << "Please enter a number to use for " << tQuoted(name) << " between (inclusive) " << lowLimit << " and " << highLimit << ", or press CTRL+C to quit: ";
+            std::getline(std::cin, userOption);
+            if (userOption == "") {
+                continue;
+            }
+            int userEntry{0};
+            try {
+                userEntry = std::stoi(userOption);
+                if (userEntry < lowLimit) {
+                    std::cout << tQuoted(userEntry) << " is less than the minimum value for " << name << " (" << name << " < " << lowLimit << std::endl;
+                    continue;
+                } else if (userEntry > highLimit) {
+                    std::cout << tQuoted(userEntry) << " is greater than the maximum value for " << name << " (" << name << " > " << highLimit << std::endl;
+                    continue;
+                } else if (!validator(userEntry)) {
+                    std::cout << tQuoted(userEntry) << " is an invalid " << name << std::endl;
+                    continue;
+                }
+                return userEntry;
+            } catch (std::exception &e) {
+                std::cout << tQuoted(userOption) << " is not a number" << std::endl;
+            }
+        }
+    }
+
+    std::string doUserEnterStringParameter(const std::string &name, const std::function<bool(std::string)> &validator)
+    {
+        using namespace GeneralUtilities;
+        std::string userOption{""};
+        while (true) {
+            userOption = "";
+            std::cout << "Please enter a string to use for " << tQuoted(name) << ", or press CTRL+C to quit: ";
+            std::getline(std::cin, userOption);
+            if (userOption == "") {
+                continue;
+            }
+            try {
+                if (!validator(userOption)) {
+                    std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+                    continue;
+                }
+                return userOption;
+            } catch (std::exception &e) {
+                std::cout << tQuoted(userOption) << " is an invalid " << name << std::endl;
+            }
+        }
+    }
+
+    template<typename T, typename TOps>
+    T doUserSelectParameter(const std::string &name, 
+                            const std::function<T(const std::string &)> &func,
+                            const std::vector<TOps> &availableOptions,
+                            const char *defaultOption)
+    {
+        using namespace GeneralUtilities;
+        if (availableOptions.size() == 0) {
+            throw std::runtime_error("No " + name + " are available");
+        } else if (availableOptions.size() == 1) {
+            return func(availableOptions.at(0));
+        }
+        unsigned int quitOption{0};
+        std::cout << "Which " << name << " should be used?" << std::endl;
+        for (unsigned int selectionIndex = 1; selectionIndex <= availableOptions.size(); selectionIndex++) {
+            std::cout << selectionIndex << ".) " << availableOptions.at(selectionIndex-1);
+            if (static_cast<std::string>(availableOptions.at(selectionIndex-1)) == static_cast<std::string>(defaultOption)) {
+                std::cout << "    <----DEFAULT" << std::endl;
+            } else {
+                std::cout << std::endl;
+            }
+            quitOption = selectionIndex + 1;
+        }
+        std::cout << quitOption << ".) Quit" << std::endl << std::endl;
+        std::string userOption{""};
+        while (true) {
+            userOption = "";
+            std::cout << "Please select " << name << " from the above options" << std::endl;
+            std::getline(std::cin, userOption);
+            if (userOption == "") {
+                return func(defaultOption);
+            }
+            unsigned int userOptionIndex{0};
+            bool userSelectedQuit{false};
+            try {
+                userOptionIndex = std::stoi(userOption);
+                if (userOptionIndex > availableOptions.size()+1) {
+                    std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+                    continue;
+                }
+                if (userOptionIndex == quitOption) {
+                    userSelectedQuit = true;
+                    throw std::invalid_argument("User selected quit option");
+                }
+                return func(availableOptions.at(userOptionIndex-1));
+            } catch (std::exception &e) {
+                if (userSelectedQuit) {
+                    throw e;
+                }
+                std::cout << tQuoted(userOption) << " wasn't one of the selections, please enter a number between (inclusive) 1 and " << quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+            }
+        }
+    }
+
 }
 
 #if defined(__ANDROID__)

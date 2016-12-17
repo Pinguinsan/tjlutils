@@ -433,3 +433,88 @@ std::string UDPDuplex::lineEndingToString(LineEnding lineEnding)
 {
     return UDPClient::lineEndingToString(lineEnding);
 }
+
+uint16_t UDPDuplex::doUserSelectClientPortNumber()
+{
+    return UDPClient::doUserSelectPortNumber();
+}
+
+std::string UDPDuplex::doUserSelectClientHostName()
+{
+    return UDPClient::doUserSelectHostName();
+}
+
+uint16_t UDPDuplex::doUserSelectServerPortNumber()
+{
+    return UDPServer::doUserSelectPortNumber();
+}
+
+UDPObjectType UDPDuplex::doUserSelectUDPObjectType()
+{
+    std::vector<std::string> udpObjectTypeChoices{UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_DUPLEX),
+                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_SERVER),
+                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_CLIENT)};
+    return GeneralUtilities::doUserSelectParameter("UDP Object Type",
+                                                    static_cast< std::function<UDPObjectType(const std::string &)> >(UDPDuplex::parseUDPObjectTypeFromRaw),
+                                                    udpObjectTypeChoices,
+                                                    UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_DUPLEX).c_str());
+
+}
+
+std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex()
+{
+    std::shared_ptr<UDPDuplex> udpDuplex{nullptr};
+    UDPObjectType udpObjectType{UDPDuplex::doUserSelectUDPObjectType()};
+    if (udpObjectType == UDPObjectType::UDP_DUPLEX) {
+        std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
+        uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
+        uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
+        udpDuplex = std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, udpObjectType);
+    } else if (udpObjectType == UDPObjectType::UDP_SERVER) {
+        uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
+        udpDuplex = std::make_shared<UDPDuplex>(serverPortNumber, udpObjectType);
+    } else if (udpObjectType == UDPObjectType::UDP_CLIENT) {
+        std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
+        uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
+        udpDuplex = std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, udpObjectType);
+    } else {
+        throw std::runtime_error("Unknown UDPObjectType passed to UDPDuplex::doUserSelectUDPDuplex()");
+    }
+    return udpDuplex;
+    
+}
+
+UDPObjectType UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &udpObjectType)
+{
+    using namespace GeneralUtilities;
+    std::string copyString{udpObjectType};
+    std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
+    std::string secondCopy{""};
+    for (auto &it : copyString) {
+        if (it != ' ') {
+            secondCopy += it;
+        }
+    }
+    if (secondCopy == "udpduplex") {
+        return UDPObjectType::UDP_DUPLEX;
+    } else if (secondCopy == "udpserver") {
+        return UDPObjectType::UDP_SERVER;
+    } else if (secondCopy == "udpclient") {
+        return UDPObjectType::UDP_CLIENT;
+    } else {
+        throw std::runtime_error("Could not parse UDPObjectType in UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &): unknown identifier " + tQuoted(udpObjectType));
+    }
+}
+
+std::string UDPDuplex::udpObjectTypeToString(UDPObjectType udpObjectType)
+{
+    if (udpObjectType == UDPObjectType::UDP_DUPLEX) {
+        return "UDP Duplex";
+    } else if (udpObjectType == UDPObjectType::UDP_SERVER) {
+        return "UDP Server";
+    } else if (udpObjectType == UDPObjectType::UDP_CLIENT) {
+        return "UDP Client";
+    } else {
+        throw std::runtime_error("Unknown UDPObjectType passed to UDPDuplex::udpObjectTypeToString(UDPObjectType)");
+    }
+}

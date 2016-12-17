@@ -291,3 +291,18 @@ void UDPServer::putBack(const std::string &str)
         this->m_messageQueue.push_front(*it);
     }
 }
+
+uint16_t UDPServer::doUserSelectPortNumber()
+{
+    return GeneralUtilities::doUserEnterNumericParameter("Server Port Number",
+                                                         static_cast<std::function<bool(uint16_t)>>(UDPServer::isValidPortNumber),
+                                                         std::numeric_limits<uint16_t>::min()+1,
+                                                         std::numeric_limits<uint16_t>::max());
+}
+
+std::shared_ptr<UDPServer> UDPServer::doUserSelectUDPServer()
+{
+    uint16_t portNumber{UDPServer::doUserSelectPortNumber()};
+    std::shared_ptr<UDPServer> udpServer{std::make_shared<UDPServer>(portNumber)};
+    return udpServer;
+}

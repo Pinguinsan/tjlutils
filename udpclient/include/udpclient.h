@@ -71,6 +71,10 @@ public:
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
     static const constexpr unsigned int s_SEND_RETRY_COUNT{3};
 
+    static uint16_t doUserSelectPortNumber();
+    static std::string doUserSelectHostName();
+    static std::shared_ptr<UDPClient> doUserSelectUDPClient();
+    
 
     static std::string parseLineEnding(LineEnding lineEnding);
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
