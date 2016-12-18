@@ -140,7 +140,7 @@ void UDPClient::initialize()
     using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
     this->m_listenAddress.sin_family = AF_INET;
-    if (bind(this->m_udpSocketIndex, (sockaddr*)&this->m_listenAddress, sizeof(this->m_listenAddress)) != 0) {
+    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_listenAddress), sizeof(this->m_listenAddress)) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
     }
 
@@ -190,7 +190,7 @@ ssize_t UDPClient::writeString(const std::string &str)
                             copyString.c_str(), 
                             strlen(copyString.c_str()),
                             MSG_DONTWAIT,
-                            (sockaddr*)&this->m_destinationAddress,
+                            reinterpret_cast<sockaddr*>(&this->m_destinationAddress),
                             sizeof(this->m_destinationAddress)) };
         if ((bytesWritten != -1) && (errno != EAGAIN) && (errno != EWOULDBLOCK))  {
             this->initialize();

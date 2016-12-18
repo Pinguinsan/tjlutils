@@ -109,7 +109,7 @@ void UDPServer::initialize()
     this->m_socketAddress.sin_port = htons(this->m_portNumber);
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(this->m_setSocketResult, (sockaddr *)&this->m_socketAddress, sizeof(sockaddr)) == -1) {
+    if (bind(this->m_setSocketResult, reinterpret_cast<sockaddr *>(&this->m_socketAddress), sizeof(sockaddr)) == -1) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 }
@@ -149,12 +149,12 @@ void UDPServer::staticAsyncUdpServer()
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
         unsigned int socketSize{sizeof(sockaddr)};
-        ssize_t returnValue{recvfrom(this->m_setSocketResult,
+        ssize_t returnValue = recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
                             0,
-                            (sockaddr *)&receivedAddress,
-                            &socketSize)};
+                            reinterpret_cast<sockaddr *>(&receivedAddress),
+                            &socketSize);
         if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
             continue;
         }
