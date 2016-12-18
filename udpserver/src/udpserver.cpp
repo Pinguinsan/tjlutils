@@ -52,14 +52,16 @@ bool constexpr UDPServer::isValidPortNumber(int portNumber)
 
 void UDPServer::setPortNumber(uint16_t portNumber)
 {
-    if (!this->isValidPortNumber(this->m_portNumber)) {
+    if (!this->isValidPortNumber(portNumber)) {
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<uint16_t>::max())
                                  + "("
-                                 + std::to_string(this->m_portNumber)
+                                 + std::to_string(portNumber)
                                  + ")");
     }
-    this->initialize();}
+    this->m_portNumber = portNumber;
+    this->initialize();
+}
 
 void UDPServer::setTimeout(unsigned int timeout)
 {

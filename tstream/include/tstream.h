@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <string>
+#include <prettyprinter.h>
 
 enum class LineEnding {
     LE_None,
@@ -88,6 +89,16 @@ public:
     virtual std::string readStringUntil(char until) = 0;
 
     static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
+
+    static const BackgroundColor COMMON_BACKGROUND_COLOR{BackgroundColor::BG_DEFAULT};
+    static const int COMMON_FONT_ATTRIBUTE{(FontAttribute::FA_BOLD | FontAttribute::FA_UNDERLINED)};
+    static const ForegroundColor TX_COLOR{ForegroundColor::FG_BLUE};
+    static const ForegroundColor RX_COLOR{ForegroundColor::FG_RED};
+    static const ForegroundColor DELAY_COLOR{ForegroundColor::FG_GREEN};
+    static const ForegroundColor FLUSH_COLOR{ForegroundColor::FG_DARK_GRAY};
+    static const ForegroundColor LOOP_COLOR{ForegroundColor::FG_CYAN};
+    static const ForegroundColor LIST_COLOR{ForegroundColor::FG_YELLOW};
+
 };
 
 #endif

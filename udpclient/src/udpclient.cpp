@@ -73,9 +73,10 @@ void UDPClient::setPortNumber(uint16_t portNumber)
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
-                                 + std::to_string(this->m_portNumber) 
+                                 + std::to_string(portNumber) 
                                  + ")");
     }
+    this->m_portNumber = portNumber;
     this->initialize();
 }
 
@@ -97,8 +98,8 @@ void UDPClient::setTimeout(unsigned int timeout)
 void UDPClient::setHostName(const std::string &hostName)
 {
     using namespace GeneralUtilities;
-    if (resolveAddressHelper (this->m_hostName, AF_INET, std::to_string(this->m_portNumber), &this->m_destinationAddress) != 0) {
-       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->m_hostName));
+    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->m_portNumber), &this->m_destinationAddress) != 0) {
+       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     this->m_hostName = hostName;
     this->initialize();
