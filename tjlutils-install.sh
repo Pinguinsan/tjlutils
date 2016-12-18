@@ -239,6 +239,10 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/udpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tstream.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tstreamexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tstreamreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tstreamstrings.h" || { echo "Could not remove file, bailing out"; exit 1;}
 
     if [[ -z "$cygwinCheck" ]]; then
         suRemoveFile "$ul/libtjlutils.so" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -292,6 +296,11 @@ else
     suLinkFile "$sourceDir/udpclient/include/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/common/tjlutils.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/include/tstreamstrings.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed,, bailing out"; exit 1;}

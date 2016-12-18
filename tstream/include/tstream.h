@@ -1,5 +1,5 @@
 /***********************************************************************
-*    tsream.h:                                                         *
+*    tstream.h:                                                        *
 *    TStream, abstract base class for simple read and write operations *
 *    Copyright (c) 2016 Tyler Lewis                                    *
 ************************************************************************
@@ -9,7 +9,7 @@
 *    but may also be distributed as a standalone file                  *
 *    The source code is released under the GNU LGPL                    *
 *    This file holds the declarations of an abstract base class TSream *
-*    It includes very basic IO operations like read and write          *        
+*    It includes very basic IO operations like read and write          *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
 *    Public license along with libraryprojects                         *
@@ -28,6 +28,30 @@ enum class LineEnding {
     LE_LineFeed,
     LE_CarriageReturnLineFeed
 };
+
+
+enum class TStreamCommandType { DELAY_SECONDS, DELAY_MILLISECONDS, DELAY_MICROSECONDS, WRITE, READ, FLUSH_RX, FLUSH_TX, FLUSH_RX_TX, LOOP_START, LOOP_END, COMMAND_UNSPECIFIED };
+enum class DelayType { SECONDS, MILLISECONDS, MICROSECONDS };
+enum class FlushType { RX, TX, RX_TX };
+enum class LoopType { START, END };
+
+class TStreamCommand
+{
+public:
+    TStreamCommand(TStreamCommandType commandType, const std::string &commandArgument) :
+        m_commandType{commandType},
+        m_commandArgument{commandArgument} { }
+    
+    TStreamCommandType commandType() const { return this->m_commandType; }
+    std::string commandArgument() const { return this->m_commandArgument; }
+    void setCommandType(const TStreamCommandType &commandType) { this->m_commandType = commandType; }
+    void setCommandArgument(const std::string &commandArgument) { this->m_commandArgument = commandArgument; }
+
+private:
+    TStreamCommandType m_commandType;
+    std::string m_commandArgument;
+};
+
 
 class TStream
 {
