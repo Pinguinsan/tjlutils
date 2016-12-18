@@ -31,7 +31,8 @@ function cleanUp() {
 
 ui="/usr/include"
 ul="/usr/lib"
-sourceDir="$(pwd)"
+olt="/opt/LibraryBuilds/tjlutils"
+sourceDir="/opt/GitHub/tjlutils"
 buildDir="/opt/LibraryBuilds/tjlutils"
 ub="/usr/bin"
 
@@ -292,7 +293,7 @@ else
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/common/tjlutils.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     
-    changeDirectory "$buildDir" || { echo "Could not enter build build directory, bailing out"; exit 1;}
+    changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed,, bailing out"; exit 1;}
     runMake || { echo "Make failed, bailing out"; exit 1;}
 
