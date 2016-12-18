@@ -33,10 +33,32 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 
 #include <generalutilities.h>
 #include <eventtimer.h>
 #include <tstream.h>
+
+class UDPDatagram
+{
+public:
+    UDPDatagram(sockaddr_in socketAddress, const std::string &message) :
+        m_socketAddress{socketAddress},
+        m_message{message} { }
+
+    UDPDatagram() :
+        m_socketAddress{sockaddr_in{}},
+        m_message{""} { }
+
+    uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
+    std::string hostName() const { return inet_ntoa(this->m_socketAddress.sin_addr); }
+    std::string message() const { return this->m_message; }
+    sockaddr_in socketAddress () const { return this->m_socketAddress; }
+
+private:
+    sockaddr_in m_socketAddress;
+    std::string m_message;
+};
 
 class UDPServer
 {
@@ -45,6 +67,7 @@ public:
     UDPServer(uint16_t port);
 
     char readByte();
+    UDPDatagram readDatagram();
     std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const std::string &until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const char *until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
@@ -69,9 +92,11 @@ public:
     void putBack(const std::string &str);
     void putBack(const char *str);
     void putBack(char back);
+    void putBack(const UDPDatagram &datagram);
 
     std::string peek();
     char peekByte();
+    UDPDatagram peekDatagram();
 
     static uint16_t doUserSelectPortNumber();
     static std::shared_ptr<UDPServer> doUserSelectUDPServer();
@@ -81,13 +106,12 @@ public:
 
 private:
     sockaddr_in m_socketAddress;
-    sockaddr_in m_receivingSocketAddress;
     uint16_t m_portNumber;
     uint16_t m_broadcast;
     int m_setSocketResult;
     bool m_isListening;
     unsigned int m_timeout;
-    std::deque<char> m_messageQueue;
+    std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
     std::future<void> m_asyncFuture;

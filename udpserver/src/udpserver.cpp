@@ -27,11 +27,11 @@ UDPServer::UDPServer() :
 UDPServer::UDPServer(uint16_t portNumber) :
     m_portNumber{portNumber},
     m_socketAddress{},
-    m_receivingSocketAddress{},
     m_broadcast{UDPServer::s_BROADCAST},
     m_isListening{false},
     m_setSocketResult{0},
     m_timeout{UDPServer::s_DEFAULT_TIMEOUT},
+    m_datagramQueue{},
     m_shutEmDown{false}
 {
     if (!this->isValidPortNumber(this->m_portNumber)) {
@@ -80,7 +80,7 @@ uint16_t UDPServer::portNumber() const
 void UDPServer::flushRXTX()
 {
     std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
-    this->m_messageQueue.clear();
+    this->m_datagramQueue.clear();
 }
 
 void UDPServer::flushRX()
@@ -135,7 +135,7 @@ bool UDPServer::isListening() const
 
 unsigned int UDPServer::available() const
 {
-    return this->m_messageQueue.size();
+    return this->m_datagramQueue.size();
 }
 
 void UDPServer::staticAsyncUdpServer()
@@ -145,12 +145,13 @@ void UDPServer::staticAsyncUdpServer()
         char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
         memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
+        sockaddr_in receivedAddress{};
         unsigned int socketSize{sizeof(sockaddr)};
         ssize_t returnValue{recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
                             0,
-                            (sockaddr *)&this->m_receivingSocketAddress,
+                            (sockaddr *)&receivedAddress,
                             &socketSize)};
         if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
             continue;
@@ -158,12 +159,7 @@ void UDPServer::staticAsyncUdpServer()
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
             ioMutexLock.lock();
-            for (auto it : receivedString) {
-                if (this->m_messageQueue.size() >= UDPServer::s_MAXIMUM_BUFFER_SIZE) {
-                    this->m_messageQueue.pop_front();
-                }
-                this->m_messageQueue.push_back(it);
-            }
+            this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
             ioMutexLock.unlock();
 
         }
@@ -173,52 +169,74 @@ void UDPServer::staticAsyncUdpServer()
 std::string UDPServer::peek()
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    std::string returnString{""};
-    for (auto &it : this->m_messageQueue) {
-        returnString += it;
+    if (this->m_datagramQueue.size() == 0) {
+        return "";
+    } else {
+        return this->m_datagramQueue.front().message();
     }
-    return returnString;
+}
+
+
+UDPDatagram UDPServer::peekDatagram()
+{
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    if (this->m_datagramQueue.size() == 0) {
+        return UDPDatagram{};
+    } else {
+        return this->m_datagramQueue.front();
+    }
 }
 
 char UDPServer::peekByte()
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    return this->m_messageQueue.front();
+    if (this->m_datagramQueue.size() == 0) {
+        return 0;
+    } else {
+        if (this->m_datagramQueue.front().message().size() == 0) {
+            return 0;
+        } else {
+            return this->m_datagramQueue.front().message().at(0);
+        }
+    }
 }
 
 char UDPServer::readByte()
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_messageQueue.size() == 0) {
+    std::string str{this->m_datagramQueue.front().message()};
+    if (str.length() == 0) {
         return 0;
+    } 
+    char charToReturn{str.at(0)};
+    std::string newDatagramMessage{str.substr(1)};
+    sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};
+    this->m_datagramQueue.pop_front();
+    this->m_datagramQueue.emplace_front(newDatagramAddress, newDatagramMessage);
+    return charToReturn;
+
+}
+
+UDPDatagram UDPServer::readDatagram()
+{
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    if (this->m_datagramQueue.size() == 0) {
+        return UDPDatagram{};
     } else {
-        char returnChar{this->m_messageQueue.front()};
-        this->m_messageQueue.pop_front();
-        return returnChar;
+        UDPDatagram returnDatagram{this->m_datagramQueue.front()};
+        this->m_datagramQueue.pop_front();
+        return returnDatagram;
     }
 }
 
 std::string UDPServer::readString(int maximumReadSize)
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_messageQueue.size() == 0) {
+    if (this->m_datagramQueue.size() == 0) {
         return "";
     }
-    std::string stringToReturn{""};
-    if (maximumReadSize < 0) {
-        for (auto it : this->m_messageQueue) {
-            stringToReturn += it;
-        }
-    } else {
-        int readCount{0};
-        for (auto &it : this->m_messageQueue) {
-            stringToReturn += it;
-            if (readCount++ > maximumReadSize) {
-                break;
-            }
-        }
-    }
-    this->m_messageQueue.clear();
+    std::string stringToReturn{this->m_datagramQueue.front().message()};
+    this->m_datagramQueue.pop_front();
     return stringToReturn;
 }
 
@@ -249,6 +267,7 @@ std::string UDPServer::readStringUntil(const char *until, int maximumReadSize)
 
 std::string UDPServer::readStringUntil(const std::string &until, int maximumReadSize)
 {
+
     using namespace GeneralUtilities;
     std::string returnString{""};
     EventTimer eventTimer;
@@ -271,6 +290,12 @@ std::string UDPServer::readStringUntil(const std::string &until, int maximumRead
     return returnString;
 }
 
+void UDPServer::putBack(const UDPDatagram &datagram)
+{
+    std::lock_guard<std::mutex> ioMutex{this->m_ioMutex};
+    this->m_datagramQueue.push_front(datagram);
+}
+
 void UDPServer::putBack(char back)
 {
     return UDPServer::putBack(std::string{1, back});
@@ -287,9 +312,10 @@ void UDPServer::putBack(const std::string &str)
         return;
     } 
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    for (auto it = str.rbegin(); it != str.rend(); it++) {
-        this->m_messageQueue.push_front(*it);
-    }
+    std::string newDatagramMessage{str + this->m_datagramQueue.front().message()};
+    sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};
+    this->m_datagramQueue.pop_front();
+    this->m_datagramQueue.emplace_front(newDatagramAddress, newDatagramMessage);
 }
 
 uint16_t UDPServer::doUserSelectPortNumber()

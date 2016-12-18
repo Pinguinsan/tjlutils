@@ -302,6 +302,15 @@ ssize_t UDPDuplex::writeString(const std::string &str)
     }
 }
 
+UDPDatagram UDPDuplex::readDatagram()
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        return this->m_udpServer->readDatagram();
+    } else {
+        return UDPDatagram{};
+    }    
+}
+
 char UDPDuplex::readByte()
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
@@ -347,6 +356,13 @@ std::string UDPDuplex::readStringUntil(char until)
     }
 }
 
+void UDPDuplex::putBack(const UDPDatagram &datagram)
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        return this->m_udpServer->putBack(datagram);
+    }
+}
+
 void UDPDuplex::putBack(const std::string &str)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
@@ -374,6 +390,15 @@ std::string UDPDuplex::peek()
         return this->m_udpServer->peek();
     } else {
         return "";
+    }
+}
+
+UDPDatagram UDPDuplex::peekDatagram()
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        return this->m_udpServer->peekDatagram();
+    } else {
+        return UDPDatagram{};
     }
 }
 

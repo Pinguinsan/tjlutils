@@ -73,6 +73,7 @@ public:
 
     /*Host/Server*/
     char readByte();
+    UDPDatagram readDatagram();
     std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const std::string &until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const char *until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
@@ -81,10 +82,12 @@ public:
     void startListening();
     void stopListening();
     bool isListening() const;
+    void putBack(const UDPDatagram &datagram);
     void putBack(const std::string &str);
     void putBack(const char *str);
     void putBack(char back);
 
+    UDPDatagram peekDatagram();
     std::string peek();
     char peekByte();
 
