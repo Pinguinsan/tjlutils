@@ -34,15 +34,14 @@
 #include <tstream.h>
 #include <tstreamstrings.h>
 
-
-
 class TScriptReader
 {
 public:
     TScriptReader(const std::string &scriptFilePath);
+    std::string scriptFilePath() const;
     std::shared_ptr<std::vector<TStreamCommand>> commands() const;
 private:
-    std::string m_tScriptFilePath;
+    std::string m_scriptFilePath;
     std::shared_ptr<std::vector<TStreamCommand>> m_commands;
 
 };

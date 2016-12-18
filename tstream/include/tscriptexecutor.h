@@ -38,7 +38,9 @@ class TScriptExecutor
 public:
     TScriptExecutor(const std::string &scriptFilePath);
     void setScriptFilePath(const std::string &scriptFilePath);
-    std::shared_ptr<TScriptReader> tScriptReader() const;
+    std::string scriptFilePath() const;
+    bool hasCommands() const;
+    size_t numberOfCommands() const;
     void execute(std::shared_ptr<TStream> ioStream, 
                  const std::function<void(const std::string &)> &printRxResult, 
                  const std::function<void(const std::string &)> &printTxResult,

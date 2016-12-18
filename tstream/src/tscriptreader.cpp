@@ -19,20 +19,20 @@
 
 #include "tscriptreader.h"
 
-TScriptReader::TScriptReader(const std::string &tScriptFilePath) :
-    m_tScriptFilePath{tScriptFilePath},
+TScriptReader::TScriptReader(const std::string &scriptFilePath) :
+    m_scriptFilePath{scriptFilePath},
     m_commands{std::make_shared<std::vector<TStreamCommand>>()}
 {
     using namespace FileUtilities;
     using namespace GeneralUtilities;
     using namespace MathUtilities;
     using namespace TStreamStrings;
-    if (!fileExists(this->m_tScriptFilePath)) {
-        throw std::runtime_error(SCRIPT_FILE_DOES_NOT_EXISTS_STRING + tQuoted(this->m_tScriptFilePath));
+    if (!fileExists(this->m_scriptFilePath)) {
+        throw std::runtime_error(SCRIPT_FILE_DOES_NOT_EXISTS_STRING + tQuoted(this->m_scriptFilePath));
     }
     std::vector<std::string> buffer;
     std::ifstream readFromFile;
-    readFromFile.open(this->m_tScriptFilePath);
+    readFromFile.open(this->m_scriptFilePath);
     if (readFromFile.is_open()) {
         std::string tempString{""};
         while (std::getline(readFromFile, tempString)) {
@@ -40,7 +40,7 @@ TScriptReader::TScriptReader(const std::string &tScriptFilePath) :
         }
         readFromFile.close();
     } else {
-        throw std::runtime_error(UNABLE_TO_OPEN_SCRIPT_FILE_STRING + tQuoted(this->m_tScriptFilePath));
+        throw std::runtime_error(UNABLE_TO_OPEN_SCRIPT_FILE_STRING + tQuoted(this->m_scriptFilePath));
     }
     buffer = trimWhitespace(buffer);
     int loops{0};
@@ -222,6 +222,11 @@ TScriptReader::TScriptReader(const std::string &tScriptFilePath) :
         this->m_commands->clear();
         return; 
     }
+}
+
+std::string TScriptReader::scriptFilePath() const
+{
+    return this->m_scriptFilePath;
 }
 
 std::shared_ptr<std::vector<TStreamCommand>> TScriptReader::commands() const

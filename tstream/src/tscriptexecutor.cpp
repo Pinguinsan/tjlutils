@@ -24,15 +24,25 @@ TScriptExecutor::TScriptExecutor(const std::string &tScriptFilePath) :
 
 }
 
+std::string TScriptExecutor::scriptFilePath() const
+{
+    return this->m_tScriptReader->scriptFilePath();
+}
+
+bool TScriptExecutor::hasCommands() const
+{
+    return (this->m_tScriptReader->commands()->size() > 0);
+}
+
+size_t TScriptExecutor::numberOfCommands() const
+{
+    return this->m_tScriptReader->commands()->size();
+}
+
 void TScriptExecutor::setScriptFilePath(const std::string &tScriptFilePath)
 {
     this->m_tScriptReader.reset();
     this->m_tScriptReader = std::make_shared<TScriptReader>(tScriptFilePath);
-}
-
-std::shared_ptr<TScriptReader> TScriptExecutor::tScriptReader() const
-{
-    return this->m_tScriptReader;
 }
 
 void TScriptExecutor::execute(std::shared_ptr<TStream> ioStream, 
