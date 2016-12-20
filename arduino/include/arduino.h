@@ -496,25 +496,25 @@ int parseAnalogPin(ArduinoType arduinoType, const std::string &pinAlias)
         }
 
     } else if (arduinoType == ArduinoType::NANO) {
-    if ((pinAlias == NANO_A0_STRING) || (pinAlias == NANO_A0_EQUIVALENT_STRING)) {
-        return 14;
-    } else if ((pinAlias == NANO_A1_STRING) || (pinAlias == NANO_A1_EQUIVALENT_STRING)) {
-        return 15;
-    } else if ((pinAlias == NANO_A2_STRING) || (pinAlias == NANO_A2_EQUIVALENT_STRING)) {
-        return 16;
-    } else if ((pinAlias == NANO_A3_STRING) || (pinAlias == NANO_A3_EQUIVALENT_STRING)) {
-        return 17;
-    } else if ((pinAlias == NANO_A4_STRING) || (pinAlias == NANO_A4_EQUIVALENT_STRING)) {
-        return 18;
-    } else if ((pinAlias == NANO_A5_STRING) || (pinAlias == NANO_A5_EQUIVALENT_STRING)) {
-        return 19;
-    } else if ((pinAlias == NANO_A6_STRING) || (pinAlias == NANO_A6_EQUIVALENT_STRING)) {
-        return 20;
-    } else if ((pinAlias == NANO_A7_STRING) || (pinAlias == NANO_A7_EQUIVALENT_STRING)) {
-        return 21;
-    } else {
-        throw std::logic_error(INVALID_ANALOG_PIN_BASE_STRING + pinAlias + INVALID_ANALOG_PIN_TO_INT_TAIL_STRING);
-    }
+        if ((pinAlias == NANO_A0_STRING) || (pinAlias == NANO_A0_EQUIVALENT_STRING)) {
+            return 14;
+        } else if ((pinAlias == NANO_A1_STRING) || (pinAlias == NANO_A1_EQUIVALENT_STRING)) {
+            return 15;
+        } else if ((pinAlias == NANO_A2_STRING) || (pinAlias == NANO_A2_EQUIVALENT_STRING)) {
+            return 16;
+        } else if ((pinAlias == NANO_A3_STRING) || (pinAlias == NANO_A3_EQUIVALENT_STRING)) {
+            return 17;
+        } else if ((pinAlias == NANO_A4_STRING) || (pinAlias == NANO_A4_EQUIVALENT_STRING)) {
+            return 18;
+        } else if ((pinAlias == NANO_A5_STRING) || (pinAlias == NANO_A5_EQUIVALENT_STRING)) {
+            return 19;
+        } else if ((pinAlias == NANO_A6_STRING) || (pinAlias == NANO_A6_EQUIVALENT_STRING)) {
+            return 20;
+        } else if ((pinAlias == NANO_A7_STRING) || (pinAlias == NANO_A7_EQUIVALENT_STRING)) {
+            return 21;
+        } else {
+            throw std::logic_error(INVALID_ANALOG_PIN_BASE_STRING + pinAlias + INVALID_ANALOG_PIN_TO_INT_TAIL_STRING);
+        }
     } else if (arduinoType == ArduinoType::MEGA) {
         if ((pinAlias == MEGA_A0_STRING) || (pinAlias == MEGA_A0_EQUIVALENT_STRING)) {
             return 54;

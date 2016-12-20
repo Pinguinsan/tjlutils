@@ -22,6 +22,83 @@
 
 namespace GeneralUtilities
 {
+    float decStringToFloat(const std::string &str)
+    {
+        std::string copyString{""};
+        for (auto &it : str) {
+            if ((it != '0') && (it != '.')) {
+                copyString += it;
+            }
+        }
+        if (copyString.length() == 0) {
+            return 0;
+        }
+        auto returnValue = atof(str.c_str());
+        if (returnValue == 0) {
+            throw std::invalid_argument("stof: invalid string " + str);
+        }
+        return returnValue;
+    }
+
+    double decStringToDouble(const std::string &str)
+    {
+        return GeneralUtilities::decStringToFloat(str);
+    }
+
+    int decStringToInt(const std::string &str)
+    {
+        std::string copyString{""};
+        for (auto &it : str) {
+            if (it != '0') {
+                copyString += it;
+            }
+        }
+        if (copyString.length() == 0) {
+            return 0;
+        }
+        auto returnValue = atoi(str.c_str());
+        if (returnValue == 0) {
+            throw std::invalid_argument("stoi: invalid string " + str);
+        }
+        return returnValue;
+    }
+
+    long int decStringToLong(const std::string &str)
+    {
+        std::string copyString{""};
+        for (auto &it : str) {
+            if (it != '0') {
+                copyString += it;
+            }
+        }
+        if (copyString.length() == 0) {
+            return 0;
+        }
+        auto returnValue = atoi(str.c_str());
+        if (returnValue == 0) {
+            throw std::invalid_argument("stol: invalid string " + str);
+        }
+        return returnValue;
+    }
+
+    long long int decStringToLongLong(const std::string &str)
+    {
+        std::string copyString{""};
+        for (auto &it : str) {
+            if (it != '0') {
+                copyString += it;
+            }
+        }
+        if (copyString.length() == 0) {
+            return 0;
+        }
+        auto returnValue = atoi(str.c_str());
+        if (returnValue == 0) {
+            throw std::invalid_argument("stoll: invalid string " + str);
+        }
+        return returnValue;
+    }
+
     std::string toBinaryString(int number)
     {
         if (number == 0) {
