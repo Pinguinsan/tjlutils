@@ -118,9 +118,16 @@ void UDPServer::startListening()
 {
     if (!this->m_isListening) {
         this->m_isListening = true;
+#if defined(__ANDROID__)
+        if (this->m_asyncFuture) {
+            delete this->m_asyncFuture;
+        }
+        this->m_asyncFuture = new std::thread{&UDPServer::staticAsyncUdpServer, this};
+#else
         this->m_asyncFuture = std::async(std::launch::async,
                                          &UDPServer::staticAsyncUdpServer,
                                          this);
+#endif
     }
 }
 
@@ -148,14 +155,18 @@ void UDPServer::staticAsyncUdpServer()
         memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
-        unsigned int socketSize{sizeof(sockaddr)};
+#if defined(__ANDROID__)
+        socklen_t socketSize{sizeof(sockaddr)};
+#else
+        unsigned int socketSize = sizeof(sockaddr);
+#endif
         ssize_t returnValue = recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
                             0,
                             reinterpret_cast<sockaddr *>(&receivedAddress),
                             &socketSize);
-        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) { 
+        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
             continue;
         }
         receivedString = std::string{lowLevelReceiveBuffer};
@@ -209,7 +220,7 @@ char UDPServer::readByte()
     std::string str{this->m_datagramQueue.front().message()};
     if (str.length() == 0) {
         return 0;
-    } 
+    }
     char charToReturn{str.at(0)};
     std::string newDatagramMessage{str.substr(1)};
     sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};
@@ -309,10 +320,10 @@ void UDPServer::putBack(const char *str)
 }
 
 void UDPServer::putBack(const std::string &str)
-{   
+{
     if (str.length() == 0) {
         return;
-    } 
+    }
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     std::string newDatagramMessage{str + this->m_datagramQueue.front().message()};
     sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};

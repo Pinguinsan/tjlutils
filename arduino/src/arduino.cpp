@@ -228,7 +228,7 @@ std::pair<IOStatus, bool> Arduino::canCapability()
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, (std::stoi(states.at(CanEnabledStatus::CAN_RETURN_STATE)) == 1));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, (GeneralUtilities::decStringToInt(states.at(CanEnabledStatus::CAN_RETURN_STATE)) == 1));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -261,7 +261,7 @@ std::pair<IOStatus, int> Arduino::analogToDigitalThreshold()
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -304,13 +304,13 @@ IOReport Arduino::ioReportRequest()
             }
             IOType ioType{parseIOTypeFromString(states.at(IOReportEnum::IO_TYPE))};
             if ((ioType == IOType::DIGITAL_INPUT) || (ioType == IOType::DIGITAL_INPUT_PULLUP)) {
-                ioReport.addDigitalInputResult(std::make_pair(std::stoi(states.at(IOReportEnum::IO_PIN_NUMBER)), std::stoi(states.at(IOReportEnum::IO_STATE))));
+                ioReport.addDigitalInputResult(std::make_pair(GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_PIN_NUMBER)), GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_STATE))));
             } else if (ioType == IOType::DIGITAL_OUTPUT) {
-                ioReport.addDigitalOutputResult(std::make_pair(std::stoi(states.at(IOReportEnum::IO_PIN_NUMBER)), std::stoi(states.at(IOReportEnum::IO_STATE))));
+                ioReport.addDigitalOutputResult(std::make_pair(GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_PIN_NUMBER)), GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_STATE))));
             } else if (ioType == IOType::ANALOG_INPUT) {
-                ioReport.addAnalogInputResult(std::make_pair(std::stoi(states.at(IOReportEnum::IO_PIN_NUMBER)), std::stoi(states.at(IOReportEnum::IO_STATE))));
+                ioReport.addAnalogInputResult(std::make_pair(GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_PIN_NUMBER)), GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_STATE))));
             } else if (ioType == IOType::ANALOG_OUTPUT) {
-                ioReport.addAnalogOutputResult(std::make_pair(std::stoi(states.at(IOReportEnum::IO_PIN_NUMBER)), std::stoi(states.at(IOReportEnum::IO_STATE))));
+                ioReport.addAnalogOutputResult(std::make_pair(GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_PIN_NUMBER)), GeneralUtilities::decStringToInt(states.at(IOReportEnum::IO_STATE))));
             }
         }
         return ioReport;
@@ -403,7 +403,7 @@ std::pair<IOStatus, int> Arduino::setAnalogToDigitalThreshold(int threshold)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(ADThresholdReq::AD_RETURN_STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(ADThresholdReq::AD_RETURN_STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -525,7 +525,7 @@ std::pair<IOStatus, bool> Arduino::digitalRead(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -565,7 +565,7 @@ std::pair<IOStatus, bool> Arduino::digitalWrite(int pinNumber, bool state)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)) == 1);
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)) == 1);
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -617,7 +617,7 @@ std::pair<IOStatus, std::vector<int>> Arduino::digitalWriteAll(bool state)
         states.pop_back();
         try {
             for (auto &it : states) {
-                writtenPins.push_back(std::stoi(it));
+                writtenPins.push_back(GeneralUtilities::decStringToInt(it));
             }
             std::sort(writtenPins.begin(), writtenPins.end());
             return std::make_pair(IOStatus::OPERATION_SUCCESS, writtenPins);
@@ -660,7 +660,7 @@ std::pair<IOStatus, bool> Arduino::softDigitalRead(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -700,7 +700,7 @@ std::pair<IOStatus, double> Arduino::analogRead(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(GeneralUtilities::decStringToInt(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -740,7 +740,7 @@ std::pair<IOStatus, int> Arduino::analogReadRaw(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -780,7 +780,7 @@ std::pair<IOStatus, double> Arduino::softAnalogRead(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(std::stoi(states.at(IOState::STATE))));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, analogToVoltage(GeneralUtilities::decStringToInt(states.at(IOState::STATE))));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -820,7 +820,7 @@ std::pair<IOStatus, int> Arduino::softAnalogReadRaw(int pinNumber)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             if (i+1 == this->m_ioTryCount) {
                 return std::make_pair(IOStatus::OPERATION_FAILURE, 0);
@@ -859,7 +859,7 @@ std::pair<IOStatus, double> Arduino::analogWrite(int pinNumber, double state)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stod(states.at(IOState::STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToDouble(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {
@@ -899,7 +899,7 @@ std::pair<IOStatus, int> Arduino::analogWriteRaw(int pinNumber, int state)
             }
         }
         try {
-            return std::make_pair(IOStatus::OPERATION_SUCCESS, std::stoi(states.at(IOState::STATE)));
+            return std::make_pair(IOStatus::OPERATION_SUCCESS, GeneralUtilities::decStringToInt(states.at(IOState::STATE)));
         } catch (std::exception &e) {
             (void)e;
             if (i+1 == this->m_ioTryCount) {

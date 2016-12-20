@@ -321,7 +321,7 @@ namespace std {
 
         int decStringToInt(const std::string &str);
 
-        long decStringToLong(const std::string &str)
+        long decStringToLong(const std::string &str);
 
         long long int decStringToLongLong(const std::string &str);
 
@@ -773,7 +773,7 @@ namespace std {
                 }
                 int userEntry{0};
                 try {
-                    userEntry = std::stoi(userOption);
+                    userEntry = GeneralUtilities::decStringToInt(userOption);
                     if (userEntry < lowLimit) {
                         std::cout << tQuoted(userEntry) << " is less than the minimum value for " <<
                         name << " (" << name << " < " << lowLimit << std::endl << std::endl;
@@ -859,7 +859,7 @@ namespace std {
                 unsigned int userOptionIndex{0};
                 bool userSelectedQuit{false};
                 try {
-                    userOptionIndex = std::stoi(userOption);
+                    userOptionIndex = GeneralUtilities::decStringToInt(userOption);
                     if (userOptionIndex > availableOptions.size() + 1) {
                         std::cout << tQuoted(userOption) <<
                         " wasn't one of the selections, please a number between (inclusive) 1 and " <<

@@ -125,12 +125,14 @@ public:
     std::string readStringUntil(char readUntil);
     ssize_t writeString(const std::string &str);
     ssize_t writeString(const char *str);
+#if !defined(__ANDROID__)
     ssize_t asyncWriteString(const std::string &str);
     ssize_t asyncWriteString(const char *str);
     std::future<std::string> asyncReadString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(char readUntil);
+#endif
     bool isDCDEnabled() const;
     bool isCTSEnabled() const;
     bool isDSREnabled() const;

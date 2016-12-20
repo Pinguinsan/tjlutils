@@ -334,6 +334,8 @@ SerialPort::SerialPort(SerialPort &&other) :
 
 }
 
+#if !defined(__ANDROID__)
+
 std::future<std::string> SerialPort::asyncReadString(int maximumReadSize)
 {
     return std::future<std::string>{std::async(std::launch::async,
@@ -398,6 +400,7 @@ ssize_t SerialPort::staticWriteString(SerialPort *serialPort, const char *str)
 {
     return serialPort->writeString(static_cast<std::string>(str));
 }
+#endif
 
 std::string SerialPort::peek()
 {

@@ -370,9 +370,8 @@ bool parseToDigitalState(const std::string &state)
 
 double parseToAnalogState(const std::string &state)
 {
-
     try {
-        double temp{std::stod(state.c_str())};
+        double temp{GeneralUtilities::decStringToDouble(state.c_str())};
         if (temp > Arduino::VOLTAGE_MAX) {
             temp = Arduino::VOLTAGE_MAX;
         }
@@ -385,7 +384,7 @@ double parseToAnalogState(const std::string &state)
 int parseToAnalogStateRaw(const std::string &state)
 {
     try {
-        int temp{std::stoi(state.c_str())};
+        int temp{GeneralUtilities::decStringToInt(state.c_str())};
         if (temp > Arduino::ANALOG_MAX) {
             temp = Arduino::ANALOG_MAX;
         }

@@ -114,9 +114,13 @@ private:
     std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
-    std::future<void> m_asyncFuture;
-    
     void initialize();
+#if defined(__ANDROID__)
+    std::thread *m_asyncFuture;
+#else
+    std::future<void> m_asyncFuture;
+#endif
+
     void staticAsyncUdpServer();
 
     static const constexpr uint16_t s_BROADCAST{1};
