@@ -45,65 +45,8 @@ void TScriptExecutor::setScriptFilePath(const std::string &tScriptFilePath)
     this->m_tScriptReader = std::make_shared<TScriptReader>(tScriptFilePath);
 }
 
-void TScriptExecutor::execute(std::shared_ptr<TStream> ioStream, 
-                             const std::function<void(const std::string &)> &printRxResult, 
-                             const std::function<void(const std::string &)> &printTxResult,
-                             const std::function<void(DelayType, int)> &printDelayResult,
-                             const std::function<void(FlushType)> &printFlushResult,
-                             const std::function<void(LoopType, int, int)> &printLoopResult)
-{
-    using namespace TStreamStrings;
-    using namespace GeneralUtilities;
-    if (!ioStream) {
-        throw std::runtime_error(NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING);
-    }
-    if (!ioStream->isOpen()) {
-        try {
-            ioStream->openPort();
-        } catch (std::exception &e) {
-            throw std::runtime_error(e.what());
-        }
-    }
-    int loop {false};
-    int loopCount{0};
-    this->m_tScriptCommands = doUnrollLoopCommands(*this->m_tScriptReader->commands());
-    for (auto &it : this->m_tScriptCommands) {
-        try {
-            if (it.commandType() == TStreamCommandType::WRITE) {
-                ioStream->writeString(it.commandArgument());
-                printTxResult(it.commandArgument());
-            } else if (it.commandType() == TStreamCommandType::READ) {
-                printRxResult(ioStream->readString());
-            } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
-                printDelayResult(DelayType::SECONDS, std::stoi(it.commandArgument()));
-                delaySeconds(std::stoi(it.commandArgument()));
-            } else if (it.commandType() == TStreamCommandType::DELAY_MILLISECONDS) {
-                printDelayResult(DelayType::MILLISECONDS, std::stoi(it.commandArgument()));
-                delayMilliseconds(std::stoi(it.commandArgument()));
-            } else if (it.commandType() == TStreamCommandType::DELAY_MICROSECONDS) {
-                printDelayResult(DelayType::MICROSECONDS, std::stoi(it.commandArgument()));
-                delayMilliseconds(std::stoi(it.commandArgument()));
-            } else if (it.commandType() == TStreamCommandType::FLUSH_RX) {
-                printFlushResult(FlushType::RX);
-                ioStream->flushRX();
-            } else if (it.commandType() == TStreamCommandType::FLUSH_TX) {
-                printFlushResult(FlushType::TX);
-                ioStream->flushTX();
-            } else if (it.commandType() == TStreamCommandType::FLUSH_RX_TX) {
-                printFlushResult(FlushType::RX_TX);
-                ioStream->flushRXTX();
-            } else {
-                throw std::runtime_error(COMMAND_TYPE_NOT_IMPLEMENTED_STRING + it.commandArgument());
-            }
-        } catch (std::exception &e) {
-            throw std::runtime_error(e.what());
-        }
-    }
-}
-
 std::vector<TStreamCommand> TScriptExecutor::doUnrollLoopCommands(const std::vector<TStreamCommand> &tStreamCommands)
 {
-    using namespace TStreamStrings;
     std::vector<TStreamCommand> copyCommands{tStreamCommands};
     if (!TScriptExecutor::containsLoopStart(copyCommands)) {
         return copyCommands;

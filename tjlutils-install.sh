@@ -26,6 +26,9 @@ function cleanUp() {
     #suRemoveFile "$ui/arduino.h"
     #suRemoveFile "$ui/udpserver.h"
     #suRemoveFile "$ui/udpclient.h"
+    #suRemoveFile "$ui/tstream.h"
+    #suRemoveFile "$ui/tscriptreader.h"
+    #suRemoveFile "$ui/tscriptexecutor.h"
     echo "All cleaned up"
 }
 
@@ -48,12 +51,6 @@ if [[ -z "$cygwinCheck" ]]; then
    fi
 else
     SUDO=""
-fi
-
-internetCheck=$(ping 8.8.8.8 -c 1 | grep '1 received')
-if [[ -z "$internetCheck" ]]; then
-    echo "There is no active internet connection, so dependancy $dependancy cannot be retrieved, bailing out"
-    exit 1
 fi
 
 function showSuccess() {
@@ -240,9 +237,8 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/udpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tstream.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tstreamexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tstreamreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tstreamstrings.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tscriptexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tscriptreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
 
     if [[ -z "$cygwinCheck" ]]; then
         suRemoveFile "$ul/libtjlutils.so" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -297,13 +293,12 @@ else
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/common/tjlutils.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/tstream/include/tstreamstrings.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
 
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
-    runCmake "$sourceDir" || { echo "Cmake failed,, bailing out"; exit 1;}
+    runCmake "$sourceDir" || { echo "Cmake failed, bailing out"; exit 1;}
     runMake || { echo "Make failed, bailing out"; exit 1;}
 
     if [[ -z "$cygwinCheck" ]]; then

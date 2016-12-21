@@ -54,10 +54,10 @@ public:
     ssize_t writeString(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
-    unsigned int  timeout() const;
+    unsigned long int timeout() const;
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
-    void setTimeout(unsigned int timeout);
+    void setTimeout(unsigned long int timeout);
     LineEnding lineEnding() const;
     void setLineEnding(LineEnding lineEnding);
 

@@ -63,12 +63,12 @@ void UDPServer::setPortNumber(uint16_t portNumber)
     this->initialize();
 }
 
-void UDPServer::setTimeout(unsigned int timeout)
+void UDPServer::setTimeout(unsigned long int timeout)
 {
     this->m_timeout = timeout;
 }
 
-unsigned int UDPServer::timeout() const
+unsigned long int UDPServer::timeout() const
 {
     return this->m_timeout;
 }

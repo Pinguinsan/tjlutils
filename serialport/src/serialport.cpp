@@ -372,23 +372,22 @@ std::future<std::string> SerialPort::asyncReadStringUntil(char readUntil)
 
 std::string SerialPort::staticReadString(SerialPort *serialPort, int maximumReadSize)
 {
-    return serialPort->readString();
+    return serialPort->readString(maximumReadSize);
 }
 
 ssize_t SerialPort::asyncWriteString(const std::string &str)
 {
-    std::async(std::launch::async,
-               static_cast<ssize_t (*)(SerialPort *, const std::string &)>(&SerialPort::staticWriteString), 
-               this, 
-               str);  
+
+    this->m_asyncFuture = std::async(std::launch::async,
+                           static_cast<ssize_t (*)(SerialPort *, const std::string &)>(&SerialPort::staticWriteString),
+                           this,
+                           str);
+    return 0;
 }
 
 ssize_t SerialPort::asyncWriteString(const char *str)
 {
-    std::async(std::launch::async,
-               static_cast<ssize_t (*)(SerialPort *, const char *)>(&SerialPort::staticWriteString), 
-               this, 
-               str);  
+   return this->asyncWriteString(static_cast<std::string>(str));
 }
 
 ssize_t SerialPort::staticWriteString(SerialPort *serialPort, const std::string &str)
@@ -452,7 +451,7 @@ std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std:
             innerEventTimer->update();
         } while ((tempString.length() == 0) && (innerEventTimer->totalMilliseconds() <= timeout));
         if ((returnString.size() + tempString.size()) > maximumReadSize) {
-            int amountToAdd = (returnString.size() + tempString.size()) - maximumReadSize;
+            size_t amountToAdd = (returnString.size() + tempString.size()) - maximumReadSize;
             serialPort->putBack(tempString.substr(amountToAdd));
             returnString += tempString.substr(0, amountToAdd);
             break;
@@ -1134,30 +1133,61 @@ bool SerialPort::isOpen() const
 {
     return this->m_isOpen;
 }
+#if defined(_WIN32)
 
-ssize_t SerialPort::writeCString(const char *str)
-{
-    ssize_t writtenBytes{0};
-    while(*str != 0) {
-        writtenBytes += (this->writeByte(*(str++)));
+    unsigned long SerialPort::writeCString(const char *str)
+    {
+        ssize_t writtenBytes{0};
+        while(*str != 0) {
+            writtenBytes += (this->writeByte(*(str++)));
+        }
+        return writtenBytes;
     }
-    return writtenBytes;
-}
 
-ssize_t SerialPort::writeString(const std::string &str)
-{
-    using namespace GeneralUtilities;
-    std::string copyString{str};
-    if (!endsWith(copyString, this->m_lineEnding)) {
-        copyString += this->m_lineEnding;
+
+    unsigned long SerialPort::writeString(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        std::string copyString{str};
+        if (!endsWith(copyString, this->m_lineEnding)) {
+            copyString += this->m_lineEnding;
+        }
+        return this->writeCString(copyString.c_str());
     }
-    return this->writeCString(copyString.c_str());
-}
 
-ssize_t SerialPort::writeString(const char *str)
-{
-    return this->writeString(static_cast<std::string>(str));
-}
+    unsigned long SerialPort::writeString(const char *str)
+    {
+        return this->writeString(static_cast<std::string>(str));
+    }
+
+#else
+
+    ssize_t SerialPort::writeCString(const char *str)
+    {
+        ssize_t writtenBytes{0};
+        while(*str != 0) {
+            writtenBytes += (this->writeByte(*(str++)));
+        }
+        return writtenBytes;
+    }
+
+
+    ssize_t SerialPort::writeString(const std::string &str)
+    {
+        using namespace GeneralUtilities;
+        std::string copyString{str};
+        if (!endsWith(copyString, this->m_lineEnding)) {
+            copyString += this->m_lineEnding;
+        }
+        return this->writeCString(copyString.c_str());
+    }
+
+    ssize_t SerialPort::writeString(const char *str)
+    {
+        return this->writeString(static_cast<std::string>(str));
+    }
+
+#endif
 
 std::string SerialPort::readStringUntil(char readUntil)
 {
@@ -1252,7 +1282,7 @@ LineEnding SerialPort::lineEnding() const
     return SerialPort::parseLineEndingFromRaw(this->m_lineEnding);
 }
 
-unsigned int SerialPort::timeout() const
+unsigned long SerialPort::timeout() const
 {
     return this->m_timeout;
 }
@@ -1262,12 +1292,9 @@ int SerialPort::retryCount() const
     return this->m_retryCount;
 }
 
-void SerialPort::setTimeout(unsigned int timeout) {
-    if (timeout < 0) {
-        throw std::runtime_error("ERROR: Serial timeout cannot be negative (" + std::to_string(timeout) + " < 0)");
-    } else {
-        this->m_timeout = timeout;
-    }
+void SerialPort::setTimeout(unsigned long int timeout)
+{
+    this->m_timeout = timeout;
 }
 
 void SerialPort::setRetryCount(int retryCount)
@@ -1856,6 +1883,7 @@ std::shared_ptr<SerialPort> SerialPort::doUserSelectSerialPort()
         serialPort->setLineEnding(lineEnding);
         return serialPort;
     } catch (std::exception &e) {
+        (void)e;
         return nullptr;
     }            
 }

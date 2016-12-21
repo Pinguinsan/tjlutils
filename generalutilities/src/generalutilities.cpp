@@ -185,9 +185,9 @@ namespace GeneralUtilities
         return returnString;
     }
 
-    std::string toBinaryString(bool number) { return (number ? toBinaryString("1") : toBinaryString("0")); }
-    std::string toDecString(bool number) { return (number ? toDecString("1") : toDecString("0")); }
-    std::string toHexString(bool number) { return (number ? toHexString("1") : toHexString("0")); }
+    std::string toBinaryString(bool number) { return (number ? toBinaryString(1) : toBinaryString(0)); }
+    std::string toDecString(bool number) { return (number ? toDecString(1) : toDecString(0)); }
+    std::string toHexString(bool number) { return (number ? toHexString(1) : toHexString(0)); }
     
     std::string toBinaryString(uint32_t number)
     {

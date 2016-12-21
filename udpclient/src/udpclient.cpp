@@ -90,7 +90,7 @@ LineEnding UDPClient::lineEnding() const
     return UDPClient::parseLineEndingFromRaw(this->m_lineEnding);
 }
 
-void UDPClient::setTimeout(unsigned int timeout)
+void UDPClient::setTimeout(unsigned long int timeout)
 {
     this->m_timeout = timeout;
 }
@@ -130,7 +130,7 @@ uint16_t UDPClient::portNumber() const
     return this->m_portNumber;
 }
 
-unsigned int UDPClient::timeout() const
+unsigned long int UDPClient::timeout() const
 {
     return this->m_timeout;
 }

@@ -63,11 +63,11 @@ public:
     ssize_t writeString(const char *str);
 
     void setClientHostName(const std::string &hostName);
-    void setClientTimeout(unsigned int timeout);
+    void setClientTimeout(unsigned long int timeout);
     void setClientPortNumber(uint16_t portNumber);
 
     std::string clientHostName() const;
-    unsigned int clientTimeout() const;
+    unsigned long int clientTimeout() const;
     uint16_t clientPortNumber() const;
 
     /*Host/Server*/
@@ -94,19 +94,19 @@ public:
     void flushRX();
     void flushTX();
     
-    unsigned int serverTimeout() const;
+    unsigned long int serverTimeout() const;
     void setServerPortNumber(uint16_t portNumber);
     uint16_t serverPortNumber() const;
-    void setServerTimeout(unsigned int timeout);
+    void setServerTimeout(unsigned long int timeout);
     void flush();
 
     /*Both - TStream interface compliance*/
     void openPort();
     void closePort();
     bool isOpen() const;
-    unsigned int timeout() const;
+    unsigned long int timeout() const;
     std::string portName() const;
-    void setTimeout(unsigned int timeout);
+    void setTimeout(unsigned long int timeout);
 
     static std::string parseLineEnding(LineEnding lineEnding);
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);

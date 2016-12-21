@@ -43,12 +43,12 @@
 #include <cctype>
 #include <algorithm>
 #include <future>
-#include "systemcommand.h"
-#include "fileutilities.h"
-#include "generalutilities.h"
-#include "prettyprinter.h"
-#include "eventtimer.h"
-#include "tstream.h"
+
+#include <systemcommand.h>
+#include <fileutilities.h>
+#include <generalutilities.h>
+#include <eventtimer.h>
+#include <tstream.h>
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
@@ -125,6 +125,7 @@ public:
     std::string readStringUntil(char readUntil);
     ssize_t writeString(const std::string &str);
     ssize_t writeString(const char *str);
+
 #if !defined(__ANDROID__)
     ssize_t asyncWriteString(const std::string &str);
     ssize_t asyncWriteString(const char *str);
@@ -132,6 +133,9 @@ public:
     std::future<std::string> asyncReadStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(char readUntil);
+private:
+    std::future<ssize_t> m_asyncFuture;
+public:
 #endif
     bool isDCDEnabled() const;
     bool isCTSEnabled() const;
@@ -152,7 +156,7 @@ public:
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
     void setLineEnding(LineEnding lineEnding);
-    void setTimeout(unsigned int timeout);
+    void setTimeout(unsigned long int timeout);
     void setRetryCount(int retryCount);
 
     std::string portName() const;
@@ -161,7 +165,7 @@ public:
     StopBits stopBits() const;
     DataBits dataBits() const;
     Parity parity() const;
-    unsigned int timeout() const;
+    unsigned long int timeout() const;
     LineEnding lineEnding() const;
     int retryCount() const;
     bool isOpen() const;
@@ -240,7 +244,7 @@ private:
     DataBits m_dataBits;
     Parity m_parity;
     std::string m_lineEnding;
-    long long int m_timeout;
+    unsigned long int m_timeout;
     int m_retryCount;
     bool m_isOpen;
     int m_maximumReadSize;

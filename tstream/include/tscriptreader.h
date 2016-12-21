@@ -32,7 +32,6 @@
 #include <generalutilities.h>
 #include <mathutilities.h>
 #include <tstream.h>
-#include <tstreamstrings.h>
 
 class TScriptReader
 {

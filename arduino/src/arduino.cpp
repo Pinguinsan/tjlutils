@@ -110,7 +110,7 @@ std::vector<std::string> Arduino::genericIOTask(const std::string &stringToSend,
         this->m_ioStream->openPort();
         GeneralUtilities::delayMilliseconds(BOOTLOADER_BOOT_TIME);
     }
-    long long int tempTimeout{this->m_ioStream->timeout()};
+    unsigned long int tempTimeout{this->m_ioStream->timeout()};
     this->m_ioStream->setTimeout(SERIAL_REPORT_REQUEST_TIME_LIMIT);
     this->m_ioStream->writeString(stringToSend);
     GeneralUtilities::delayMilliseconds(delay);

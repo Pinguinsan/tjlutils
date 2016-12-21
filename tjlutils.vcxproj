@@ -163,6 +163,7 @@
     <ClInclude Include="serialport\include\serialport.h" />
     <ClInclude Include="systemcommand\include\systemcommand.h" />
     <ClInclude Include="templateobjects\include\templateobjects.h" />
+    <ClInclude Include="tstream\include\tstream.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arduino\src\arduino.cpp" />

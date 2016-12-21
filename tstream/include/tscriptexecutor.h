@@ -30,7 +30,6 @@
 
 #include <generalutilities.h>
 #include <tstream.h>
-#include <tstreamstrings.h>
 #include <tscriptreader.h>
 
 class TScriptExecutor
@@ -41,12 +40,62 @@ public:
     std::string scriptFilePath() const;
     bool hasCommands() const;
     size_t numberOfCommands() const;
+    
+    template <typename ... RxArgs, typename ... TxArgs, typename ... DelayArgs, typename ... FlushArgs, typename ... LoopArgs>
     void execute(std::shared_ptr<TStream> ioStream, 
-                 const std::function<void(const std::string &)> &printRxResult, 
-                 const std::function<void(const std::string &)> &printTxResult,
-                 const std::function<void(DelayType, int)> &printDelayResult,
-                 const std::function<void(FlushType)> &printFlushResult,
-                 const std::function<void(LoopType, int, int)> &printLoopResult);
+                 const std::function<void(RxArgs...)> &printRxResult, 
+                 const std::function<void(TxArgs...)> &printTxResult,
+                 const std::function<void(DelayArgs...)> &printDelayResult,
+                 const std::function<void(FlushArgs...)> &printFlushResult,
+                 const std::function<void(LoopArgs...)> &printLoopResult)
+    {
+        using namespace GeneralUtilities;
+        if (!ioStream) {
+            throw std::runtime_error(NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING);
+        }
+        if (!ioStream->isOpen()) {
+            try {
+                ioStream->openPort();
+            } catch (std::exception &e) {
+                throw std::runtime_error(e.what());
+            }
+        }
+        int loop {false};
+        int loopCount{0};
+        this->m_tScriptCommands = doUnrollLoopCommands(*this->m_tScriptReader->commands());
+        for (auto &it : this->m_tScriptCommands) {
+            try {
+                if (it.commandType() == TStreamCommandType::WRITE) {
+                    ioStream->writeString(it.commandArgument());
+                    printTxResult(it.commandArgument());
+                } else if (it.commandType() == TStreamCommandType::READ) {
+                    printRxResult(ioStream->readString());
+                } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
+                    printDelayResult(DelayType::SECONDS, std::stoi(it.commandArgument()));
+                    delaySeconds(std::stoi(it.commandArgument()));
+                } else if (it.commandType() == TStreamCommandType::DELAY_MILLISECONDS) {
+                    printDelayResult(DelayType::MILLISECONDS, std::stoi(it.commandArgument()));
+                    delayMilliseconds(std::stoi(it.commandArgument()));
+                } else if (it.commandType() == TStreamCommandType::DELAY_MICROSECONDS) {
+                    printDelayResult(DelayType::MICROSECONDS, std::stoi(it.commandArgument()));
+                    delayMilliseconds(std::stoi(it.commandArgument()));
+                } else if (it.commandType() == TStreamCommandType::FLUSH_RX) {
+                    printFlushResult(FlushType::RX);
+                    ioStream->flushRX();
+                } else if (it.commandType() == TStreamCommandType::FLUSH_TX) {
+                    printFlushResult(FlushType::TX);
+                    ioStream->flushTX();
+                } else if (it.commandType() == TStreamCommandType::FLUSH_RX_TX) {
+                    printFlushResult(FlushType::RX_TX);
+                    ioStream->flushRXTX();
+                } else {
+                    throw std::runtime_error(COMMAND_TYPE_NOT_IMPLEMENTED_STRING + it.commandArgument());
+                }
+            } catch (std::exception &e) {
+                throw std::runtime_error(e.what());
+            }
+        }
+    }
 private:
     std::shared_ptr<TScriptReader> m_tScriptReader;
     std::vector<TStreamCommand> m_tScriptCommands;

@@ -77,10 +77,10 @@ public:
     void stopListening();
     bool isListening() const;
     
-    unsigned int timeout() const;
+    unsigned long int timeout() const;
     void setPortNumber(uint16_t portNumber);
     uint16_t portNumber() const;
-    void setTimeout(unsigned int timeout);
+    void setTimeout(unsigned long int timeout);
     void flushRXTX();
     void flushRX();
     void flushTX();

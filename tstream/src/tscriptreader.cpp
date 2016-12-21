@@ -26,7 +26,6 @@ TScriptReader::TScriptReader(const std::string &scriptFilePath) :
     using namespace FileUtilities;
     using namespace GeneralUtilities;
     using namespace MathUtilities;
-    using namespace TStreamStrings;
     if (!fileExists(this->m_scriptFilePath)) {
         throw std::runtime_error(SCRIPT_FILE_DOES_NOT_EXISTS_STRING + tQuoted(this->m_scriptFilePath));
     }

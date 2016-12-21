@@ -106,6 +106,15 @@
     <Filter Include="serialport\include">
       <UniqueIdentifier>{d53a9ab6-7cf1-4af2-badf-6668cd550ad5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tstream">
+      <UniqueIdentifier>{a414b20d-e123-4180-a056-a02705bce7f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tstream\src">
+      <UniqueIdentifier>{1ed61e86-8923-4474-b306-9eaed59d7a96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tstream\include">
+      <UniqueIdentifier>{de0966e3-32f0-4213-9658-210998c9c644}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\tjlutils.h">
@@ -149,6 +158,9 @@
     </ClInclude>
     <ClInclude Include="fileutilities\include\win32-dirent.h">
       <Filter>fileutilities\include</Filter>
+    </ClInclude>
+    <ClInclude Include="tstream\include\tstream.h">
+      <Filter>tstream\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

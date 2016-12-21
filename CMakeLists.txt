@@ -46,8 +46,7 @@ set (ARDUINO_SOURCES "${SOURCE_BASE}/arduino/src/arduino.cpp")
 set (UDPSERVER_SOURCES "${SOURCE_BASE}/udpserver/src/udpserver.cpp")
 set (UDPCLIENT_SOURCES "${SOURCE_BASE}/udpclient/src/udpclient.cpp")
 set (UDPDUPLEX_SOURCES "${SOURCE_BASE}/udpduplex/src/udpduplex.cpp")
-set (TSTREAM_SOURCES "${SOURCE_BASE}/tstream/src/tstreamstrings.cpp" 
-                     "${SOURCE_BASE}/tstream/src/tscriptexecutor.cpp" 
+set (TSTREAM_SOURCES "${SOURCE_BASE}/tstream/src/tscriptexecutor.cpp" 
                      "${SOURCE_BASE}/tstream/src/tscriptreader.cpp")
 
 
