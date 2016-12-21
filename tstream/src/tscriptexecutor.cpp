@@ -55,7 +55,7 @@ std::vector<TStreamCommand> TScriptExecutor::doUnrollLoopCommands(const std::vec
         std::pair<int, int> innerLoopPositions = findInnerLoopIndexes(copyCommands);
         std::vector<TStreamCommand> toUnroll{};
         std::vector<TStreamCommand> temp{};
-        int numberOfLoops{std::stoi(copyCommands.at(innerLoopPositions.first).commandArgument())};
+        int numberOfLoops{GeneralUtilities::decStringToInt(copyCommands.at(innerLoopPositions.first).commandArgument())};
         for (int loops = 0; loops < numberOfLoops; loops++) {
             for (int i = innerLoopPositions.first+1; i < innerLoopPositions.second; i++) {
                 toUnroll.emplace_back(copyCommands.at(i));

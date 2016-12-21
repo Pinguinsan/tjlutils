@@ -31,8 +31,8 @@ const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
 const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
 const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"None"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
-const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"2", "1"};
-const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"8", "7", "6", "5"};
+const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"1", "2"};
+const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_LINE_ENDINGS{"None", "CR", "LF", "CRLF"};
 const char *SerialPort::s_SERIAL_PORT_HELPER_LONG_NAME{"\"C:/Users/Public/Public Programs/EnumerateSerial.exe\""};
 const char *SerialPort::s_SERIAL_PORT_HELPER_SHORT_NAME{"EnumerateSerial.exe"};
@@ -817,8 +817,8 @@ unsigned char SerialPort::rawRead()
 unsigned char SerialPort::timedRead()
 {
     unsigned char byteRead{0};
-    auto startTime{std::chrono::high_resolution_clock::now()};
-    auto endTime{std::chrono::high_resolution_clock::now()};
+    auto startTime = std::chrono::high_resolution_clock::now();
+    auto endTime = std::chrono::high_resolution_clock::now();
     do {
         byteRead = this->rawRead();
         if (std::isprint(byteRead)) {

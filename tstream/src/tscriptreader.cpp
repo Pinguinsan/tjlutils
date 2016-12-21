@@ -93,9 +93,9 @@ TScriptReader::TScriptReader(const std::string &scriptFilePath) :
                     continue;
                 } else {
                     try {
-                        loopCount = tAbs(std::stoi(targetLoopCount));
+                        loopCount = tAbs(GeneralUtilities::decStringToInt(targetLoopCount));
                         loops++;
-                        this->m_commands->emplace_back(TStreamCommandType::LOOP_START, targetLoopCount);
+                        this->m_commands->emplace_back(TStreamCommandType::LOOP_START, GeneralUtilities::toString(loopCount));
                     } catch (std::exception &e) {
                         std::cout << GENERIC_CONFIG_WARNING_BASE_STRING << currentLine << GENERIC_CONFIG_WARNING_TAIL_STRING << std::endl;
                         std::cout << LOOP_COUNT_PARAMETER_NOT_AN_INTEGER_STRING << std::endl;
@@ -145,8 +145,8 @@ TScriptReader::TScriptReader(const std::string &scriptFilePath) :
                 }
                 targetDelay = getBetween("(", ")", copyString);
                 try {
-                    long long int delay{std::stoll(targetDelay)};
-                    this->m_commands->emplace_back(commandType, targetDelay);
+                    long long int delay{GeneralUtilities::decStringToLongLong(targetDelay)};
+                    this->m_commands->emplace_back(commandType, GeneralUtilities::toString(delay));
                 } catch (std::exception &e) {
                     std::cout << GENERIC_CONFIG_WARNING_BASE_STRING << currentLine << GENERIC_CONFIG_WARNING_TAIL_STRING << std::endl;
                     if (commandType == TStreamCommandType::DELAY_SECONDS) {
