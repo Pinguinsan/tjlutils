@@ -119,9 +119,9 @@ public:
     void openPort();
     void closePort();
     unsigned char readByte();
-    std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char readUntil);
     ssize_t writeString(const std::string &str);
     ssize_t writeString(const char *str);
@@ -129,9 +129,9 @@ public:
 #if !defined(__ANDROID__)
     ssize_t asyncWriteString(const std::string &str);
     ssize_t asyncWriteString(const char *str);
-    std::future<std::string> asyncReadString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::future<std::string> asyncReadStringUntil(const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::future<std::string> asyncReadStringUntil(const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::future<std::string> asyncReadString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::future<std::string> asyncReadStringUntil(const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::future<std::string> asyncReadStringUntil(const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::future<std::string> asyncReadStringUntil(char readUntil);
 private:
     std::future<ssize_t> m_asyncFuture;
@@ -157,7 +157,7 @@ public:
     void setDataBits(DataBits dataBits);
     void setLineEnding(LineEnding lineEnding);
     void setTimeout(unsigned long int timeout);
-    void setRetryCount(int retryCount);
+    void setRetryCount(unsigned long retryCount);
 
     std::string portName() const;
     int portNumber() const;
@@ -167,7 +167,7 @@ public:
     Parity parity() const;
     unsigned long int timeout() const;
     LineEnding lineEnding() const;
-    int retryCount() const;
+    unsigned long retryCount() const;
     bool isOpen() const;
 
     std::string baudRateToString() const;
@@ -215,8 +215,8 @@ public:
     static std::vector<const char *> availableLineEndings();
     static bool isValidSerialPortName(const std::string &serialPortName);
 
-    static const unsigned int DEFAULT_TIMEOUT;
-    static const int DEFAULT_RETRY_COUNT;
+    static const unsigned long DEFAULT_TIMEOUT;
+    static const unsigned long DEFAULT_RETRY_COUNT;
 
     static std::string doUserSelectSerialPortName();
     static BaudRate doUserSelectBaudRate();
@@ -249,14 +249,14 @@ private:
     bool m_isOpen;
     int m_maximumReadSize;
 
-    static const int constexpr SERIAL_PORT_BUF_MAX{4025};
+    static const unsigned long constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);
     static std::pair<int, std::string> getPortNameAndNumber(const std::string &name);
     static std::vector<std::string> generateSerialPortNames();
 
     ssize_t writeCString(const char *str);
     ssize_t writeByte(char byteToSend);
-    ssize_t writeBufferedBytes(unsigned char *buffer, int bufferSize);
+    ssize_t writeBufferedBytes(unsigned char *buffer, unsigned long bufferSize);
     unsigned char timedRead();
     unsigned char rawRead();
 
@@ -269,9 +269,9 @@ private:
     static ssize_t staticWriteString(SerialPort *serialPort, const std::string &str);
     static ssize_t staticWriteString(SerialPort *serialPort, const char *str);
 
-    static std::string staticReadString(SerialPort *serialPort, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    static std::string staticReadString(SerialPort *serialPort, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     static std::string staticReadStringUntil(SerialPort *serialPort, char readUntil);
     
     static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;

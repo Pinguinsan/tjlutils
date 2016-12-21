@@ -209,7 +209,7 @@ uint16_t UDPDuplex::serverPortNumber() const
     }
 }
 
-unsigned long int UDPDuplex::serverTimeout() const
+unsigned long UDPDuplex::serverTimeout() const
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->timeout();
@@ -225,7 +225,7 @@ void UDPDuplex::setServerPortNumber(uint16_t portNumber)
     }
 }
 
-void UDPDuplex::setServerTimeout(unsigned long int timeout)
+void UDPDuplex::setServerTimeout(unsigned long timeout)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         this->m_udpServer->setTimeout(timeout);
@@ -320,7 +320,7 @@ char UDPDuplex::readByte()
     }
 }
 
-std::string UDPDuplex::readString(int maximumReadSize)
+std::string UDPDuplex::readString(unsigned long maximumReadSize)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->readString(maximumReadSize);
@@ -329,7 +329,7 @@ std::string UDPDuplex::readString(int maximumReadSize)
     }
 }
 
-std::string UDPDuplex::readStringUntil(const std::string &str, int maximumReadSize)
+std::string UDPDuplex::readStringUntil(const std::string &str, unsigned long maximumReadSize)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->readStringUntil(str, maximumReadSize);
@@ -338,7 +338,7 @@ std::string UDPDuplex::readStringUntil(const std::string &str, int maximumReadSi
     }
 }
 
-std::string UDPDuplex::readStringUntil(const char *str, int maximumReadSize)
+std::string UDPDuplex::readStringUntil(const char *str, unsigned long maximumReadSize)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->readStringUntil(str, maximumReadSize);

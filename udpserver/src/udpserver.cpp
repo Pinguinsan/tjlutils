@@ -63,7 +63,7 @@ void UDPServer::setPortNumber(uint16_t portNumber)
     this->initialize();
 }
 
-void UDPServer::setTimeout(unsigned long int timeout)
+void UDPServer::setTimeout(unsigned long timeout)
 {
     this->m_timeout = timeout;
 }
@@ -242,7 +242,7 @@ UDPDatagram UDPServer::readDatagram()
     }
 }
 
-std::string UDPServer::readString(int maximumReadSize)
+std::string UDPServer::readString(unsigned long maximumReadSize)
 {
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
@@ -273,12 +273,12 @@ std::string UDPServer::readStringUntil(char until)
     return this->readStringUntil(std::string{1, until});
 }
 
-std::string UDPServer::readStringUntil(const char *until, int maximumReadSize)
+std::string UDPServer::readStringUntil(const char *until, unsigned long maximumReadSize)
 {
     return this->readStringUntil(static_cast<std::string>(until), maximumReadSize);
 }
 
-std::string UDPServer::readStringUntil(const std::string &until, int maximumReadSize)
+std::string UDPServer::readStringUntil(const std::string &until, unsigned long maximumReadSize)
 {
 
     using namespace GeneralUtilities;
@@ -286,6 +286,9 @@ std::string UDPServer::readStringUntil(const std::string &until, int maximumRead
     EventTimer eventTimer;
     eventTimer.start();
     int readCount{0};
+    if (maximumReadSize == TStream::NO_MAXIMUM_READ_SIZE) {
+        maximumReadSize = std::numeric_limits<unsigned long>::max();
+    }
     do {
         std::string tempString{""};
         tempString = this->readString();

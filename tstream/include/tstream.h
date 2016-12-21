@@ -63,7 +63,7 @@ class TStream
 public:
     virtual ~TStream() { }
 
-    virtual void setTimeout(unsigned long int timeout) = 0;
+    virtual void setTimeout(unsigned long timeout) = 0;
     virtual unsigned long int timeout() const = 0;
     LineEnding lineEnding() const;
     void setLineEnding(LineEnding lineEnding);
@@ -87,12 +87,12 @@ public:
     virtual void putBack(const char *str) = 0;
     virtual void putBack(char back) = 0;
 
-    virtual std::string readString(int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
-    virtual std::string readStringUntil(const std::string &until, int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
-    virtual std::string readStringUntil(const char *until, int maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
+    virtual std::string readString(unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
+    virtual std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
+    virtual std::string readStringUntil(const char *until, unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
     virtual std::string readStringUntil(char until) = 0;
 
-    static const constexpr int NO_MAXIMUM_READ_SIZE{-1};
+    static const constexpr unsigned long NO_MAXIMUM_READ_SIZE{0};
 
     static const BackgroundColor COMMON_BACKGROUND_COLOR{BackgroundColor::BG_DEFAULT};
     static const int COMMON_FONT_ATTRIBUTE{(FontAttribute::FA_BOLD | FontAttribute::FA_UNDERLINED)};

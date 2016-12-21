@@ -63,19 +63,19 @@ public:
     ssize_t writeString(const char *str);
 
     void setClientHostName(const std::string &hostName);
-    void setClientTimeout(unsigned long int timeout);
+    void setClientTimeout(unsigned long timeout);
     void setClientPortNumber(uint16_t portNumber);
 
     std::string clientHostName() const;
-    unsigned long int clientTimeout() const;
+    unsigned long clientTimeout() const;
     uint16_t clientPortNumber() const;
 
     /*Host/Server*/
     char readByte();
     UDPDatagram readDatagram();
-    std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
     unsigned int available() const;
     void startListening();
@@ -97,16 +97,16 @@ public:
     unsigned long int serverTimeout() const;
     void setServerPortNumber(uint16_t portNumber);
     uint16_t serverPortNumber() const;
-    void setServerTimeout(unsigned long int timeout);
+    void setServerTimeout(unsigned long timeout);
     void flush();
 
     /*Both - TStream interface compliance*/
     void openPort();
     void closePort();
     bool isOpen() const;
-    unsigned long int timeout() const;
+    unsigned long timeout() const;
     std::string portName() const;
-    void setTimeout(unsigned long int timeout);
+    void setTimeout(unsigned long timeout);
 
     static std::string parseLineEnding(LineEnding lineEnding);
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
@@ -129,10 +129,10 @@ public:
     static const char *s_DEFAULT_CLIENT_HOST_NAME;
 
     static const constexpr uint16_t s_DEFAULT_CLIENT_PORT_NUMBER{8887};
-    static const constexpr unsigned int s_DEFAULT_CLIENT_TIMEOUT{100};
+    static const constexpr unsigned long s_DEFAULT_CLIENT_TIMEOUT{100};
 
     static const constexpr uint16_t s_DEFAULT_SERVER_PORT_NUMBER{8888};
-    static const constexpr unsigned int s_DEFAULT_SERVER_TIMEOUT{100};
+    static const constexpr unsigned long s_DEFAULT_SERVER_TIMEOUT{100};
 
 private:
     std::unique_ptr<UDPServer> m_udpServer;

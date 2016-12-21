@@ -533,6 +533,7 @@ namespace std {
                     return true;
                 }
             }
+            return false;
         }
 
         template<typename T>

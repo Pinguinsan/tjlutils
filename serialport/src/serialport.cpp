@@ -23,8 +23,8 @@ const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
 const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_None};
-const unsigned int SerialPort::DEFAULT_TIMEOUT{100};
-const int SerialPort::DEFAULT_RETRY_COUNT{0};
+const unsigned long SerialPort::DEFAULT_TIMEOUT{100};
+const unsigned long SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
@@ -336,27 +336,27 @@ SerialPort::SerialPort(SerialPort &&other) :
 
 #if !defined(__ANDROID__)
 
-std::future<std::string> SerialPort::asyncReadString(int maximumReadSize)
+std::future<std::string> SerialPort::asyncReadString(unsigned long maximumReadSize)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(SerialPort *, int)>(&SerialPort::staticReadString),
+                                               static_cast<std::string (*)(SerialPort *, unsigned long)>(&SerialPort::staticReadString),
                                                this,
                                                maximumReadSize)}; 
 }
 
-std::future<std::string> SerialPort::asyncReadStringUntil(const std::string &readUntil, int maximumReadSize)
+std::future<std::string> SerialPort::asyncReadStringUntil(const std::string &readUntil, unsigned long maximumReadSize)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(SerialPort *, const std::string &, int)>(&SerialPort::staticReadStringUntil),
+                                               static_cast<std::string (*)(SerialPort *, const std::string &, unsigned long)>(&SerialPort::staticReadStringUntil),
                                                this,
                                                readUntil,
                                                maximumReadSize)}; 
 }
 
-std::future<std::string> SerialPort::asyncReadStringUntil(const char *readUntil, int maximumReadSize)
+std::future<std::string> SerialPort::asyncReadStringUntil(const char *readUntil, unsigned long maximumReadSize)
 {
     return std::future<std::string>{std::async(std::launch::async,
-                                               static_cast<std::string (*)(SerialPort *, const char *, int)>(&SerialPort::staticReadStringUntil),
+                                               static_cast<std::string (*)(SerialPort *, const char *, unsigned long)>(&SerialPort::staticReadStringUntil),
                                                this,
                                                readUntil,
                                                maximumReadSize)}; 
@@ -370,7 +370,7 @@ std::future<std::string> SerialPort::asyncReadStringUntil(char readUntil)
                                                readUntil)}; 
 }
 
-std::string SerialPort::staticReadString(SerialPort *serialPort, int maximumReadSize)
+std::string SerialPort::staticReadString(SerialPort *serialPort, unsigned long maximumReadSize)
 {
     return serialPort->readString(maximumReadSize);
 }
@@ -431,12 +431,15 @@ void SerialPort::putBack(char back)
     (void)back;
 }
 
-std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, int maximumReadSize)
+std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, unsigned long maximumReadSize)
 {
     std::string returnString{""};
     std::unique_ptr<EventTimer> eventTimer{std::make_unique<EventTimer>()};
     std::unique_ptr<EventTimer> innerEventTimer{std::make_unique<EventTimer>()};
     long long int timeout{0};
+    if (maximumReadSize == TStream::NO_MAXIMUM_READ_SIZE) {
+        maximumReadSize = std::numeric_limits<unsigned long>::max();
+    }
     if (serialPort->timeout() <= 0) {
         timeout = 0;
     } else {
@@ -464,7 +467,7 @@ std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std:
     return returnString;
 }
 
-std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const char *readUntil, int maximumReadSize)
+std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const char *readUntil, unsigned long maximumReadSize)
 {
     return SerialPort::staticReadStringUntil(serialPort, static_cast<std::string>(readUntil), maximumReadSize);
 }
@@ -830,7 +833,7 @@ unsigned char SerialPort::timedRead()
 }
 
 
-std::string SerialPort::readString(int maximumReadSize)
+std::string SerialPort::readString(unsigned long maximumReadSize)
 {
     std::string returnString{""};
     int i{0};
@@ -852,7 +855,7 @@ std::string SerialPort::readString(int maximumReadSize)
     return returnString;
 }
 
-std::string SerialPort::readStringUntil(const std::string &readUntil, int maximumReadSize)
+std::string SerialPort::readStringUntil(const std::string &readUntil, unsigned long maximumReadSize)
 {
     using namespace GeneralUtilities;
     std::string returnString{""};
@@ -890,7 +893,7 @@ ssize_t SerialPort::writeByte(char byteToSend)
 #endif
 }
 
-ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, int bufferSize)
+ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, unsigned long int bufferSize)
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     long int writtenBytes;
@@ -1194,7 +1197,7 @@ std::string SerialPort::readStringUntil(char readUntil)
     return this->readStringUntil(std::string{1, readUntil});
 }
 
-std::string SerialPort::readStringUntil(const char *readUntil, int maximumReadSize)
+std::string SerialPort::readStringUntil(const char *readUntil, unsigned long maximumReadSize)
 {
     return this->readStringUntil(static_cast<std::string>(readUntil), maximumReadSize);
 }
@@ -1287,23 +1290,19 @@ unsigned long SerialPort::timeout() const
     return this->m_timeout;
 }
 
-int SerialPort::retryCount() const
+unsigned long SerialPort::retryCount() const
 {
     return this->m_retryCount;
 }
 
-void SerialPort::setTimeout(unsigned long int timeout)
+void SerialPort::setTimeout(unsigned long timeout)
 {
     this->m_timeout = timeout;
 }
 
-void SerialPort::setRetryCount(int retryCount)
+void SerialPort::setRetryCount(unsigned long retryCount)
 {
-    if (retryCount < 0) {
-        throw std::runtime_error("ERROR: Serial retry count cannot be negative (" + std::to_string(retryCount) + " < 0)");
-    } else {
-        this->m_retryCount = retryCount;
-    }
+    this->m_retryCount = retryCount;
 }
 
 int SerialPort::portNumber() const

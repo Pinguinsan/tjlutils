@@ -68,19 +68,19 @@ public:
 
     char readByte();
     UDPDatagram readDatagram();
-    std::string readString(int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *until, int maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
+    std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
     unsigned int available() const;
     void startListening();
     void stopListening();
     bool isListening() const;
     
-    unsigned long int timeout() const;
+    unsigned long timeout() const;
     void setPortNumber(uint16_t portNumber);
     uint16_t portNumber() const;
-    void setTimeout(unsigned long int timeout);
+    void setTimeout(unsigned long timeout);
     void flushRXTX();
     void flushRX();
     void flushTX();
@@ -110,7 +110,7 @@ private:
     uint16_t m_broadcast;
     int m_setSocketResult;
     bool m_isListening;
-    unsigned int m_timeout;
+    unsigned long m_timeout;
     std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
