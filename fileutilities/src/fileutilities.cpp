@@ -112,11 +112,6 @@ namespace FileUtilities
         return getFileListAsVector(directory, mask.c_str(), caseSensitive);
     }
 
-    std::vector<std::string> getFileListAsVector(const std::string &directory, const char *mask, bool caseSensitive)
-    {
-        return getFileListAsVector(directory.c_str(), mask, caseSensitive);
-    }
-
     std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const std::string &mask, bool caseSensitive)
     {
         return getDirectoryListAsVector(directory.c_str(), mask.c_str(), caseSensitive);
@@ -125,11 +120,6 @@ namespace FileUtilities
     std::vector<std::string> getDirectoryListAsVector(const char *directory, const std::string &mask, bool caseSensitive)
     {
         return getDirectoryListAsVector(directory, mask.c_str(), caseSensitive);
-    }
-
-    std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const char *mask, bool caseSensitive)
-    {
-        return getDirectoryListAsVector(directory.c_str(), mask, caseSensitive);
     }
 
     std::list<std::string> getFileList(const char *directory, const char *mask, bool caseSensitive)
@@ -162,11 +152,6 @@ namespace FileUtilities
         return getFileList(directory, mask.c_str(), caseSensitive);
     }
 
-    std::list<std::string> getFileList(const std::string &directory, const char *mask, bool caseSensitive)
-    {
-        return getFileList(directory.c_str(), mask, caseSensitive);
-    }
-
     std::list<std::string> getDirectoryList(const std::string &directory, const std::string &mask, bool caseSensitive)
     {
         return getDirectoryList(directory.c_str(), mask.c_str(), caseSensitive);
@@ -175,11 +160,6 @@ namespace FileUtilities
     std::list<std::string> getDirectoryList(const char *directory, const std::string &mask, bool caseSensitive)
     {
         return getDirectoryList(directory, mask.c_str(), caseSensitive);
-    }
-
-    std::list<std::string> getDirectoryList(const std::string &directory, const char *mask, bool caseSensitive)
-    {
-        return getDirectoryList(directory.c_str(), mask, caseSensitive);
     }
 
     std::string getCurrentDirectory()

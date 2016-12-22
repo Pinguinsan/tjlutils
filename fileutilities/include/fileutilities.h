@@ -62,24 +62,19 @@ namespace FileUtilities
     
     std::vector<std::string> getFileListAsVector(const std::string &directory, const std::string &mask = "", bool caseSensitive = true);
     std::vector<std::string> getFileListAsVector(const char *directory, const char *mask = "", bool caseSensitive = true);
-    std::vector<std::string> getFileListAsVector(const char *directory, const std::string &mask = "", bool caseSensitive = true);
-    std::vector<std::string> getFileListAsVector(const std::string &directory, const char *mask = "", bool caseSensitive = true);
-    
+    std::vector<std::string> getFileListAsVector(const char *directory, const std::string &mask = "", bool caseSensitive = true);    
     
     std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const std::string &mask = "", bool caseSensitive = true);
     std::vector<std::string> getDirectoryListAsVector(const char *directory, const char *mask = "", bool caseSensitive = true);
     std::vector<std::string> getDirectoryListAsVector(const char *directory, const std::string &mask = "", bool caseSensitive = true);
-    std::vector<std::string> getDirectoryListAsVector(const std::string &directory, const char *mask = "", bool caseSensitive = true);
     
     std::list<std::string> getFileList(const std::string &directory, const std::string &mask = "", bool caseSensitive = true);
     std::list<std::string> getFileList(const char *directory, const char *mask = "", bool caseSensitive = true);
     std::list<std::string> getFileList(const char *directory, const std::string &mask = "", bool caseSensitive = true);
-    std::list<std::string> getFileList(const std::string &directory, const char *mask = "", bool caseSensitive = true);
     
     std::list<std::string> getDirectoryList(const std::string &directory, const std::string &mask = "", bool caseSensitive = true);
     std::list<std::string> getDirectoryList(const char *directory, const char *mask = "", bool caseSensitive = true);
     std::list<std::string> getDirectoryList(const char *directory, const std::string &mask = "", bool caseSensitive = true);
-    std::list<std::string> getDirectoryList(const std::string &directory, const char *mask = "", bool caseSensitive = true);
     
     std::vector<std::string> getPathDirectoriesAsVector();
     std::list<std::string> getPathDirectories();
