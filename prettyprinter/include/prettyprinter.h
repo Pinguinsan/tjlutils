@@ -23,7 +23,6 @@
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include <mathutilities.h>
 
 enum ForegroundColor {
     FG_DEFAULT       = 39,
@@ -95,8 +94,6 @@ public:
     std::ostream *outputStream();
     int fontAttributes() const;
 
-    static ForegroundColor randomForegroundColor();
-    static BackgroundColor randomBackgroundColor();
     void resetBackgroundColor();
     void resetForegroundColor();
     void resetFontAttributes();
@@ -138,6 +135,15 @@ public:
     {
         return this->println("");
     }
+
+    static const BackgroundColor COMMON_BACKGROUND_COLOR{BackgroundColor::BG_DEFAULT};
+    static const int COMMON_FONT_ATTRIBUTE{(FontAttribute::FA_BOLD | FontAttribute::FA_UNDERLINED)};
+    static const ForegroundColor TX_COLOR{ForegroundColor::FG_BLUE};
+    static const ForegroundColor RX_COLOR{ForegroundColor::FG_RED};
+    static const ForegroundColor DELAY_COLOR{ForegroundColor::FG_GREEN};
+    static const ForegroundColor FLUSH_COLOR{ForegroundColor::FG_DARK_GRAY};
+    static const ForegroundColor LOOP_COLOR{ForegroundColor::FG_CYAN};
+    static const ForegroundColor LIST_COLOR{ForegroundColor::FG_YELLOW};
 
 private:
     ForegroundColor m_foregroundColor;

@@ -164,18 +164,6 @@ int PrettyPrinter::fontAttributes() const
     return this->m_fontAttributes;
 }
 
-ForegroundColor PrettyPrinter::randomForegroundColor()
-{
-    using namespace MathUtilities;
-    return PrettyPrinter::s_FOREGROUND_TERMINAL_COLORS_CONTAINER.at(randomBetween(0, PrettyPrinter::s_FOREGROUND_TERMINAL_COLORS_CONTAINER.size()-1));
-}
-
-BackgroundColor PrettyPrinter::randomBackgroundColor()
-{
-    using namespace MathUtilities;
-    return PrettyPrinter::s_BACKGROUND_TERMINAL_COLORS_CONTAINER.at(randomBetween(0, PrettyPrinter::s_BACKGROUND_TERMINAL_COLORS_CONTAINER.size()-1));
-}
-
 void PrettyPrinter::resetStreamToDefault(std::ostream *oStream)
 {
     *oStream << PrettyPrinter::s_DEFAULT_TERMINAL_FOREGROUND_COLOR;
