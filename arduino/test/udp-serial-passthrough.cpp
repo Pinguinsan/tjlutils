@@ -29,15 +29,7 @@ int main()
                                                                         Arduino::FIRMWARE_STOP_BITS,
                                                                         Arduino::FIRMWARE_PARITY)};
 
-    std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
-    uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
-    uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
-    std::cout << "Using ClientHostName = " << clientHostName << std::endl;
-    std::cout << "Using ClientPortNumber = " << clientPortNumber << std::endl;
-    std::cout << "Using ServerPortNumber = " << serverPortNumber << std::endl << std::endl;
-    std::shared_ptr<UDPDuplex> udpDuplex{std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, UDPObjectType::UDP_DUPLEX)};
-    
-    //std::shared_ptr<UDPDuplex> udpDuplex{std::make_shared<UDPDuplex>("pinguinsan1224.asuscomm.com", 62002, 8888)};
+    std::shared_ptr<UDPDuplex> udpDuplex{std::make_shared<UDPDuplex>("127.0.0.1", 8888, 8887)};
     prettyPrinter->setFontAttributes(COMMON_FONT_ATTRIBUTE);
     serialPort->openPort();
     udpDuplex->openPort();
@@ -51,7 +43,8 @@ int main()
             std::cout << tWhitespace(RX_INDENTATION_AMOUNT);
             prettyPrinter->println("Rx << " + str);
             serialPort->writeString(str);
-            delayMilliseconds(100);
+            delayMilliseconds(25);
+
             std::string returnString{serialPort->readString()};
             udpDuplex->writeString(returnString);
             prettyPrinter->setForegroundColor(TX_COLOR);

@@ -14,6 +14,8 @@ static const ForegroundColor SUCCESS_COLOR{ForegroundColor::FG_GREEN};
 static const ForegroundColor LIST_COLOR{ForegroundColor::FG_YELLOW};
 static const int COMMON_ATTRIBUTES{(FontAttribute::FA_BOLD | FontAttribute::FA_UNDERLINED)};
 
+static std::vector<const char *> STEP_THROUGH_SWITCHES{"-s", "--s", "-step", "--step"};
+static bool stepThrough{false};
 template <typename T>
 bool alwaysTrue(T param)
 {
@@ -21,7 +23,7 @@ bool alwaysTrue(T param)
     return true;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     /*
     //std::string serialPortName{SerialPort::doUserSelectSerialPortName()};
@@ -35,7 +37,14 @@ int main()
                                                                         Arduino::FIRMWARE_PARITY)};
     
     
-    */    
+    */
+    static const char *ANY_KEY_TO_CONTINUE_STRING{"Press any key to continue..."};  
+    for (int i = 0; i < argc; i++) {
+        if (GeneralUtilities::isSwitch(argv[i], STEP_THROUGH_SWITCHES)) {
+            stepThrough = true;
+        }
+    }
+
     std::vector<int> pins{2, 3, 4, 5, 6};
     std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
     uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
@@ -59,6 +68,7 @@ int main()
 
     std::unique_ptr<PrettyPrinter> prettyPrinter{std::make_unique<PrettyPrinter>()};
 
+    std::string throwAway{""};
     prettyPrinter->setFontAttributes(COMMON_ATTRIBUTES);
     prettyPrinter->setForegroundColor(LIST_COLOR);
     std::cout << "Using ClientHostName=";
@@ -78,8 +88,11 @@ int main()
     
     std::cout << "Using ArduinoIOTryCount=";
     prettyPrinter->println(arduinoIOTryCount);
+
+    if (stepThrough) {
+        prettyPrinter->println("Using StepThroughMode");
+    }
     prettyPrinter->println();
-    
     std::shared_ptr<TStream> serialPort{std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, UDPObjectType::UDP_DUPLEX)};
     std::cout << "Creating Arduino object using serial port " << std::quoted(serialPort->portName()) << "..."; 
     std::unique_ptr<Arduino> arduino{std::make_unique<Arduino>(ArduinoType::MEGA, serialPort)};
@@ -98,7 +111,6 @@ int main()
                 prettyPrinter->print(*it);
                 if (it+1 != result.second.end()) {
                     prettyPrinter->print(",");
-                    std::cout << " ";
                 }
             }
             prettyPrinter->println(")");
@@ -106,7 +118,11 @@ int main()
             prettyPrinter->setForegroundColor(FAILURE_COLOR);
             prettyPrinter->println("failure");
         }
-        GeneralUtilities::delayMilliseconds(delayBetween);
+        if (stepThrough) {
+            std::getline(std::cin, throwAway);
+        } else {
+            GeneralUtilities::delayMilliseconds(delayBetween);
+        }
         for (auto &it : pins) {
             std::cout << "Writing pin " << it << " LOW...";
             if (arduino->digitalWrite(it, 0).first == IOStatus::OPERATION_SUCCESS) {
@@ -117,7 +133,11 @@ int main()
                 prettyPrinter->println("failure");
             }
 
-            GeneralUtilities::delayMilliseconds(delayBetween);
+            if (stepThrough) {
+                std::getline(std::cin, throwAway);
+            } else {
+                GeneralUtilities::delayMilliseconds(delayBetween);
+            }
             
             std::cout << "Writing pin " << it << " HIGH...";
             if (arduino->digitalWrite(it, 1).first == IOStatus::OPERATION_SUCCESS) {
@@ -127,7 +147,11 @@ int main()
                 prettyPrinter->setForegroundColor(FAILURE_COLOR);
                 prettyPrinter->println("failure");
             }            
-            GeneralUtilities::delayMilliseconds(delayBetween);
+            if (stepThrough) {
+                std::getline(std::cin, throwAway);
+            } else {
+                GeneralUtilities::delayMilliseconds(delayBetween);
+            }
         }
         for (int i = 0; i < 3; i++) {
             if (i != 0) {
@@ -140,7 +164,6 @@ int main()
                         prettyPrinter->print(*it);
                         if (it+1 != result.second.end()) {
                             prettyPrinter->print(",");
-                            std::cout << " ";
                         }
                     }
                     prettyPrinter->println(")");
@@ -148,7 +171,11 @@ int main()
                     prettyPrinter->setForegroundColor(FAILURE_COLOR);
                     prettyPrinter->println("failure");
                 }
-                GeneralUtilities::delayMilliseconds(delayBetween);
+                if (stepThrough) {
+                    std::getline(std::cin, throwAway);
+                } else {
+                    GeneralUtilities::delayMilliseconds(delayBetween);
+                }
             }
             std::cout << "Writing all pins LOW...";
             result = arduino->digitalWriteAll(0);
@@ -159,7 +186,6 @@ int main()
                     prettyPrinter->print(*it);
                     if (it+1 != result.second.end()) {
                         prettyPrinter->print(",");
-                        std::cout << " ";
                     }
                 }
                 prettyPrinter->println(")");
@@ -167,7 +193,11 @@ int main()
                 prettyPrinter->setForegroundColor(FAILURE_COLOR);
                 prettyPrinter->println("failure");
             }
-            GeneralUtilities::delayMilliseconds(delayBetween);
+            if (stepThrough) {
+                std::getline(std::cin, throwAway);
+            } else {
+                GeneralUtilities::delayMilliseconds(delayBetween);
+            }
         }
     } while(true);
     return 0;
