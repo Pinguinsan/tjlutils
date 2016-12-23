@@ -178,36 +178,4 @@ namespace MathUtilities
     {
         return roundDown(static_cast<double>(numberToRound), threshold);
     }
-
-    int intExp(int base, int super)
-    {
-        if (super == 0) {
-            return 1;
-        }
-        int total{base};
-        for (int i = 1; i < super; i++) {
-            total = total * base;
-        }
-        return total;
-    }
-
-    int tAbs(int val)
-    {
-        return ((val >= 0) ? val : -1*val);
-    }
-
-    int tAbs(int lhs, int rhs)
-    {
-        return (lhs-rhs >= 0 ) ? (lhs-rhs) : -1*(lhs-rhs);
-    }
-
-    int tMax(int lhs, int rhs)
-    {
-        return (lhs >= rhs) ? lhs : rhs;
-    }
-
-    int tMin(int lhs, int rhs)
-    {
-        return (lhs <= rhs) ? lhs : rhs;
-    }
 }

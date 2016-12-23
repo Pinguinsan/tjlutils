@@ -64,10 +64,43 @@ namespace MathUtilities
     int roundUp(float numberToRound, double threshold=0.00000001);
     int roundDown(float numberToRound, double threshold=0.999999999);
     int intExp(int base, int super);
-    int tAbs(int val);
-    int tAbs(int lhs, int rhs);
-    int tMax(int lhs, int rhs);
-    int tMin(int lhs, int rhs);
+
+    template <typename T>
+    T intExp(T base, int super)
+    {
+        if (super == 0) {
+            return 1;
+        }
+        T total{base};
+        for (int i = 1; i < super; i++) {
+            total = total * base;
+        }
+        return total;
+    }
+
+    template <typename T>
+    T tAbs(T val)
+    {
+        return ((val >= 0) ? val : -1*val);
+    }
+
+    template <typename Lhs, typename Rhs>
+    Lhs tAbs(Lhs lhs, Rhs rhs)
+    {
+        return (lhs-rhs >= 0 ) ? (lhs-rhs) : -1*(lhs-rhs);
+    }
+
+    template <typename Lhs, typename Rhs>
+    Lhs tMax(Lhs lhs, Rhs rhs)
+    {
+        return (lhs >= rhs) ? lhs : rhs;
+    }
+
+    template <typename Lhs, typename Rhs>
+    Lhs tMin(Lhs lhs, Rhs rhs)
+    {
+        return (lhs <= rhs) ? lhs : rhs;
+    }
     std::mt19937 randomlySeededMersenneTwister();
 
     class Random 

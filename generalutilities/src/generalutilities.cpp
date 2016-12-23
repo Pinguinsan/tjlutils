@@ -486,61 +486,34 @@ namespace GeneralUtilities
         }
     }
 
-    void delaySeconds(double howLong)
+    void delayHours(unsigned long long howLong)
     {
-        howLong = (howLong >= 0 ? howLong : -1*howLong);
-        std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
-        long long int nanosecondsElapsed{0};
-        long long int secondsElapsed{0};
-
-        do {
-            endTime = std::chrono::high_resolution_clock::now();
-            nanosecondsElapsed = ((endTime - startTime).count());
-            secondsElapsed = (nanosecondsElapsed / NANOSECONDS_PER_SECOND);
-        }
-        while (secondsElapsed < howLong);
+        std::this_thread::sleep_for(std::chrono::hours(howLong));
     }
 
-    void delayMilliseconds(double howLong)
+    void delayMinutes(unsigned long long howLong)
     {
-        howLong = (howLong >= 0 ? howLong : -1*howLong);
-        std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
-        long long int nanosecondsElapsed{0};
-        long long int millisecondsElapsed{0};
-        do {
-            endTime = std::chrono::high_resolution_clock::now();
-            nanosecondsElapsed = ((endTime - startTime).count());
-            millisecondsElapsed = (nanosecondsElapsed / NANOSECONDS_PER_MILLISECOND);
-        }
-        while (millisecondsElapsed < howLong);
+        std::this_thread::sleep_for(std::chrono::minutes(howLong));
     }
 
-    void delayMicroseconds(double howLong)
+    void delaySeconds(unsigned long long howLong)
     {
-        std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
-        long long int nanosecondsElapsed{0};
-        long long int microsecondsElapsed{0};
-        do {
-            endTime = std::chrono::high_resolution_clock::now();
-            nanosecondsElapsed = ((endTime - startTime).count());
-            microsecondsElapsed = (nanosecondsElapsed / NANOSECONDS_PER_MICROSECOND);
-        }
-        while (microsecondsElapsed < howLong);
+        std::this_thread::sleep_for(std::chrono::seconds(howLong));
     }
 
-    void delayNanoseconds(double howLong)
+    void delayMilliseconds(unsigned long long howLong)
     {
-        std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
-        std::chrono::time_point<std::chrono::high_resolution_clock> endTime = std::chrono::high_resolution_clock::now();
-        long long int nanosecondsElapsed{0};
-        do {
-            endTime = std::chrono::high_resolution_clock::now();
-            nanosecondsElapsed = ((endTime - startTime).count());
-        }
-        while (nanosecondsElapsed < howLong);
+        std::this_thread::sleep_for(std::chrono::milliseconds(howLong));
+    }
+
+    void delayMicroseconds(unsigned long long howLong)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(howLong));
+    }
+
+    void delayNanoseconds(unsigned long long howLong)
+    {
+        std::this_thread::sleep_for(std::chrono::nanoseconds(howLong));
     }
 
     std::pair<std::string, std::string> splitFileName(const std::string &fullPath)

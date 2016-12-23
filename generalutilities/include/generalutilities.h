@@ -43,6 +43,7 @@
 #include <memory>
 #include <chrono>
 #include <map>
+#include <thread>
 #include <algorithm>
 #include <unordered_map>
 #include <exception>
@@ -259,16 +260,15 @@ namespace std {
 
         char intToChar(int intToConvert);
 
-        void delaySeconds(double howLong);
-
-        void delayMilliseconds(double howLong);
-
-        void delayMicroseconds(double howLong);
-
-        void delayNanoseconds(double howLong);
-
         std::pair<std::string, std::string> splitFileName(const std::string &fullPath);
 
+        void delayHours(unsigned long long howLong);
+        void delayMinutes(unsigned long long howLong);
+        void delaySeconds(unsigned long long howLong);
+        void delayMilliseconds(unsigned long long howLong);
+        void delayMicroseconds(unsigned long long howLong);
+        void delayNanoseconds(unsigned long long howLong);
+ 
         bool isDigit(char charToCheck);
 
         bool endsWith(const std::string &stringToCheck, const std::string &matchString);

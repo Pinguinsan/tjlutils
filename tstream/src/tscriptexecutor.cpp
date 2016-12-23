@@ -67,7 +67,7 @@ std::vector<TStreamCommand> TScriptExecutor::doUnrollLoopCommands(const std::vec
         for (auto &it : toUnroll) {
             temp.emplace_back(it);
         }
-        for (int i = innerLoopPositions.second+1; i < copyCommands.size(); i++) {
+        for (unsigned int i = innerLoopPositions.second+1; i < copyCommands.size(); i++) {
             temp.emplace_back(copyCommands.at(i));
         }
         copyCommands = temp; 
@@ -78,13 +78,13 @@ std::pair<int, int> TScriptExecutor::findInnerLoopIndexes(const std::vector<TStr
 {
     int lastLoopStartPosition{0};
     int lastLoopEndPosition{0};
-    for (int i = 0; i < tStreamCommands.size(); i++) {
+    for (unsigned int i = 0; i < tStreamCommands.size(); i++) {
         if (tStreamCommands.at(i).commandType() == TStreamCommandType::LOOP_START) {
             lastLoopStartPosition = i;
         }
     }
 
-    for (int i = lastLoopStartPosition; i < tStreamCommands.size(); i++) {
+    for (unsigned int i = lastLoopStartPosition; i < tStreamCommands.size(); i++) {
         if (tStreamCommands.at(i).commandType() == TStreamCommandType::LOOP_END) {
             if (lastLoopStartPosition == 0) {
                 lastLoopEndPosition = lastLoopStartPosition + i;
