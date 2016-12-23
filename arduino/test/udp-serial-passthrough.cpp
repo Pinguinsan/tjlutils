@@ -18,6 +18,7 @@ static const int TX_INDENTATION_AMOUNT{4};
 
 uint16_t getReturnPortName(const std::string &str);
 std::string getReturnAddress(const std::string &str);
+void setResponseAddress(UDPDatagram datagram, std::shared_ptr<UDPDuplex> udpDuplex);
 
 int main()
 {
@@ -29,16 +30,21 @@ int main()
                                                                         Arduino::FIRMWARE_STOP_BITS,
                                                                         Arduino::FIRMWARE_PARITY)};
 
-    std::shared_ptr<UDPDuplex> udpDuplex{std::make_shared<UDPDuplex>("127.0.0.1", 8888, 8887)};
+    std::shared_ptr<UDPDuplex> udpDuplex{std::make_shared<UDPDuplex>("127.0.0.1", 8887, 8888)};
     prettyPrinter->setFontAttributes(COMMON_FONT_ATTRIBUTE);
     serialPort->openPort();
     udpDuplex->openPort();
     do {
         std::string str{""};
+        UDPDatagram datagram;
         if (udpDuplex->available()) {
-            str = udpDuplex->readString();
+            datagram = udpDuplex->readDatagram();
+            str = datagram.message();
         }
         if (!str.empty()) {
+            //setResponseAddress(datagram, udpDuplex);
+            //std::cout << "Address = " << udpDuplex->clientHostName() << std::endl;
+            //std::cout << "Port number = " << udpDuplex->clientPortNumber() << std::endl;
             prettyPrinter->setForegroundColor(RX_COLOR);
             std::cout << tWhitespace(RX_INDENTATION_AMOUNT);
             prettyPrinter->println("Rx << " + str);
@@ -72,4 +78,10 @@ uint16_t getReturnPortName(const std::string &str)
 std::string getReturnAddress(const std::string &str)
 {
     return str;
+}
+
+void setResponseAddress(UDPDatagram datagram, std::shared_ptr<UDPDuplex> udpDuplex)
+{
+    udpDuplex->setClientPortNumber(datagram.portNumber());
+    udpDuplex->setClientHostName(datagram.hostName());
 }
