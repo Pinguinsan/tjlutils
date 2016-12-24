@@ -339,14 +339,25 @@ namespace GeneralUtilities
             size_t tempFound{findString.find(beginning)};
             foundPosition = findString.find(beginning);
             foundEndPosition = foundPosition + (findString.substr(tempFound+1).find(ending));
-        } else {
+        } else {    
             foundPosition = findString.find(beginning);
             foundEndPosition = findString.find(ending);
         }
-        if ((foundPosition == std::string::npos) || (foundEndPosition == std::string::npos)) {
-            return "";
+        if (foundPosition == std::string::npos) {
+            if (ending.length() == 0) {
+                return findString;
+            } else {
+                return "";
+            }
+        } else if (foundEndPosition == std::string::npos) {
+            if (ending.length() == 0) {
+                return findString.substr(foundPosition+1);
+            } else {
+                return "";
+            }
+        } else {
+            return findString.substr(foundPosition+1, foundEndPosition-foundPosition-1);
         }
-        return findString.substr(foundPosition+1, foundEndPosition-foundPosition-1);
     }
 
     std::vector<std::string> getAllBetween(const std::string &beginning, const std::string &ending, const std::string &findString)
