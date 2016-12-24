@@ -226,6 +226,24 @@ namespace FileUtilities
         return fileExists(static_cast<std::string>(fileToCheck));
     }
 
+    
+    unsigned int getInstanceCount(const char *str)
+    {
+        return getInstanceCount(static_cast<std::string>(str));
+    }
+
+    unsigned int getInstanceCount(const std::string &str)
+    {
+        std::unique_ptr<SystemCommand> systemCommand{std::make_unique<SystemCommand>()};
+        systemCommand->setCommand("ps aux | grep " + str);
+        systemCommand->execute();
+        if (systemCommand->hasError()) {
+            return 0;
+        } else {
+            return systemCommand->outputAsVector().size()-2;
+        }
+    }
+
     std::vector<std::string> parseArgsToVector(int argcIn,char **argvIn) 
     {
         if (argcIn == 0) {

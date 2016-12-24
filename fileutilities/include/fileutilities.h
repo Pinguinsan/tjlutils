@@ -34,6 +34,7 @@
 #include <fstream>
 #include <algorithm>
 #include <list>
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
@@ -41,7 +42,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "generalutilities.h"
+#include <generalutilities.h>
+#include <systemcommand.h>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
     #include <direct.h>
@@ -83,6 +85,8 @@ namespace FileUtilities
     bool directoryExists(const char *directoryToCheck);
     bool fileExists(const std::string &fileToCheck);
     bool fileExists(const char *fileToCheck);
+    unsigned int getInstanceCount(const char *str);
+    unsigned int getInstanceCount(const std::string &str);
     std::vector<std::string> parseArgsToVector(int argcIn,char **argvIn);
     std::list<std::string> parseArgsToList(int argcIn, char **argvIn);
 }
