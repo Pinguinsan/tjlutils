@@ -30,10 +30,10 @@ public:
     virtual String readString() = 0;
     virtual String readStringUntil(char until) = 0;
     virtual void setEnabled(bool enabled) = 0;
-    virtual int rxPin() const = 0;
-    virtual int txPin() const  = 0;
-    virtual long long int baudRate() const = 0;
-    virtual long long int timeout() const = 0;
+    virtual short rxPin() const = 0;
+    virtual short txPin() const  = 0;
+    virtual long long baudRate() const = 0;
+    virtual long long timeout() const = 0;
     virtual bool serialPortIsNull() const = 0;
     virtual bool isEnabled() const = 0;
     virtual bool initialize() = 0;
@@ -41,22 +41,26 @@ public:
     virtual void print(const std::string &stringToPrint) = 0;
     virtual void print(const char *stringToPrint) = 0;
     virtual void print(char charToprint) = 0;
+    virtual void print(short shortToPrint) = 0;
     virtual void print(int intToPrint) = 0;
+    virtual void print(bool boolToPrint) = 0;
 
     virtual SerialPortInfo &operator<<(const std::string &rhs) = 0;
     virtual SerialPortInfo &operator<<(const char *rhs) = 0;
     virtual SerialPortInfo &operator<<(char rhs) = 0;
+    virtual SerialPortInfo &operator<<(short rhs) = 0;
     virtual SerialPortInfo &operator<<(int rhs) = 0;
+    virtual SerialPortInfo &operator<<(bool rhs) = 0;
 };
 
 class HardwareSerialPortInfo : public SerialPortInfo
 {
 public:
      HardwareSerialPortInfo(HardwareSerial *serialPort, 
-                            int rxPin, 
-                            int txPin, 
-                            long long int baudRate, 
-                            long long int timeout,
+                            short rxPin, 
+                            short txPin, 
+                            long long baudRate, 
+                            long long timeout,
                             bool enabled) :
         m_serialPort{serialPort},
         m_rxPin{rxPin},
@@ -93,22 +97,22 @@ public:
         this->m_isEnabled = enabled; 
     }
 
-    int rxPin() const 
+    short rxPin() const 
     { 
         return this->m_rxPin; 
     }
     
-    int txPin() const 
+    short txPin() const 
     { 
         return this->m_txPin; 
     }
 
-    long long int baudRate() const
+    long long baudRate() const
     {
         return this->m_baudRate;
     }
 
-    long long int timeout() const
+    long long timeout() const
     {
         return this->m_timeout;
     }
@@ -150,9 +154,19 @@ public:
         this->m_serialPort->print(charToPrint);
     }
     
+    void print(short shortToPrint)
+    {
+        this->m_serialPort->print(shortToPrint);
+    }
+
     void print(int intToPrint)
     {
         this->m_serialPort->print(intToPrint);
+    }
+
+    void print(bool boolToPrint)
+    {
+        this->m_serialPort->print(boolToPrint);
     }
 
     SerialPortInfo &operator<<(const std::string &rhs)
@@ -173,7 +187,19 @@ public:
         return *this;
     }
 
+    SerialPortInfo &operator<<(short rhs)
+    {
+        this->m_serialPort->print(rhs);
+        return *this;
+    }
+
     SerialPortInfo &operator<<(int rhs)
+    {
+        this->m_serialPort->print(rhs);
+        return *this;
+    }
+
+    SerialPortInfo &operator<<(bool rhs)
     {
         this->m_serialPort->print(rhs);
         return *this;
@@ -182,10 +208,10 @@ public:
 private:
     HardwareSerial *m_serialPort;
     std::ohserialstream *m_outputStream;
-    int m_rxPin;
-    int m_txPin;
-    long long int m_baudRate;
-    long long int m_timeout;
+    short m_rxPin;
+    short m_txPin;
+    long long m_baudRate;
+    long long m_timeout;
     bool m_isEnabled;
 
 };
@@ -195,10 +221,10 @@ private:
 class SoftwareSerialPortInfo : public SerialPortInfo
 {
 public:
-       SoftwareSerialPortInfo( int rxPin, 
-                               int txPin, 
-                               long long int baudRate, 
-                               long long int timeout,
+       SoftwareSerialPortInfo( short rxPin, 
+                               short txPin, 
+                               long long baudRate, 
+                               long long timeout,
                                bool enabled) :
         m_serialPort{new SoftwareSerial{static_cast<uint8_t>(rxPin), static_cast<uint8_t>(txPin)}},
         m_rxPin{rxPin},
@@ -236,7 +262,7 @@ public:
             }
             endTime = millis();
             elapsedTime = endTime - startTime;
-        } while (elapsedTime <= static_cast<unsigned long long int>(this->m_timeout));
+        } while (elapsedTime <= static_cast<unsigned long long>(this->m_timeout));
         return returnString;
     }
 
@@ -256,7 +282,7 @@ public:
             }
             endTime = millis();
             elapsedTime = endTime - startTime;
-        } while ((elapsedTime <= static_cast<unsigned long long int>(this->m_timeout)) && (readChar != until));
+        } while ((elapsedTime <= static_cast<unsigned long long>(this->m_timeout)) && (readChar != until));
         return returnString;
     }
 
@@ -265,22 +291,22 @@ public:
         this->m_isEnabled = enabled; 
     }
 
-    int rxPin() const 
+    short rxPin() const 
     { 
         return this->m_rxPin; 
     }
     
-    int txPin() const 
+    short txPin() const 
     { 
         return this->m_txPin; 
     }
 
-    long long int baudRate() const
+    long long baudRate() const
     {
         return this->m_baudRate;
     }
 
-    long long int timeout() const
+    long long timeout() const
     {
         return this->m_timeout;
     }
@@ -321,9 +347,19 @@ public:
         this->m_serialPort->print(charToPrint);
     }
     
+    void print(short shortToPrint)
+    {
+        this->m_serialPort->print(shortToPrint);
+    }
+
     void print(int intToPrint)
     {
         this->m_serialPort->print(intToPrint);
+    }
+
+    void print(bool boolToPrint)
+    {
+        this->m_serialPort->print(boolToPrint);
     }
 
     SerialPortInfo &operator<<(const std::string &rhs)
@@ -344,7 +380,19 @@ public:
         return *this;
     }
 
+    SerialPortInfo &operator<<(short rhs)
+    {
+        this->m_serialPort->print(rhs);
+        return *this;
+    }
+
     SerialPortInfo &operator<<(int rhs)
+    {
+        this->m_serialPort->print(rhs);
+        return *this;
+    }
+
+    SerialPortInfo &operator<<(bool rhs)
     {
         this->m_serialPort->print(rhs);
         return *this;
@@ -352,10 +400,10 @@ public:
 
 private:
     SoftwareSerial *m_serialPort;
-    int m_rxPin;
-    int m_txPin;
-    long long int m_baudRate;
-    long long int m_timeout;
+    short m_rxPin;
+    short m_txPin;
+    long long m_baudRate;
+    long long m_timeout;
     bool m_isEnabled;
 
 };

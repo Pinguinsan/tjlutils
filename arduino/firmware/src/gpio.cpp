@@ -1,9 +1,9 @@
 #include "../include/gpio.h"
 
-const int GPIO::ANALOG_MAX{1023};
-int GPIO::s_analogToDigitalThreshold{510};
+const short GPIO::ANALOG_MAX{1023};
+short GPIO::s_analogToDigitalThreshold{510};
 
-GPIO::GPIO(int pinNumber, IOType ioType) :
+GPIO::GPIO(short pinNumber, IOType ioType) :
     m_pinNumber{pinNumber},
     m_ioType{ioType},
     m_logicState{false},
@@ -12,7 +12,7 @@ GPIO::GPIO(int pinNumber, IOType ioType) :
     setIOType(this->m_ioType);
 }
 
-int GPIO::getIOAgnosticState()
+short GPIO::getIOAgnosticState()
 {
     if ((this->m_ioType == IOType::DIGITAL_INPUT) || (this->m_ioType == IOType::DIGITAL_INPUT_PULLUP)) {
         return this->g_digitalRead();
@@ -32,11 +32,11 @@ std::vector<unsigned char> GPIO::getEEPROMWritableState()
     return GPIO::toEEPROMWritableState(this->getIOAgnosticState());
 }
 
-std::vector<unsigned char> GPIO::toEEPROMWritableState(int longState)
+std::vector<unsigned char> GPIO::toEEPROMWritableState(short longState)
 {
     std::vector<unsigned char> result;
     result.reserve(5);
-    int copyInt{longState};
+    short copyInt{longState};
     while (copyInt > 0) {
         if (copyInt > 254) {
             result.insert(result.begin(), 255);
@@ -51,7 +51,7 @@ std::vector<unsigned char> GPIO::toEEPROMWritableState(int longState)
     return result;
 }
 
-void GPIO::setAnalogToDigitalThreshold(int threshold)
+void GPIO::setAnalogToDigitalThreshold(short threshold)
 {
     using namespace FirmwareUtilities;
     if (threshold < 0) {
@@ -60,12 +60,12 @@ void GPIO::setAnalogToDigitalThreshold(int threshold)
     GPIO::s_analogToDigitalThreshold = threshold;
 }   
 
-int GPIO::analogToDigitalThreshold()
+short GPIO::analogToDigitalThreshold()
 {
     return GPIO::s_analogToDigitalThreshold;
 }
 
-void GPIO::setPinNumber(int pinNumber)
+void GPIO::setPinNumber(short pinNumber)
 {
     this->m_pinNumber = pinNumber;
 }
@@ -117,7 +117,7 @@ bool GPIO::g_softDigitalRead()
 }
 
 
-int GPIO::g_softAnalogRead()
+short GPIO::g_softAnalogRead()
 {
     if ((this->m_ioType == IOType::ANALOG_OUTPUT) || (this->m_ioType == IOType::ANALOG_INPUT)) {
         return this->m_analogState;
@@ -139,7 +139,7 @@ void GPIO::g_digitalWrite(bool logicState)
     this->m_logicState = logicState;
 } 
 
-int GPIO::g_analogRead()
+short GPIO::g_analogRead()
 {
     if (this->m_ioType != IOType::ANALOG_INPUT) {
         setIOType(IOType::ANALOG_INPUT);
@@ -147,7 +147,7 @@ int GPIO::g_analogRead()
     return (this->m_analogState = analogRead(this->m_pinNumber));
 }
 
-void GPIO::g_analogWrite(int state)
+void GPIO::g_analogWrite(short state)
 {
     if ((this->m_ioType != IOType::DIGITAL_OUTPUT) && (this->m_ioType != IOType::ANALOG_OUTPUT)) {
         setIOType(IOType::ANALOG_OUTPUT);
@@ -160,7 +160,7 @@ void GPIO::g_analogWrite(int state)
 }
 
 
-int GPIO::pinNumber() const
+short GPIO::pinNumber() const
 {
     return this->m_pinNumber;
 }

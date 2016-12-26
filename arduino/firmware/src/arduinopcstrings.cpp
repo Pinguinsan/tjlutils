@@ -57,30 +57,21 @@ namespace ArduinoPCStrings
     const char *DIGITAL_WRITE_HEADER{"{dwrite"};
     const char *DIGITAL_WRITE_ALL_HEADER{"{dwriteall"};
     
-    const char *HEARTBEAT_HEADER{"{heartbeat"};
-    
     const char *IO_REPORT_HEADER{"{ioreport"};
-    
-    const char *LOAD_SYSTEM_STATE_HEADER{"{loadstate"};
     
     const char *PIN_TYPE_HEADER{"{ptype"};
     const char *PIN_TYPE_CHANGE_HEADER{"{ptchange"};
     
     const char *SOFT_DIGITAL_READ_HEADER{"{sdread"};
     const char *SOFT_ANALOG_READ_HEADER{"{saread"};
-    const char *STORE_SYSTEM_STATE_HEADER{"{storestate"};
 
     const char *FIRMWARE_VERSION_HEADER{"{version"};
-    
-    const char *STORE_SYSTEM_STATE_END_HEADER{"{storestateend"};
     const char *IO_REPORT_END_HEADER{"{ioreportend"};
-    const char *LOAD_SYSTEM_STATE_END_HEADER{"{loadstateend"};
     const char *DIGITAL_INPUT_IDENTIFIER{"din"};
     const char *DIGITAL_OUTPUT_IDENTIFIER{"dout"};
     const char *DIGITAL_INPUT_PULLUP_IDENTIFIER{"dinpup"};
     const char *ANALOG_INPUT_IDENTIFIER{"ain"};
     const char *ANALOG_OUTPUT_IDENTIFIER{"aout"};
-    const char *INVALID_LENGTH_EXCEEDED_HEADER{"{invalid:length_exceeded}"};
     const char *UNSPECIFIED_IO_TYPE_IDENTIFIER{"unspecified"};
     const char *INVALID_HEADER{"{invalid"};
     const char *FIRMWARE_VERSION{"0.50"};

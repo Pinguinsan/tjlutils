@@ -2,7 +2,7 @@
 
 namespace FirmwareUtilities
 {
-    bool isEvenlyDivisibleBy(int numberToCheck, int divisor)
+    bool isEvenlyDivisibleBy(short numberToCheck, short divisor)
     {
         if ((numberToCheck == 0) || (divisor == 0)) {
             return false;
@@ -10,12 +10,12 @@ namespace FirmwareUtilities
         return ((numberToCheck % divisor) == 0);
     }
 
-    bool isEven(int numberToCheck)
+    bool isEven(short numberToCheck)
     {
         return isEvenlyDivisibleBy(numberToCheck, 2);
     }
 
-    bool isOdd(int numberToCheck) 
+    bool isOdd(short numberToCheck) 
     {
         return !isEven(numberToCheck);
     }
@@ -34,19 +34,19 @@ namespace FirmwareUtilities
         return copyString;
     }
 
-    std::string toBinaryString(int number)
+    std::string toBinaryString(short number)
     {
         if (number == 0) {
             return "0";
         }
-        int digitCount = 0;
-        int copy = number;
+        short digitCount = 0;
+        short copy = number;
         do {
             digitCount++;
         } while (copy /= 2);
         copy = number;
         std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
+        for (short i = 0; i < digitCount; i++) {
             copy = number % 2;
             if (copy == 0) returnString.insert(returnString.begin(), '0');
             else if ((copy % 1) == 0) returnString.insert(returnString.begin(), '1');
@@ -55,20 +55,20 @@ namespace FirmwareUtilities
         return returnString;
     }
 
-    std::string toDecString(int number)
+    std::string toDecString(short number)
     {
         if (number == 0) {
             return "0";
         }
-        int digitCount = 0;
-        int copy = number;
+        short digitCount = 0;
+        short copy = number;
         while (copy > 0) {
             copy /= 10;
             digitCount++;
         }
         copy = number;
         std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
+        for (short i = 0; i < digitCount; i++) {
             copy = number % 10;
             if (copy == 0) returnString.insert(returnString.begin(), '0');
             else if ((copy % 9 ) == 0) returnString.insert(returnString.begin(), '9');
@@ -85,19 +85,19 @@ namespace FirmwareUtilities
         return returnString;
     }
 
-    std::string toHexString(int number)
+    std::string toHexString(short number)
     {
         if (number == 0) {
             return "0";
         }
-        int digitCount = 0;
-        int copy = number;
+        short digitCount = 0;
+        short copy = number;
         do {
             digitCount++;
         } while (copy /= 16);
         copy = number;
         std::string returnString{""};
-        for (int i = 0; i < digitCount; i++) {
+        for (short i = 0; i < digitCount; i++) {
             copy = number % 16;
             if (copy == 0) returnString.insert(returnString.begin(), '0');
             else if ((copy % 15) == 0) returnString.insert(returnString.begin(), 'f');
@@ -126,33 +126,33 @@ namespace FirmwareUtilities
     
     std::string toBinaryString(uint32_t number)
     {
-        return toBinaryString(static_cast<int>(number));
+        return toBinaryString(static_cast<short>(number));
     }
 
     std::string toDecString(uint32_t number)
     {
-        return toDecString(static_cast<int>(number));
+        return toDecString(static_cast<short>(number));
     }
 
 
     std::string toHexString(uint32_t number)
     {
-        return toHexString(static_cast<int>(number));
+        return toHexString(static_cast<short>(number));
     }
 
     std::string toBinaryString(uint8_t number)
     {
-        return toBinaryString(static_cast<int>(number));
+        return toBinaryString(static_cast<short>(number));
     }
 
     std::string toDecString(uint8_t number)
     {
-        return toDecString(static_cast<int>(number));
+        return toDecString(static_cast<short>(number));
     }    
     
     std::string toHexString(uint8_t number)
     {
-        return toHexString(static_cast<int>(number));
+        return toHexString(static_cast<short>(number));
         
     }
 
@@ -294,16 +294,16 @@ namespace FirmwareUtilities
         return stripAllFromString(stringToStrip, std::string(1, whatToStrip));
     }
 
-    std::string whitespace(unsigned int howMuch) 
+    std::string whitespace(unsigned short howMuch) 
     {
         std::string returnString{""};
-        for (unsigned int i = 0; i < howMuch; i++) {
+        for (unsigned short i = 0; i < howMuch; i++) {
             returnString += " ";
         }
         return returnString;
     }
 
-    int charToInt(char charToConvert)
+    short charToInt(char charToConvert)
     {
         switch(charToConvert) {
         case '0': return 0;
@@ -320,7 +320,7 @@ namespace FirmwareUtilities
         }
     }
 
-    char intToChar (int intToConvert)
+    char intToChar (short intToConvert)
     {
         switch(intToConvert) {
         case 0: return '0';
@@ -342,10 +342,10 @@ namespace FirmwareUtilities
         return ((charToCheck == '0') || (charToCheck == '1') || (charToCheck == '2') || (charToCheck == '3') || (charToCheck == '4') || (charToCheck == '5') || (charToCheck == '6') || (charToCheck == '7') || (charToCheck == '8') || (charToCheck == '9'));
     }
 
-    String toFixedWidth(const String &inputString, unsigned int fixedWidth)
+    String toFixedWidth(const String &inputString, unsigned short fixedWidth)
     {
         String copyString{inputString};
-        unsigned int copyLength{copyString.length()};
+        unsigned short copyLength{copyString.length()};
         if (copyLength < fixedWidth) {
             copyLength = fixedWidth - copyLength;
             while (copyLength--) {
@@ -355,10 +355,10 @@ namespace FirmwareUtilities
         return copyString;
     }
 
-    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth)
+    std::string toFixedWidth(const std::string &inputString, unsigned short fixedWidth)
     {
         std::string copyString{inputString};
-        unsigned int copyLength{copyString.length()};
+        unsigned short copyLength{copyString.length()};
         if (copyLength < fixedWidth) {
             copyLength = (fixedWidth - copyLength);
             while (copyLength--) {
@@ -368,7 +368,7 @@ namespace FirmwareUtilities
         return copyString;
     }
 
-    std::string toFixedWidth(const char *inputString, unsigned int fixedWidth)
+    std::string toFixedWidth(const char *inputString, unsigned short fixedWidth)
     {
         return toFixedWidth(static_cast<std::string>(inputString), fixedWidth);
     }
@@ -379,7 +379,7 @@ namespace FirmwareUtilities
         if (startsWith(copyString, "0x")) {
             copyString = copyString.substr(2);
         }
-        unsigned int ret{0};   
+        unsigned short ret{0};   
         std::stringstream ss;
         ss << std::hex << copyString;
         ss >> ret;
@@ -392,36 +392,36 @@ namespace FirmwareUtilities
         if (startsWith(copyString, "0x")) {
             copyString = copyString.substr(2);
         }
-        unsigned int ret{0};   
+        unsigned short ret{0};   
         std::stringstream ss;
         ss << std::hex << copyString;
         ss >> ret;
         return ret;
     }
 
-    int intExp(int base, int super)
+    short intExp(short base, short super)
     {
         if (super == 0) {
             return 1;
         }
-        int total{base};
-        for (int i = 1; i < super; i++) {
+        short total{base};
+        for (short i = 1; i < super; i++) {
             total = total * base;
         }
         return total;
     }
 
-    int tAbs(int lhs, int rhs)
+    short tAbs(short lhs, short rhs)
     {
         return (lhs-rhs >= 0 ) ? (lhs-rhs) : -1*(lhs-rhs);
     }
 
-    int tMax(int lhs, int rhs)
+    short tMax(short lhs, short rhs)
     {
         return (lhs >= rhs) ? lhs : rhs;
     }
 
-    int tMin(int lhs, int rhs)
+    short tMin(short lhs, short rhs)
     {
         return (lhs <= rhs) ? lhs : rhs;
     }

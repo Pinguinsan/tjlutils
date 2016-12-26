@@ -30,27 +30,27 @@ enum class IOType { DIGITAL_INPUT, DIGITAL_OUTPUT, ANALOG_INPUT, ANALOG_OUTPUT, 
 class GPIO
 {
 public:
-    GPIO(int pinNumber, IOType ioType);
+    GPIO(short pinNumber, IOType ioType);
     bool g_digitalRead();
     bool g_softDigitalRead();
     void g_digitalWrite(bool logicState);
-    int g_analogRead();
-    int g_softAnalogRead();
-    void g_analogWrite(int state);
+    short g_analogRead();
+    short g_softAnalogRead();
+    void g_analogWrite(short state);
     
     IOType ioType() const;
-    int pinNumber() const;
+    short pinNumber() const;
     
     void setIOType(IOType ioType);
-    void setPinNumber(int pinNumber);
+    void setPinNumber(short pinNumber);
 
-    int getIOAgnosticState();
+    short getIOAgnosticState();
     std::vector<unsigned char> getEEPROMWritableState();
-    static std::vector<unsigned char> toEEPROMWritableState(int longState);
+    static std::vector<unsigned char> toEEPROMWritableState(short longState);
 
-    static const int ANALOG_MAX;
-    static void setAnalogToDigitalThreshold(int threshold);
-    static int analogToDigitalThreshold();
+    static const short ANALOG_MAX;
+    static void setAnalogToDigitalThreshold(short threshold);
+    static short analogToDigitalThreshold();
 
     friend bool operator==(const GPIO &lhs, const GPIO &rhs)
     {
@@ -64,12 +64,12 @@ public:
     }
 
 private:
-    int m_pinNumber;
+    short m_pinNumber;
     IOType m_ioType;
     bool m_logicState;
-    int m_analogState;
+    short m_analogState;
 
-    static int s_analogToDigitalThreshold;
+    static short s_analogToDigitalThreshold;
 };
 
 #endif //ARDUINOPC_GPIO_H

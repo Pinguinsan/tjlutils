@@ -22,7 +22,7 @@ public:
                        unsigned char third, unsigned char fourth, 
                        unsigned char fifth, unsigned char sixth, 
                        unsigned char seventh, unsigned char eighth);
-    bool setNthByte(int index, unsigned char nth);
+    bool setNthByte(short index, unsigned char nth);
     void toBasicArray(unsigned char copyArray[8]) const;
     std::vector<unsigned char> dataPacket() const;
 
@@ -31,7 +31,7 @@ public:
         if (lhs.dataPacket().size() != rhs.dataPacket().size()) {
             return false;
         }
-        int i{0};
+        short i{0};
         for (auto &it : rhs.dataPacket()) {
             if (it != rhs.dataPacket().at(i++)) {
                 return false;
