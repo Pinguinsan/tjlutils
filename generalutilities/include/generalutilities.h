@@ -268,6 +268,9 @@ namespace std {
         void delayMilliseconds(unsigned long long howLong);
         void delayMicroseconds(unsigned long long howLong);
         void delayNanoseconds(unsigned long long howLong);
+
+        std::vector<std::string> parseToVector(const std::string &thingToParse, char delimiter);
+        std::vector<std::string> parseToVector(const std::string &thingToParse, const std::string &delimiter);
  
         bool isDigit(char charToCheck);
 
@@ -614,8 +617,8 @@ namespace std {
         };
 
         template<typename BeginningIterator, typename EndingIterator, typename Function>
-        size_t findLastOfIf(const BeginningIterator &bit, const EndingIterator &eit,
-                            Function function) {
+        size_t findLastOfIf(const BeginningIterator &bit, const EndingIterator &eit, Function function) 
+        {
             size_t foundPosition{GeneralUtilities::generalnpos};
             for (auto iter = bit; iter != eit; iter++) {
                 if (function(*iter)) {
@@ -626,7 +629,8 @@ namespace std {
         }
 
         template<typename BeginningIterator, typename EndingIterator, typename Function>
-        size_t findIf(const BeginningIterator &bit, const EndingIterator &eit, Function function) {
+        size_t findIf(const BeginningIterator &bit, const EndingIterator &eit, Function function) 
+        {
             size_t foundPosition{GeneralUtilities::generalnpos};
             for (auto iter = bit; iter != eit; iter++) {
                 if (function(*iter)) {
@@ -637,17 +641,10 @@ namespace std {
         }
 
         template<typename T, typename dT>
-        std::vector<T> parseToVector(const T &thingToParse, dT delimiter) {
-            static_assert(std::is_same<typename std::decay<decltype(*(std::begin(
-                    thingToParse)))>::type, typename std::decay<dT>::type>::value,
-                          "The object to parse must dereference to the same type as the delimiters type");
+        std::vector<T> parseToVector(const T &thingToParse, dT delimiter) 
+        {
             std::vector<T> returnVector;
             T copyThing{thingToParse};
-            if (copyThing.length() > 0) {
-                if (copyThing[0] == delimiter) {
-                    copyThing = copyThing.substr(1);
-                }
-            }
             if (copyThing.find(delimiter) == std::string::npos) {
                 returnVector.emplace_back(copyThing);
                 return returnVector;
@@ -666,17 +663,10 @@ namespace std {
         }
 
         template<typename T, typename dT, typename Container = std::vector<T>>
-        Container parseToContainerAdapter(const T &thingToParse, dT delimiter) {
-            static_assert(std::is_same<typename std::decay<decltype(*(std::begin(
-                    thingToParse)))>::type, typename std::decay<dT>::type>::value,
-                          "The object to parse must dereference to the same type as the delimiters type");
+        Container parseToContainerAdapter(const T &thingToParse, dT delimiter) 
+        {
             Container returnContainer;
             T copyThing{thingToParse};
-            if (copyThing.length() > 0) {
-                if (copyThing[0] == delimiter) {
-                    copyThing = copyThing.substr(1);
-                }
-            }
             if (copyThing.find(delimiter) == std::string::npos) {
                 returnContainer.emplace(copyThing);
                 return returnContainer;
@@ -688,25 +678,39 @@ namespace std {
                     copyThing = copyThing.substr(foundPosition + 1);
                 } else {
                     returnContainer.emplace(copyThing);
-                    copyThing = "";
+                    copyThing = T{};
                 }
             }
             return returnContainer;
         }
 
+        template<typename Container = std::vector<std::string>>
+        Container parseToContainerAdapter(const std::string &thingToParse, char delimiter)
+        {
+            std::istringstream transfer{thingToParse};
+            std::string tempString{""};
+            Container returnContainer{};
+            while (std::getline(transfer, tempString, delimiter)) {
+                returnContainer.emplace(tempString);
+            }
+            return returnContainer;
+        }
+
+        template<typename Container = std::vector<std::string>>
+        Container parseToContainerAdapter(const std::string &thingToParse, const std::string &delimiter)
+        {
+            if (delimiter.size() != 1) {
+                return GeneralUtilities::parseToContainerAdapter<std::string, std::string>(thingToParse, delimiter);
+            } else {
+                return parseToContainerAdapter(thingToParse, delimiter[0]);
+            }
+        }
 
         template<typename T, typename dT, typename Container = std::vector<T>>
-        Container parseToContainer(const T &thingToParse, dT delimiter) {
-            static_assert(std::is_same<typename std::decay<decltype(*(std::begin(
-                    thingToParse)))>::type, typename std::decay<dT>::type>::value,
-                          "The object to parse must dereference to the same type as the delimiters type");
+        Container parseToContainer(const T &thingToParse, dT delimiter) 
+        {
             Container returnContainer;
             T copyThing{thingToParse};
-            if (copyThing.length() > 0) {
-                if (copyThing[0] == delimiter) {
-                    copyThing = copyThing.substr(1);
-                }
-            }
             if (copyThing.find(delimiter) == std::string::npos) {
                 returnContainer.emplace_back(copyThing);
                 return returnContainer;
@@ -718,10 +722,33 @@ namespace std {
                     copyThing = copyThing.substr(foundPosition + 1);
                 } else {
                     returnContainer.emplace_back(copyThing);
-                    copyThing = "";
+                    copyThing = T{};
                 }
             }
             return returnContainer;
+        }
+
+
+        template<typename Container = std::vector<std::string>>
+        Container parseToContainer(const std::string &thingToParse, char delimiter)
+        {
+            std::istringstream transfer{thingToParse};
+            std::string tempString{""};
+            Container returnContainer{};
+            while (std::getline(transfer, tempString, delimiter)) {
+                returnContainer.push_back(tempString);
+            }
+            return returnContainer;
+        }
+
+        template<typename Container = std::vector<std::string>>
+        Container parseToContainer(const std::string &thingToParse, const std::string & delimiter)
+        {
+            if (delimiter.size() != 1) {
+                return GeneralUtilities::parseToContainer<std::string, std::string, Container>(thingToParse, delimiter);
+            } else {
+                return parseToContainer(thingToParse, delimiter[0]);
+            }
         }
 
         template<typename T>

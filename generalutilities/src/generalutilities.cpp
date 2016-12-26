@@ -695,4 +695,25 @@ namespace GeneralUtilities
     {
         return ("(" + static_cast<std::string>(convert) + ")");
     }
+
+    std::vector<std::string> parseToVector(const std::string &thingToParse, char delimiter)
+    {
+        std::istringstream transfer{thingToParse};
+        std::string tempString{""};
+        std::vector<std::string> returnVector{};
+        while (std::getline(transfer, tempString, delimiter)) {
+            returnVector.emplace_back(tempString);
+        }
+        return returnVector;
+    }
+
+    std::vector<std::string> parseToVector(const std::string &thingToParse, const std::string &delimiter)
+    {
+        if (delimiter.size() != 1) {
+            return GeneralUtilities::parseToVector<std::string, std::string>(thingToParse, delimiter);
+        } else {
+            return parseToVector(thingToParse, delimiter[0]);
+        }
+    }
+
 }
