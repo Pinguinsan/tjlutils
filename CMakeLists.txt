@@ -4,13 +4,19 @@ project (libraryprojects)
 set (BUILD_SHARED_LIBRARIES)
 set(CMAKE_BUILD_TYPE Debug)
 
-IF (CYGWIN OR WIN32)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+    set (X86 TRUE)
+else()
+    set (X86 FALSE)
+endif()
+
+if ((CYGWIN OR WIN32) OR (NOT X86))
     set(GCC_ADDITIONAL_COMPILE_FLAGS "")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
-ELSE()
+else()
     set(GCC_ADDITIONAL_COMPILE_FLAGS "-fsanitize=undefined -frecord-gcc-switches")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_ADDITIONAL_COMPILE_FLAGS}")
-ENDIF()
+endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/crypto/include/"
