@@ -21,17 +21,17 @@
 
 namespace FirmwareUtilities
 {
-    const short constexpr ASCII_WHITESPACE_MAXIMUM_VALUE{32};
+    const int constexpr ASCII_WHITESPACE_MAXIMUM_VALUE{32};
     std::string toLowercase(const std::string &str);
     std::string toUppercase(const std::string &str);
     
-    bool isEvenlyDivisibleBy(short numberToCheck, short divisor);
-    bool isEven(short numberToCheck);
-    bool isOdd(short numberToCheck);
+    bool isEvenlyDivisibleBy(int numberToCheck, int divisor);
+    bool isEven(int numberToCheck);
+    bool isOdd(int numberToCheck);
     
-    std::string toBinaryString(short number);
-    std::string toDecString(short number);
-    std::string toHexString(short number);
+    std::string toBinaryString(int number);
+    std::string toDecString(int number);
+    std::string toHexString(int number);
 
     std::string toBinaryString(uint32_t number);
     std::string toDecString(uint32_t number);
@@ -63,21 +63,21 @@ namespace FirmwareUtilities
     std::string stripFromString(const std::string &stringToStrip, char whatToStrip);
     std::string stripAllFromString(const std::string &stringToStrip, const std::string &whatToStrip);
     std::string stripAllFromString(const std::string &stringToStrip, char whatToStrip);
-    std::string whitespace(unsigned short howMuch);
-    short charToInt(char charToConvert);
-    char intToChar (short intToConvert);
+    std::string whitespace(unsigned int howMuch);
+    int charToInt(char charToConvert);
+    char intToChar (int intToConvert);
     bool isDigit(char charToCheck);
-    String toFixedWidth(const String &inputString, unsigned short fixedWidth);
-    std::string toFixedWidth(const std::string &inputString, unsigned short fixedWidth);
+    String toFixedWidth(const String &inputString, unsigned int fixedWidth);
+    std::string toFixedWidth(const std::string &inputString, unsigned int fixedWidth);
     uint32_t parseCanID(const std::string &str);
     uint8_t parseCanByte(const std::string &str);
     uint32_t hexStringToUInt(const std::string &str);
     uint8_t hexStringToUChar(const std::string &str);
 
-    short intExp(short base, short super);
-    short tAbs(short lhs, short rhs);
-    short tMax(short lhs, short rhs);
-    short tMin(short lhs, short rhs);
+    int intExp(int base, int super);
+    int tAbs(int lhs, int rhs);
+    int tMax(int lhs, int rhs);
+    int tMin(int lhs, int rhs);
 
     template <typename T>
     std::string toString(const T &convert)

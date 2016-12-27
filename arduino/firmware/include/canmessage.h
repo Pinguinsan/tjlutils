@@ -13,7 +13,7 @@ public:
     uint8_t frame() const;
     uint8_t length() const;
     CanDataPacket dataPacket() const;
-    bool setDataPacketNthByte(short index, unsigned char nth);
+    bool setDataPacketNthByte(int index, unsigned char nth);
 
     void setID(uint32_t id);
     void setFrame(uint8_t frame);
@@ -22,8 +22,8 @@ public:
     std::string toString() const;
     static uint32_t parseCanID(const std::string &str);
     static uint8_t parseCanByte(const std::string &str);  
-    static const short CAN_BYTE_WIDTH;
-    static const short CAN_ID_WIDTH;  
+    static const int CAN_BYTE_WIDTH;
+    static const int CAN_ID_WIDTH;  
 
 private:
     uint32_t m_id;

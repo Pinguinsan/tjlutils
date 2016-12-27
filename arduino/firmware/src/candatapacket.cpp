@@ -42,7 +42,7 @@ void CanDataPacket::setDataPacket(unsigned char first, unsigned char second,
                                                     fifth, sixth, seventh, eighth};
 }                         
 
-bool CanDataPacket::setNthByte(short index, unsigned char nth)
+bool CanDataPacket::setNthByte(int index, unsigned char nth)
 {
     if ((index >= 0) && (index < 8)) {
         this->m_dataPacket.at(index) = nth;
@@ -54,7 +54,7 @@ bool CanDataPacket::setNthByte(short index, unsigned char nth)
 
 void CanDataPacket::toBasicArray(unsigned char copyArray[8]) const
 {
-    short i = 0;
+    int i = 0;
     for (auto &it : this->m_dataPacket) {
         copyArray[i++] = it;
     }

@@ -1,7 +1,7 @@
 #include "../include/canmessage.h"
 
-const short CanMessage::CAN_BYTE_WIDTH{2};
-const short CanMessage::CAN_ID_WIDTH{3};
+const int CanMessage::CAN_BYTE_WIDTH{2};
+const int CanMessage::CAN_ID_WIDTH{3};
 
 CanMessage::CanMessage(uint32_t id, uint8_t frame, uint8_t length, const CanDataPacket &dataPacket) :
     m_id{id},
@@ -41,7 +41,7 @@ void CanMessage::setDataPacket(const CanDataPacket &dataPacket)
     this->m_dataPacket = dataPacket;
 }
 
-bool CanMessage::setDataPacketNthByte(short index, unsigned char nth)
+bool CanMessage::setDataPacketNthByte(int index, unsigned char nth)
 {   
     return this->m_dataPacket.setNthByte(index, nth);
 }
@@ -76,7 +76,7 @@ std::string CanMessage::toString() const
         return "";
     }
     std::string returnString{"0x" + toFixedWidth(toHexString(this->m_id), CAN_ID_WIDTH) + ":"};
-    unsigned short i{0};
+    unsigned int i{0};
     for (auto &it : this->m_dataPacket.dataPacket()) {
         returnString += "0x" + toFixedWidth(toHexString(it), CAN_BYTE_WIDTH);
         if (i++ != (this->m_dataPacket.dataPacket().size()-1)) {
