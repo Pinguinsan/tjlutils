@@ -431,6 +431,12 @@ void SerialPort::putBack(char back)
     (void)back;
 }
 
+ssize_t SerialPort::available()
+{
+    //TODO: Implement
+    return 0;
+}
+
 std::string SerialPort::staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, unsigned long maximumReadSize)
 {
     std::string returnString{""};

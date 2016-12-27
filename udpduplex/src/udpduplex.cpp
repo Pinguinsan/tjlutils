@@ -411,7 +411,7 @@ char UDPDuplex::peekByte()
     }
 }
     
-unsigned int UDPDuplex::available() const
+ssize_t UDPDuplex::available()
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->available();

@@ -72,7 +72,7 @@ public:
     std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
-    unsigned int available() const;
+    ssize_t available();
     void startListening();
     void stopListening();
     bool isListening() const;
@@ -121,7 +121,8 @@ private:
     std::future<void> m_asyncFuture;
 #endif
 
-    void staticAsyncUdpServer();
+    void asyncDatagramListener();
+    void syncDatagramListener();
 
     static const constexpr uint16_t s_BROADCAST{1};
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};

@@ -77,7 +77,7 @@ public:
     std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
     std::string readStringUntil(char until);
-    unsigned int available() const;
+    ssize_t available();
     void startListening();
     void stopListening();
     bool isListening() const;

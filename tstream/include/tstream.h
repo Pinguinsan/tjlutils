@@ -70,6 +70,7 @@ public:
     virtual ssize_t writeString(const std::string &str) = 0;
     virtual ssize_t writeString(const char *str) = 0;
     virtual ssize_t writeByte(char toSend) = 0;
+    virtual ssize_t available() = 0;
     virtual bool isOpen() const = 0;
     virtual void openPort() = 0;
     virtual void closePort() = 0;

@@ -125,6 +125,7 @@ public:
     std::string readStringUntil(char readUntil);
     ssize_t writeString(const std::string &str);
     ssize_t writeString(const char *str);
+    ssize_t available();
 
 #if !defined(__ANDROID__)
     ssize_t asyncWriteString(const std::string &str);

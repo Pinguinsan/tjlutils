@@ -122,10 +122,10 @@ void UDPServer::startListening()
         if (this->m_asyncFuture) {
             delete this->m_asyncFuture;
         }
-        this->m_asyncFuture = new std::thread{&UDPServer::staticAsyncUdpServer, this};
+        this->m_asyncFuture = new std::thread{&UDPServer::asyncDatagramListener, this};
 #else
         this->m_asyncFuture = std::async(std::launch::async,
-                                         &UDPServer::staticAsyncUdpServer,
+                                         &UDPServer::asyncDatagramListener,
                                          this);
 #endif
     }
@@ -142,12 +142,13 @@ bool UDPServer::isListening() const
     return this->m_isListening;
 }
 
-unsigned int UDPServer::available() const
+ssize_t UDPServer::available() 
 {
+    this->syncDatagramListener();
     return this->m_datagramQueue.size();
 }
 
-void UDPServer::staticAsyncUdpServer()
+void UDPServer::asyncDatagramListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     do {
@@ -160,27 +161,59 @@ void UDPServer::staticAsyncUdpServer()
 #else
         unsigned int socketSize = sizeof(sockaddr);
 #endif
-        ssize_t returnValue = recvfrom(this->m_setSocketResult,
+        ssize_t returnValue {recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
-                            0,
+                            MSG_DONTWAIT,
                             reinterpret_cast<sockaddr *>(&receivedAddress),
-                            &socketSize);
+                            &socketSize)};
         if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
-            continue;
+            //No data;
+        } else {
+            receivedString = std::string{lowLevelReceiveBuffer};
+            if (receivedString.length() > 0) {
+                ioMutexLock.lock();
+                this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
+                ioMutexLock.unlock();
+
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    } while (!this->m_shutEmDown);
+}
+
+void UDPServer::syncDatagramListener()
+{
+    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
+        char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
+        memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
+        std::string receivedString{""};
+        sockaddr_in receivedAddress{};
+#if defined(__ANDROID__)
+        socklen_t socketSize{sizeof(sockaddr)};
+#else
+        unsigned int socketSize = sizeof(sockaddr);
+#endif
+        ssize_t returnValue{recvfrom(this->m_setSocketResult,
+                            lowLevelReceiveBuffer,
+                            sizeof(lowLevelReceiveBuffer)-1,
+                            MSG_DONTWAIT,
+                            reinterpret_cast<sockaddr *>(&receivedAddress),
+                            &socketSize)};
+        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
+            return;
         }
         receivedString = std::string{lowLevelReceiveBuffer};
         if (receivedString.length() > 0) {
             ioMutexLock.lock();
             this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
             ioMutexLock.unlock();
-
         }
-    } while (!this->m_shutEmDown);
 }
 
 std::string UDPServer::peek()
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
         return "";
@@ -192,6 +225,7 @@ std::string UDPServer::peek()
 
 UDPDatagram UDPServer::peekDatagram()
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
         return UDPDatagram{};
@@ -202,6 +236,7 @@ UDPDatagram UDPServer::peekDatagram()
 
 char UDPServer::peekByte()
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
         return 0;
@@ -216,6 +251,7 @@ char UDPServer::peekByte()
 
 char UDPServer::readByte()
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     std::string str{this->m_datagramQueue.front().message()};
     if (str.length() == 0) {
@@ -232,6 +268,7 @@ char UDPServer::readByte()
 
 UDPDatagram UDPServer::readDatagram()
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
         return UDPDatagram{};
@@ -244,6 +281,7 @@ UDPDatagram UDPServer::readDatagram()
 
 std::string UDPServer::readString(unsigned long maximumReadSize)
 {
+    this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     if (this->m_datagramQueue.size() == 0) {
         return "";
