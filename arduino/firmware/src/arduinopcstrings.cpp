@@ -75,4 +75,6 @@ namespace ArduinoPCStrings
     const char *UNSPECIFIED_IO_TYPE_IDENTIFIER{"unspecified"};
     const char *INVALID_HEADER{"{invalid"};
     const char *FIRMWARE_VERSION{"0.50"};
+
+    
 }

@@ -541,22 +541,22 @@ void addSoftwareSerialRequest(const std::string &str)
     std::string maybeTxPin{str.substr(foundPosition+1).c_str()};
     int txPinNumber{parsePin(maybeTxPin)};
     if (txPinNumber == INVALID_PIN) {
-        printResult(ADD_SOFTWARE_SERIAL_HEADER, rxPinNumber, maybeTxPin, OPERATION_FAILURE);
+        printResult(ADD_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
         return;
     }
     if (pinInUseBySerialPort(rxPinNumber)) {
-        printResult(ADD_SOFTWARE_SERIAL_HEADER, rxPinNumber, OPERATION_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(ADD_SOFTWARE_SERIAL_HEADER, maybeRxPin, OPERATION_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (pinInUseBySerialPort(txPinNumber)) {
-        printResult(ADD_SOFTWARE_SERIAL_HEADER, OPERATION_FAILURE, txPinNumber, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(ADD_SOFTWARE_SERIAL_HEADER, OPERATION_FAILURE, maybeTxPin, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     for (auto &it : softwareSerialPorts) {
         if ((rxPinNumber == it->rxPin()) && (txPinNumber == it->txPin())) {
             it->setEnabled(true);
             it->initialize();
-            printResult(ADD_SOFTWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_KIND_OF_SUCCESS);
+            printResult(ADD_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_KIND_OF_SUCCESS);
             return;
         }
     }
@@ -564,9 +564,9 @@ void addSoftwareSerialRequest(const std::string &str)
         SWSerial *swSerialTemp{ new SWSerial{rxPinNumber, txPinNumber, SERIAL_BAUD, SERIAL_TIMEOUT, true} };
         softwareSerialPorts.push_back(swSerialTemp);
         swSerialTemp->initialize();
-        printResult(ADD_SOFTWARE_SERIAL_HEADER, swSerialTemp->rxPin(), swSerialTemp->txPin(), OPERATION_SUCCESS);
+        printResult(ADD_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_SUCCESS);
     } else {
-        printResult(ADD_SOFTWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_FAILURE);
+        printResult(ADD_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
     }
 }
 
@@ -582,18 +582,18 @@ void addHardwareSerialRequest(const std::string &str)
     std::string maybeTxPin{str.substr(foundPosition+1).c_str()};
     int txPinNumber{parsePin(maybeTxPin)};
     if (txPinNumber == INVALID_PIN) {
-        printResult(ADD_HARDWARE_SERIAL_HEADER, rxPinNumber, maybeTxPin, OPERATION_FAILURE);
+        printResult(ADD_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
         return;
     }
     for (auto &it : hardwareSerialPorts) {
         if ((rxPinNumber == it->rxPin()) && (txPinNumber == it->txPin())) {
             it->setEnabled(true);
             it->initialize();
-            printResult(ADD_HARDWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_KIND_OF_SUCCESS);
+            printResult(ADD_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_KIND_OF_SUCCESS);
             return;
         }
     }
-    printResult(ADD_HARDWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_FAILURE);
+    printResult(ADD_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
 }
 
 void removeSoftwareSerialRequest(const std::string &str)
@@ -606,23 +606,23 @@ void removeSoftwareSerialRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(rxPinNumber)) {
-        printResult(REMOVE_SOFTWARE_SERIAL_HEADER, rxPinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(REMOVE_SOFTWARE_SERIAL_HEADER, maybeRxPin, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     std::string maybeTxPin{str.substr(foundPosition+1).c_str()};
     int txPinNumber{parsePin(maybeTxPin)};
     if (txPinNumber == INVALID_PIN) {
-        printResult(REMOVE_SOFTWARE_SERIAL_HEADER, rxPinNumber, maybeTxPin, OPERATION_FAILURE);
+        printResult(REMOVE_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
         return;
     }
     for (auto &it : softwareSerialPorts) {
         if ((rxPinNumber == it->rxPin()) && (txPinNumber == it->txPin())) {
             it->setEnabled(false);
-            printResult(REMOVE_SOFTWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_SUCCESS);
+            printResult(REMOVE_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_SUCCESS);
             return;
         }
     }
-    printResult(REMOVE_SOFTWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_FAILURE);
+    printResult(REMOVE_SOFTWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
 }
 
 void removeHardwareSerialRequest(const std::string &str)
@@ -635,23 +635,23 @@ void removeHardwareSerialRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(rxPinNumber)) {
-        printResult(REMOVE_HARDWARE_SERIAL_HEADER, rxPinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(REMOVE_HARDWARE_SERIAL_HEADER, maybeRxPin, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     std::string maybeTxPin{str.substr(foundPosition+1).c_str()};
     int txPinNumber{parsePin(maybeTxPin)};
     if (txPinNumber == INVALID_PIN) {
-        printResult(REMOVE_HARDWARE_SERIAL_HEADER, rxPinNumber, maybeTxPin, OPERATION_FAILURE);
+        printResult(REMOVE_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
         return;
     }
     for (auto &it : hardwareSerialPorts) {
         if ((rxPinNumber == it->rxPin()) && (txPinNumber == it->txPin())) {
             it->setEnabled(false);
-            printResult(REMOVE_HARDWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_SUCCESS);
+            printResult(REMOVE_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_SUCCESS);
             return;
         }
     }
-    printResult(REMOVE_HARDWARE_SERIAL_HEADER, rxPinNumber, txPinNumber, OPERATION_FAILURE);
+    printResult(REMOVE_HARDWARE_SERIAL_HEADER, maybeRxPin, maybeTxPin, OPERATION_FAILURE);
 }
 
 bool isValidSoftwareSerialAddition(int rxPinNumber, int txPinNumber)
@@ -752,7 +752,11 @@ void ioReportRequest()
         } else if (gpioPin->ioType() == IOType::ANALOG_OUTPUT) {
             state = gpioPin->g_softAnalogRead();
         }
-        *getCurrentValidOutputStream() << '{' << gpioPin->pinNumber() << ':' << getIOTypeString(gpioPin->ioType()) << ':' << state << "};";
+        if (isValidAnalogInputPin(gpioPin->pinNumber())) {
+            *getCurrentValidOutputStream() << '{' << analogPinFromNumber(gpioPin->pinNumber()) << ':' << getIOTypeString(gpioPin->ioType()) << ':' << state << "};";
+        } else {
+            *getCurrentValidOutputStream() << '{' << gpioPin->pinNumber() << ':' << getIOTypeString(gpioPin->ioType()) << ':' << state << "};";
+        }
     }
     *getCurrentValidOutputStream() << IO_REPORT_END_HEADER << '}';
 }
@@ -763,21 +767,21 @@ void digitalReadRequest(const std::string &str, bool soft)
         printResult(DIGITAL_READ_HEADER, INVALID_PIN, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    int pinNumber = parsePin(str);
+    int pinNumber{parsePin(str)};
     if (pinNumber == INVALID_PIN) {
         printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), str, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (!isValidDigitalInputPin(pinNumber)) {
-        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber, STATE_FAILURE, OPERATION_FAILURE);
+        printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     bool state{(soft ? gpioPinByPinNumber(pinNumber)->g_softDigitalRead() : gpioPinByPinNumber(pinNumber)->g_digitalRead())};
-    printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), pinNumber, state, OPERATION_SUCCESS);
+    printResult((soft ? SOFT_DIGITAL_READ_HEADER : DIGITAL_READ_HEADER), str, state, OPERATION_SUCCESS);
 }
 
 void digitalWriteRequest(const std::string &str)
@@ -794,21 +798,21 @@ void digitalWriteRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(DIGITAL_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (!isValidDigitalOutputPin(pinNumber)) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
+        printResult(DIGITAL_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     std::string maybeState{str.substr(foundPosition+1).c_str()};
     int state{parseToDigitalState(maybeState)};
     if (state == OPERATION_FAILURE) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber, maybeState, OPERATION_FAILURE);
+        printResult(DIGITAL_WRITE_HEADER, maybePin, maybeState, OPERATION_FAILURE);
         return;
     } 
     gpioPinByPinNumber(pinNumber)->g_digitalWrite(state);
-    printResult(DIGITAL_WRITE_HEADER, pinNumber, maybeState, OPERATION_SUCCESS);
+    printResult(DIGITAL_WRITE_HEADER, maybePin, maybeState, OPERATION_SUCCESS);
 }
 
 void digitalWriteAllRequest(const std::string &str)
@@ -829,7 +833,12 @@ void digitalWriteAllRequest(const std::string &str)
         GPIO *gpioPin{it.second};
         if (gpioPin->ioType() == IOType::DIGITAL_OUTPUT) {
             gpioPin->g_digitalWrite(state);
-        *getCurrentValidOutputStream() << ':' << gpioPin->pinNumber();
+            if (isValidAnalogInputPin(gpioPin->pinNumber())) {
+                *getCurrentValidOutputStream() << ':' << analogPinFromNumber(gpioPin->pinNumber());
+            } else {
+                *getCurrentValidOutputStream() << ':' << gpioPin->pinNumber();
+        
+            }
         }
     }
     *getCurrentValidOutputStream() << ':' << state << ':' << OPERATION_SUCCESS << '}';
@@ -847,14 +856,14 @@ void analogReadRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult(ANALOG_READ_HEADER, pinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(ANALOG_READ_HEADER, str, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (!isValidAnalogInputPin(pinNumber)) {
-        printResult(ANALOG_READ_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
+        printResult(ANALOG_READ_HEADER, str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
-    printResult(ANALOG_READ_HEADER, analogPinFromNumber(pinNumber), gpioPinByPinNumber(pinNumber)->g_analogRead(), OPERATION_SUCCESS);
+    printResult(ANALOG_READ_HEADER, str, gpioPinByPinNumber(pinNumber)->g_analogRead(), OPERATION_SUCCESS);
 }
 
 void analogWriteRequest(const std::string &str)
@@ -872,20 +881,20 @@ void analogWriteRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(ANALOG_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (!isValidAnalogOutputPin(pinNumber)) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
+        printResult(ANALOG_WRITE_HEADER, maybePin, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     std::string maybeState{str.substr(foundPosition+1).c_str()};
     int state{parseToAnalogState(maybeState)};
     if (state == OPERATION_FAILURE) {
-        printResult(ANALOG_WRITE_HEADER, pinNumber, maybeState, OPERATION_FAILURE);
+        printResult(ANALOG_WRITE_HEADER, maybePin, maybeState, OPERATION_FAILURE);
     } else {
         gpioPinByPinNumber(pinNumber)->g_analogWrite(state);
-        printResult(ANALOG_WRITE_HEADER, pinNumber, state, OPERATION_SUCCESS);
+        printResult(ANALOG_WRITE_HEADER, maybePin, state, OPERATION_SUCCESS);
     }
 }
 
@@ -901,10 +910,10 @@ void pinTypeRequest(const std::string &str)
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult(PIN_TYPE_HEADER, pinNumber, getSerialPinIOTypeString(pinNumber), OPERATION_SUCCESS);
+        printResult(PIN_TYPE_HEADER, str, getSerialPinIOTypeString(pinNumber), OPERATION_SUCCESS);
         return;
     }
-    printResult(PIN_TYPE_HEADER, pinNumber, getIOTypeString(gpioPinByPinNumber(pinNumber)->ioType()), OPERATION_SUCCESS);
+    printResult(PIN_TYPE_HEADER, str, getIOTypeString(gpioPinByPinNumber(pinNumber)->ioType()), OPERATION_SUCCESS);
 }
 
 void pinTypeChangeRequest(const std::string &str)
@@ -926,19 +935,19 @@ void pinTypeChangeRequest(const std::string &str)
     std::string maybeType{str.substr(foundPosition+1)};
     IOType type{parseIOType(maybeType)};
     if (type == IOType::UNSPECIFIED) {
-        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, maybeType, OPERATION_FAILURE);
+        printResult(PIN_TYPE_CHANGE_HEADER, maybePin, maybeType, OPERATION_FAILURE);
         return;
     }
     if (pinInUseBySerialPort(pinNumber)) {
-        printResult(DIGITAL_WRITE_HEADER, pinNumber, getIOTypeString(type), OPERATION_PIN_USED_BY_SERIAL_PORT);
+        printResult(DIGITAL_WRITE_HEADER, maybePin, getIOTypeString(type), OPERATION_PIN_USED_BY_SERIAL_PORT);
         return;
     }
     if (!checkValidIOChangeRequest(type, pinNumber)) {
-        printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, getIOTypeString(type), OPERATION_FAILURE);
+        printResult(PIN_TYPE_CHANGE_HEADER, maybePin, getIOTypeString(type), OPERATION_FAILURE);
         return;
     }
     gpioPinByPinNumber(pinNumber)->setIOType(type);
-    printResult(PIN_TYPE_CHANGE_HEADER, pinNumber, getIOTypeString(type), OPERATION_SUCCESS);
+    printResult(PIN_TYPE_CHANGE_HEADER, maybePin, getIOTypeString(type), OPERATION_SUCCESS);
 }
 
 void softAnalogReadRequest(const std::string &str)
@@ -953,11 +962,11 @@ void softAnalogReadRequest(const std::string &str)
         return;
     }
     if (!isValidAnalogOutputPin(pinNumber)) {
-        printResult(SOFT_ANALOG_READ_HEADER, pinNumber, STATE_FAILURE, OPERATION_FAILURE);
+        printResult(SOFT_ANALOG_READ_HEADER, str, STATE_FAILURE, OPERATION_FAILURE);
         return;
     }
     int state{gpioPinByPinNumber(pinNumber)->g_softAnalogRead()};
-    printResult(SOFT_ANALOG_READ_HEADER, pinNumber, state, OPERATION_SUCCESS);
+    printResult(SOFT_ANALOG_READ_HEADER, str, state, OPERATION_SUCCESS);
 }
 
 void heartbeatRequest()
