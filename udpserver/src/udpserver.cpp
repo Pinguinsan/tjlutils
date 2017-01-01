@@ -156,11 +156,7 @@ void UDPServer::asyncDatagramListener()
         memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
-#if defined(__ANDROID__)
-        socklen_t socketSize{sizeof(sockaddr)};
-#else
-        unsigned int socketSize = sizeof(sockaddr);
-#endif
+        platform_socklen_t socketSize{sizeof(sockaddr)};
         ssize_t returnValue {recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
@@ -189,11 +185,7 @@ void UDPServer::syncDatagramListener()
         memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
-#if defined(__ANDROID__)
-        socklen_t socketSize{sizeof(sockaddr)};
-#else
-        unsigned int socketSize = sizeof(sockaddr);
-#endif
+        platform_socklen_t socketSize{sizeof(sockaddr)};
         ssize_t returnValue{recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,

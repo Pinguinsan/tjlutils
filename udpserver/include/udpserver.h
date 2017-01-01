@@ -39,6 +39,14 @@
 #include <eventtimer.h>
 #include <tstream.h>
 
+#if defined(__ANDROID__)
+    using platform_socklen_t = socklen_t;
+#elif defined(_WIN32)
+     using platform_socklen_t = int;
+#else
+    using platform_socklen_t = socklen_t;
+#endif
+
 class UDPDatagram
 {
 public:

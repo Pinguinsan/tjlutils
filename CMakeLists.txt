@@ -28,7 +28,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/serialport/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/prettyprinter/include/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/arduino/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpserver/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpclient/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpduplex/include/"
@@ -48,7 +47,6 @@ set (MATHUTILITIES_SOURCES "${SOURCE_BASE}/mathutilities/src/mathutilities.cpp")
 set (SERIALPORT_SOURCES "${SOURCE_BASE}/serialport/src/serialport.cpp")
 set (EVENTTIMER_SOURCES "${SOURCE_BASE}/eventtimer/src/eventtimer.cpp")
 set (PRETTYPRINTER_SOURCES "${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp")
-set (ARDUINO_SOURCES "${SOURCE_BASE}/arduino/src/arduino.cpp")
 set (UDPSERVER_SOURCES "${SOURCE_BASE}/udpserver/src/udpserver.cpp")
 set (UDPCLIENT_SOURCES "${SOURCE_BASE}/udpclient/src/udpclient.cpp")
 set (UDPDUPLEX_SOURCES "${SOURCE_BASE}/udpduplex/src/udpduplex.cpp")
@@ -66,7 +64,6 @@ add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                             "${SERIALPORT_SOURCES}"
                             "${EVENTTIMER_SOURCES}"
                             "${PRETTYPRINTER_SOURCES}"
-                            "${ARDUINO_SOURCES}"
                             "${UDPSERVER_SOURCES}"
                             "${UDPCLIENT_SOURCES}"
                             "${UDPDUPLEX_SOURCES}"
@@ -82,7 +79,6 @@ add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${SERIALPORT_SOURCES}"
                                   "${EVENTTIMER_SOURCES}"
                                   "${PRETTYPRINTER_SOURCES}"
-                                  "${ARDUINO_SOURCES}"
                                   "${UDPSERVER_SOURCES}"
                                   "${UDPCLIENT_SOURCES}"
                                   "${UDPDUPLEX_SOURCES}"
