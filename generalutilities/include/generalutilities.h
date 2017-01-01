@@ -601,156 +601,40 @@ namespace std {
             return returnContainer;
         }
 
-
-        template<class T>
-        class isIterator {
-        public:
-            T makeT();
-
-            typedef void *twoptrs[2];  // sizeof(twoptrs) > sizeof(void *)
-            twoptrs &test(...); // Common case
-            template<class R>
-            typename R::iterator_category *test(R); // Iterator
-            template<class R>
-            void *test(R *); // Pointer
-            const bool value = sizeof(test(makeT())) == sizeof(void *);
-        };
-
-        template<typename BeginningIterator, typename EndingIterator, typename Function>
-        size_t findLastOfIf(const BeginningIterator &bit, const EndingIterator &eit, Function function) 
-        {
-            size_t foundPosition{GeneralUtilities::generalnpos};
-            for (auto iter = bit; iter != eit; iter++) {
-                if (function(*iter)) {
-                    foundPosition = std::distance(bit, iter);
-                }
-            }
-            return foundPosition;
-        }
-
-        template<typename BeginningIterator, typename EndingIterator, typename Function>
-        size_t findIf(const BeginningIterator &bit, const EndingIterator &eit, Function function) 
-        {
-            size_t foundPosition{GeneralUtilities::generalnpos};
-            for (auto iter = bit; iter != eit; iter++) {
-                if (function(*iter)) {
-                    return foundPosition;
-                }
-            }
-            return foundPosition;
-        }
-
-        template<typename T, typename dT>
-        std::vector<T> parseToVector(const T &thingToParse, dT delimiter) 
-        {
-            std::vector<T> returnVector;
-            T copyThing{thingToParse};
-            if (copyThing.find(delimiter) == std::string::npos) {
-                returnVector.emplace_back(copyThing);
-                return returnVector;
-            }
-            while (copyThing.length() > 0) {
-                size_t foundPosition{copyThing.find(delimiter)};
-                if (foundPosition != std::string::npos) {
-                    returnVector.emplace_back(copyThing.substr(0, foundPosition));
-                    copyThing = copyThing.substr(foundPosition + 1);
-                } else {
-                    returnVector.emplace_back(copyThing);
-                    copyThing = "";
-                }
-            }
-            return returnVector;
-        }
-
-        template<typename T, typename dT, typename Container = std::vector<T>>
-        Container parseToContainerAdapter(const T &thingToParse, dT delimiter) 
+        template <typename Container, typename InputIter>
+        Container parseToContainer(InputIter first, InputIter last, typename std::remove_reference<decltype(*first)>::type delimiter)
         {
             Container returnContainer;
-            T copyThing{thingToParse};
-            if (copyThing.find(delimiter) == std::string::npos) {
-                returnContainer.emplace(copyThing);
-                return returnContainer;
-            }
-            while (copyThing.length() > 0) {
-                size_t foundPosition{copyThing.find(delimiter)};
-                if (foundPosition != std::string::npos) {
-                    returnContainer.emplace(copyThing.substr(0, foundPosition));
-                    copyThing = copyThing.substr(foundPosition + 1);
-                } else {
-                    returnContainer.emplace(copyThing);
-                    copyThing = T{};
+            InputIter it;
+            do {
+                it = std::find(first, last, delimiter);
+                typename Container::value_type tempContainer;
+                std::copy(first, it, std::inserter(tempContainer, tempContainer.end()));
+                if (!tempContainer.empty()) {
+                    returnContainer.insert(returnContainer.end(), tempContainer);
                 }
-            }
+                first = it+1;
+            } while (it != last);
             return returnContainer;
         }
 
-        template<typename Container = std::vector<std::string>>
-        Container parseToContainerAdapter(const std::string &thingToParse, char delimiter)
-        {
-            std::istringstream transfer{thingToParse};
-            std::string tempString{""};
-            Container returnContainer{};
-            while (std::getline(transfer, tempString, delimiter)) {
-                returnContainer.emplace(tempString);
-            }
-            return returnContainer;
-        }
-
-        template<typename Container = std::vector<std::string>>
-        Container parseToContainerAdapter(const std::string &thingToParse, const std::string &delimiter)
-        {
-            if (delimiter.size() != 1) {
-                return GeneralUtilities::parseToContainerAdapter<std::string, std::string>(thingToParse, delimiter);
-            } else {
-                return parseToContainerAdapter(thingToParse, delimiter[0]);
-            }
-        }
-
-        template<typename T, typename dT, typename Container = std::vector<T>>
-        Container parseToContainer(const T &thingToParse, dT delimiter) 
+        template <typename Container, typename InputIter>
+        Container parseToContainerAdapter(InputIter first, InputIter last, typename std::remove_reference<decltype(*first)>::type delimiter)
         {
             Container returnContainer;
-            T copyThing{thingToParse};
-            if (copyThing.find(delimiter) == std::string::npos) {
-                returnContainer.emplace_back(copyThing);
-                return returnContainer;
-            }
-            while (copyThing.length() > 0) {
-                size_t foundPosition{copyThing.find(delimiter)};
-                if (foundPosition != std::string::npos) {
-                    returnContainer.emplace_back(copyThing.substr(0, foundPosition));
-                    copyThing = copyThing.substr(foundPosition + 1);
-                } else {
-                    returnContainer.emplace_back(copyThing);
-                    copyThing = T{};
+            InputIter it;
+            do {
+                it = std::find(first, last, delimiter);
+                typename Container::value_type tempContainer;
+                std::copy(first, it, std::inserter(tempContainer, tempContainer.end()));
+                if (!tempContainer.empty()) {
+                    returnContainer.push(tempContainer);
                 }
-            }
+                first = it+1;
+            } while (it != last);
             return returnContainer;
         }
-
-
-        template<typename Container = std::vector<std::string>>
-        Container parseToContainer(const std::string &thingToParse, char delimiter)
-        {
-            std::istringstream transfer{thingToParse};
-            std::string tempString{""};
-            Container returnContainer{};
-            while (std::getline(transfer, tempString, delimiter)) {
-                returnContainer.push_back(tempString);
-            }
-            return returnContainer;
-        }
-
-        template<typename Container = std::vector<std::string>>
-        Container parseToContainer(const std::string &thingToParse, const std::string & delimiter)
-        {
-            if (delimiter.size() != 1) {
-                return GeneralUtilities::parseToContainer<std::string, std::string, Container>(thingToParse, delimiter);
-            } else {
-                return parseToContainer(thingToParse, delimiter[0]);
-            }
-        }
-
+        
         template<typename T>
         std::string tQuoted(const T &convert) {
             return ("\"" + toString(convert) + "\"");
