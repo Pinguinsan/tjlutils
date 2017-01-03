@@ -89,11 +89,13 @@ public:
 private:
     std::string m_hostName;
     uint16_t m_portNumber;
+    sockaddr_storage m_destinationAddress;
+    
     std::string m_returnAddressHostName;
     uint16_t m_returnAddressPortNumber;
     sockaddr_in m_returnAddress;
-    sockaddr_storage m_destinationAddress;
     sockaddr_storage m_returnAddressStorage;
+    
     unsigned int m_timeout;
     int m_udpSocketIndex;
     std::string m_lineEnding;
