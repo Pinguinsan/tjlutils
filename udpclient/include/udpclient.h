@@ -55,10 +55,12 @@ public:
     uint16_t portNumber() const;
     std::string hostName() const;
     std::string returnAddressHostName() const;
+    uint16_t returnAddressPortNumber() const;
     unsigned long int timeout() const;
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
-    void returnAddressHostName(const std::string &returnAddressHostName) const;
+    void setReturnAddressPortNumber(uint16_t returnAddressPortNumber);
+    void setReturnAddressHostName(const std::string &returnAddressHostName);
     void setTimeout(unsigned long int timeout);
     LineEnding lineEnding() const;
     void setLineEnding(LineEnding lineEnding);
@@ -74,8 +76,8 @@ public:
 
     static uint16_t doUserSelectPortNumber();
     static std::string doUserSelectHostName();
-    static std::string doUserSelectReturnAddressPortNumber();
-    static std::string doUserSelectReturnAddressHostName();
+    //static std::string doUserSelectReturnAddressPortNumber();
+    //static std::string doUserSelectReturnAddressHostName();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
     
 

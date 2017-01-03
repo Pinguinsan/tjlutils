@@ -50,7 +50,7 @@ UDPClient::UDPClient(const std::string &hostName) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     m_hostName{hostName},
     m_portNumber{portNumber},
-    m_listenAddress{},
+    m_returnAddress{},
     m_destinationAddress{},
     m_udpSocketIndex{},
     m_timeout{UDPClient::s_DEFAULT_TIMEOUT},
@@ -67,12 +67,12 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     this->initialize();
 }
 
-uint16_t UDPClient::returnAddressPortNumber()
+uint16_t UDPClient::returnAddressPortNumber() const
 {
     return this->m_returnAddressPortNumber;
 }
 
-std::string UDPClient::returnAddressHostName()
+std::string UDPClient::returnAddressHostName() const
 {
     return this->m_returnAddressHostName;
 }
