@@ -670,13 +670,6 @@ namespace GeneralUtilities
     {
         return ("\"" + static_cast<std::string>(convert) + "\"");
     }
-
-    std::string stripTrailingWhitespace(const std::string &stringToStrip)
-    {
-        size_t lastPosition = findLastOfIf(stringToStrip.begin(), stringToStrip.end(), [](char c) -> bool { return (static_cast<unsigned>(c) <= ASCII_WHITESPACE_MAXIMUM_VALUE); });
-        return stringToStrip.substr(0, lastPosition);
-    }
-
     std::string tEndl()
     {
         #if (defined(_WIN32) || defined(_MSC_VER))

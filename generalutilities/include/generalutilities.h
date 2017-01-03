@@ -268,9 +268,6 @@ namespace std {
         void delayMilliseconds(unsigned long long howLong);
         void delayMicroseconds(unsigned long long howLong);
         void delayNanoseconds(unsigned long long howLong);
-
-        std::vector<std::string> parseToVector(const std::string &thingToParse, char delimiter);
-        std::vector<std::string> parseToVector(const std::string &thingToParse, const std::string &delimiter);
  
         bool isDigit(char charToCheck);
 
@@ -351,8 +348,6 @@ namespace std {
         std::string toHexString(bool number);
 
         std::string tEndl();
-
-        std::string stripTrailingWhitespace(const std::string &stringToStrip);
 
         std::string tParenthesis(const std::string &convert);
 

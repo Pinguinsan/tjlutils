@@ -89,7 +89,8 @@ namespace FileUtilities
 
     std::vector<std::string> getPathDirectoriesAsVector()
     {
-        return GeneralUtilities::parseToVector(static_cast<std::string>(getenv("PATH")), ':');
+        std::string temp{static_cast<std::string>(getenv("PATH"))};
+        return GeneralUtilities::parseToContainer<std::vector<std::string>>(temp.begin(), temp.end(), ':');
     }
 
     std::list<std::string> getPathDirectories()
