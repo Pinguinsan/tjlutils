@@ -67,6 +67,39 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     this->initialize();
 }
 
+uint16_t UDPClient::returnAddressPortNumber()
+{
+    return this->m_returnAddressPortNumber;
+}
+
+std::string UDPClient::returnAddressHostName()
+{
+    return this->m_returnAddressHostName;
+}
+
+void UDPClient::setReturnAddressPortNumber(uint16_t portNumber)
+{
+    if (!isValidPortNumber(portNumber)) {
+        throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
+                                 std::to_string(std::numeric_limits<uint16_t>::max()) 
+                                 + "("
+                                 + std::to_string(portNumber) 
+                                 + ")");
+    }
+    this->m_returnAddressPortNumber = portNumber;
+    this->initialize();
+}
+
+void UDPClient::setReturnAddressHostName(const std::string &hostName)
+{
+    using namespace GeneralUtilities;
+    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->m_returnAddressPortNumber), &this->m_returnAddressStorage) != 0) {
+       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
+    }
+    this->m_returnAddressHostName = hostName;
+    this->initialize();
+}
+
 void UDPClient::setPortNumber(uint16_t portNumber)
 {
     if (!isValidPortNumber(portNumber)) {
@@ -139,8 +172,8 @@ void UDPClient::initialize()
 {
     using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
-    this->m_listenAddress.sin_family = AF_INET;
-    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_listenAddress), sizeof(this->m_listenAddress)) != 0) {
+    this->m_returnAddress.sin_family = AF_INET;
+    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
     }
 
@@ -157,10 +190,9 @@ int UDPClient::resolveAddressHelper(const std::string &hostName, int family, con
     addrinfo* resultList{nullptr};
     addrinfo hints{};
     hints.ai_family = family;
-    hints.ai_socktype = SOCK_DGRAM; // without this flag, getaddrinfo will return 3x the number of addresses (one for each socket type).
+    hints.ai_socktype = SOCK_DGRAM;
     result = getaddrinfo(hostName.c_str(), service.c_str(), &hints, &resultList);
     if (result == 0) {
-        //ASSERT(result_list->ai_addrlen <= sizeof(sockaddr_in));
         memcpy(addressPtr, resultList->ai_addr, resultList->ai_addrlen);
         freeaddrinfo(resultList);
     }

@@ -54,9 +54,11 @@ public:
     ssize_t writeString(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
+    std::string returnAddressHostName() const;
     unsigned long int timeout() const;
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
+    void returnAddressHostName(const std::string &returnAddressHostName) const;
     void setTimeout(unsigned long int timeout);
     LineEnding lineEnding() const;
     void setLineEnding(LineEnding lineEnding);
@@ -72,6 +74,8 @@ public:
 
     static uint16_t doUserSelectPortNumber();
     static std::string doUserSelectHostName();
+    static std::string doUserSelectReturnAddressPortNumber();
+    static std::string doUserSelectReturnAddressHostName();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
     
 
@@ -83,8 +87,11 @@ public:
 private:
     std::string m_hostName;
     uint16_t m_portNumber;
-    sockaddr_in m_listenAddress;
+    std::string m_returnAddressHostName;
+    uint16_t m_returnAddressPortNumber;
+    sockaddr_in m_returnAddress;
     sockaddr_storage m_destinationAddress;
+    sockaddr_storage m_returnAddressStorage;
     unsigned int m_timeout;
     int m_udpSocketIndex;
     std::string m_lineEnding;
