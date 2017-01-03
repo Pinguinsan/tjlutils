@@ -23,12 +23,15 @@
 
 //Loopback
 const char *UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME{UDPClient::s_DEFAULT_HOST_NAME};
+const char *UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME{UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME};
 
 UDPDuplex::UDPDuplex(UDPObjectType udpObjectType) :
     UDPDuplex(UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME, 
               UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, 
               UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER,
-              m_udpObjectType)
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
 {
 
 }
@@ -37,34 +40,89 @@ UDPDuplex::UDPDuplex(uint16_t serverPortNumber, UDPObjectType udpObjectType) :
     UDPDuplex(UDPDuplex::s_DEFAULT_CLIENT_HOST_NAME, 
               UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, 
               serverPortNumber,
-              m_udpObjectType)
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
 {
 
 }
 
-UDPDuplex::UDPDuplex(const std::string &clientHostname, UDPObjectType m_udpObjectType) :
-    UDPDuplex(clientHostname, 
+UDPDuplex::UDPDuplex(const std::string &clientHostName, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
               UDPDuplex::s_DEFAULT_CLIENT_PORT_NUMBER, 
               UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER,
-              m_udpObjectType)
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
 {
 
 }
 
-UDPDuplex::UDPDuplex(const std::string &clientHostname, uint16_t clientPortNumber, UDPObjectType udpObjectType) :
-    UDPDuplex(clientHostname, 
-    clientPortNumber, 
-    UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER,
-    m_udpObjectType)
+UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
+              clientPortNumber, 
+              UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
 {
 
 }
 
 UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
+              clientPortNumber, 
+              serverPortNumber,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
+
+{
+
+}
+
+UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, const std::string &clientReturnAddressHostName, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
+              clientPortNumber, 
+              serverPortNumber,
+              clientReturnAddressHostName,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER,
+              udpObjectType)
+
+{
+
+}
+
+UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
+              clientPortNumber, 
+              serverPortNumber,
+              UDPDuplex::s_DEFAULT_CLIENT_RETURN_ADDRESS_HOST_NAME,
+              clientReturnAddressPortNumber,
+              udpObjectType)
+
+{
+
+}
+
+UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, const std::string &clientReturnAddressHostName, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType) :
+    UDPDuplex(clientHostName, 
+              clientPortNumber, 
+              UDPDuplex::s_DEFAULT_SERVER_PORT_NUMBER,
+              clientReturnAddressHostName,
+              clientReturnAddressPortNumber,
+              udpObjectType)
+{
+
+}
+
+
+UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, const std::string &clientReturnAddressHostName, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType) :
     m_udpClient{nullptr},
     m_udpServer{nullptr},
     m_udpObjectType{udpObjectType}
 {
+
     if ((this->m_udpObjectType  == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
         if (!this->isValidPortNumber(serverPortNumber)) {
             throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
@@ -85,7 +143,17 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
                                     + std::to_string(clientPortNumber) 
                                     + ")");
         }
-        this->m_udpClient = std::make_unique<UDPClient>(clientHostName, clientPortNumber);
+        if (!this->isValidPortNumber(clientReturnAddressPortNumber)) {
+            throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
+                                    std::to_string(std::numeric_limits<uint16_t>::max()) 
+                                    + "("
+                                    + std::to_string(clientReturnAddressPortNumber) 
+                                    + ")");
+        }
+        this->m_udpClient = std::make_unique<UDPClient>(clientHostName, 
+                                                        clientPortNumber, 
+                                                        clientReturnAddressHostName, 
+                                                        clientReturnAddressPortNumber);
     }
 }
 
@@ -154,6 +222,20 @@ void UDPDuplex::setClientHostName(const std::string &hostName)
     }
 }
 
+void UDPDuplex::setClientReturnAddressPortNumber(uint16_t portNumber)
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+       this->m_udpClient->setReturnAddressPortNumber(portNumber);
+    }
+}
+
+void UDPDuplex::setClientReturnAddressHostName(const std::string &hostName)
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        this->m_udpClient->setReturnAddressHostName(hostName);
+    }
+}
+
 void UDPDuplex::setClientTimeout(unsigned long int timeout)
 {
     if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
@@ -188,6 +270,24 @@ std::string UDPDuplex::clientHostName() const
         return this->m_udpClient->hostName();
     } else {
         return "";
+    }
+}
+
+std::string UDPDuplex::clientReturnAddressHostName() const
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        return this->m_udpClient->returnAddressHostName();
+    } else {
+        return "";
+    }
+}
+    
+uint16_t UDPDuplex::clientReturnAddressPortNumber() const
+{
+    if ((this->m_udpObjectType  == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType  == UDPObjectType::UDP_DUPLEX)) {
+        return this->m_udpClient->returnAddressPortNumber();
+    } else {
+        return 0;
     }
 }
 
@@ -473,9 +573,19 @@ uint16_t UDPDuplex::doUserSelectClientPortNumber()
     return UDPClient::doUserSelectPortNumber();
 }
 
+uint16_t UDPDuplex::doUserSelectClientReturnAddressPortNumber()
+{
+    return UDPClient::doUserSelectReturnAddressPortNumber();
+}
+
 std::string UDPDuplex::doUserSelectClientHostName()
 {
     return UDPClient::doUserSelectHostName();
+}
+
+std::string UDPDuplex::doUserSelectClientReturnAddressHostName()
+{
+    return UDPClient::doUserSelectReturnAddressHostName();
 }
 
 uint16_t UDPDuplex::doUserSelectServerPortNumber()
@@ -502,15 +612,29 @@ std::shared_ptr<UDPDuplex> UDPDuplex::doUserSelectUDPDuplex()
     if (udpObjectType == UDPObjectType::UDP_DUPLEX) {
         std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
         uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
+        std::string clientReturnAddressHostName{UDPDuplex::doUserSelectClientReturnAddressHostName()};
+        uint16_t clientReturnAddressPortNumber{UDPDuplex::doUserSelectClientReturnAddressPortNumber()};
         uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
-        udpDuplex = std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, serverPortNumber, udpObjectType);
+        udpDuplex = std::make_shared<UDPDuplex>(clientHostName, 
+                                                clientPortNumber,
+                                                serverPortNumber,
+                                                clientReturnAddressHostName,
+                                                clientReturnAddressPortNumber, 
+                                                udpObjectType);
+
     } else if (udpObjectType == UDPObjectType::UDP_SERVER) {
         uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
         udpDuplex = std::make_shared<UDPDuplex>(serverPortNumber, udpObjectType);
     } else if (udpObjectType == UDPObjectType::UDP_CLIENT) {
         std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
         uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
-        udpDuplex = std::make_shared<UDPDuplex>(clientHostName, clientPortNumber, udpObjectType);
+        std::string clientReturnAddressHostName{UDPDuplex::doUserSelectClientReturnAddressHostName()};
+        uint16_t clientReturnAddressPortNumber{UDPDuplex::doUserSelectClientReturnAddressPortNumber()};
+        udpDuplex = std::make_shared<UDPDuplex>(clientHostName,
+                                                clientPortNumber,
+                                                clientReturnAddressHostName,
+                                                clientReturnAddressPortNumber,
+                                                udpObjectType);
     } else {
         throw std::runtime_error("Unknown UDPObjectType passed to UDPDuplex::doUserSelectUDPDuplex()");
     }

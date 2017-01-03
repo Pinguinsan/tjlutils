@@ -48,6 +48,9 @@ public:
     UDPClient(uint16_t portNumber);
     UDPClient(const std::string &hostName);
     UDPClient(const std::string &hostName, uint16_t portNumber);
+    UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName);
+    UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t clientReturnAddressPortNumber);
+    UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber);
 
     ssize_t writeByte(char toSend);
     ssize_t writeString(const char *str);
@@ -70,14 +73,16 @@ public:
     bool isOpen() const;
 
     static const char *s_DEFAULT_HOST_NAME;
+    static const char *s_DEFAULT_RETURN_ADDRESS_HOST_NAME;
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
+    static const constexpr uint16_t s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER{1234};
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
     static const constexpr unsigned int s_SEND_RETRY_COUNT{3};
 
     static uint16_t doUserSelectPortNumber();
     static std::string doUserSelectHostName();
-    //static std::string doUserSelectReturnAddressPortNumber();
-    //static std::string doUserSelectReturnAddressHostName();
+    static uint16_t doUserSelectReturnAddressPortNumber();
+    static std::string doUserSelectReturnAddressHostName();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
     
 
@@ -87,14 +92,14 @@ public:
 
 
 private:
-    std::string m_hostName;
-    uint16_t m_portNumber;
     sockaddr_storage m_destinationAddress;
+    uint16_t m_portNumber;
+    std::string m_hostName;
     
-    std::string m_returnAddressHostName;
-    uint16_t m_returnAddressPortNumber;
     sockaddr_in m_returnAddress;
     sockaddr_storage m_returnAddressStorage;
+    std::string m_returnAddressHostName;
+    uint16_t m_returnAddressPortNumber;
     
     unsigned int m_timeout;
     int m_udpSocketIndex;
