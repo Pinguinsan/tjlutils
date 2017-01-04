@@ -92,14 +92,11 @@ public:
 
 
 private:
-    sockaddr_storage m_destinationAddress;
-    uint16_t m_portNumber;
-    std::string m_hostName;
+    sockaddr_in m_destinationAddress;
+    //sockaddr_storage m_destinationAddressStorage;
     
     sockaddr_in m_returnAddress;
-    sockaddr_storage m_returnAddressStorage;
-    std::string m_returnAddressHostName;
-    uint16_t m_returnAddressPortNumber;
+    //sockaddr_storage m_returnAddressStorage;
     
     unsigned int m_timeout;
     int m_udpSocketIndex;
@@ -107,7 +104,8 @@ private:
     
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
 
-    void initialize();
+    void initialize(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber);
+
     
     static constexpr bool isValidPortNumber(int portNumber);
     static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;

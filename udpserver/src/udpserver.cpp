@@ -18,6 +18,8 @@
 
 #include "udpserver.h"
 
+const uint16_t UDPServer::s_BROADCAST{1};
+
 UDPServer::UDPServer() :
     UDPServer{UDPServer::s_DEFAULT_PORT_NUMBER}
 {
@@ -25,24 +27,14 @@ UDPServer::UDPServer() :
 }
 
 UDPServer::UDPServer(uint16_t portNumber) :
-    m_portNumber{portNumber},
     m_socketAddress{},
-    m_broadcast{UDPServer::s_BROADCAST},
     m_isListening{false},
     m_setSocketResult{0},
     m_timeout{UDPServer::s_DEFAULT_TIMEOUT},
     m_datagramQueue{},
     m_shutEmDown{false}
 {
-    if (!this->isValidPortNumber(this->m_portNumber)) {
-        this->m_portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
-        throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
-                                 std::to_string(std::numeric_limits<uint16_t>::max())
-                                 + "("
-                                 + std::to_string(this->m_portNumber)
-                                 + ")");
-    }
-    this->initialize();
+    this->initialize(portNumber);
 }
 
 bool constexpr UDPServer::isValidPortNumber(int portNumber)
@@ -58,9 +50,9 @@ void UDPServer::setPortNumber(uint16_t portNumber)
                                  + "("
                                  + std::to_string(portNumber)
                                  + ")");
+    } else {
+        this->m_socketAddress.sin_port = htons(portNumber);
     }
-    this->m_portNumber = portNumber;
-    this->m_socketAddress.sin_port = htons(this->m_portNumber);
 }
 
 void UDPServer::setTimeout(unsigned long timeout)
@@ -73,16 +65,15 @@ unsigned long int UDPServer::timeout() const
     return this->m_timeout;
 }
 
-uint16_t UDPServer::portNumber() const
-{
-    return this->m_portNumber;
-}
-
-
 void UDPServer::flushRXTX()
 {
     std::lock_guard<std::mutex> ioLock{this->m_ioMutex};
     this->m_datagramQueue.clear();
+}
+
+uint16_t UDPServer::portNumber() const 
+{ 
+    return ntohs(this->m_socketAddress.sin_port); 
 }
 
 void UDPServer::flushRX()
@@ -95,19 +86,29 @@ void UDPServer::flushTX()
     return this->flushRXTX();
 }
 
-void UDPServer::initialize()
+void UDPServer::initialize(uint16_t portNumber)
 {
     using namespace GeneralUtilities;
+    if (!this->isValidPortNumber(portNumber)) {
+        portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
+        throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
+                                 std::to_string(std::numeric_limits<uint16_t>::max())
+                                 + "("
+                                 + std::to_string(portNumber)
+                                 + ")");
+    }
+
+
     this->m_setSocketResult = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (this->m_setSocketResult == -1) {
        throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 
-    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &this->m_broadcast, sizeof(this->m_broadcast));
+    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &UDPServer::s_BROADCAST, sizeof(UDPServer::s_BROADCAST));
     memset(&this->m_socketAddress, 0, sizeof(this->m_socketAddress));
     this->m_socketAddress.sin_family = AF_INET;
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
-    this->m_socketAddress.sin_port = htons(this->m_portNumber);
+    this->m_socketAddress.sin_port = htons(portNumber);
 
     if (bind(this->m_setSocketResult, reinterpret_cast<sockaddr *>(&this->m_socketAddress), sizeof(sockaddr)) == -1) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
@@ -285,12 +286,12 @@ std::string UDPServer::readString(unsigned long maximumReadSize)
 
 void UDPServer::openPort()
 {
-    this->startListening();
+    //this->startListening();
 }
 
 void UDPServer::closePort()
 {
-    this->stopListening();
+    //this->stopListening();
 }
 
 bool UDPServer::isOpen() const

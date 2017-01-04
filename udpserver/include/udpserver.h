@@ -58,15 +58,14 @@ public:
         m_socketAddress{sockaddr_in{}},
         m_message{""} { }
 
+    sockaddr_in socketAddress () const { return this->m_socketAddress; }
     uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
     std::string message() const { return this->m_message; }
-    sockaddr_in socketAddress () const { return this->m_socketAddress; }
     std::string hostName() const 
     { 
         char lowLevelTempBuffer[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(this->m_socketAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
         return std::string{lowLevelTempBuffer};
-        //{ return inet_ntoa(this->m_socketAddress.sin_addr); }
     }
     /*
     // IPv4 demo of inet_ntop() and inet_pton()
@@ -134,15 +133,14 @@ public:
 
 private:
     sockaddr_in m_socketAddress;
-    uint16_t m_portNumber;
-    uint16_t m_broadcast;
     int m_setSocketResult;
     bool m_isListening;
     unsigned long m_timeout;
     std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
-    void initialize();
+
+    void initialize(uint16_t portNumber);
 #if defined(__ANDROID__)
     std::thread *m_asyncFuture;
 #else
@@ -152,7 +150,7 @@ private:
     void asyncDatagramListener();
     void syncDatagramListener();
 
-    static const constexpr uint16_t s_BROADCAST{1};
+    static const uint16_t s_BROADCAST;
     static const constexpr size_t s_RECEIVED_BUFFER_MAX{65535};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
 
