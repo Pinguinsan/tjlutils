@@ -136,7 +136,7 @@ void UDPClient::setReturnAddressPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->m_returnAddressPortNumber = portNumber;
-    this->m_returnAddress.sin_port = htons(this->m_returnAddressPortNumberz);
+    this->m_returnAddress.sin_port = htons(this->m_returnAddressPortNumber);
 }
 
 void UDPClient::setReturnAddressHostName(const std::string &hostName)
@@ -146,7 +146,8 @@ void UDPClient::setReturnAddressHostName(const std::string &hostName)
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     this->m_returnAddressHostName = hostName;
-    inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
+    sockaddr_in *temp{reinterpret_cast<sockaddr_in*>(&this->m_destinationAddress)};
+    inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(temp->sin_addr)));
 }
 
 void UDPClient::setPortNumber(uint16_t portNumber)
@@ -159,7 +160,7 @@ void UDPClient::setPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->m_portNumber = portNumber;
-    this->m_destinationAddress.sin_port = htons(this->m_portNumber);
+    reinterpret_cast<sockaddr*>(&this->m_destinationAddress)->sin_port = htons(this->m_portNumber);
 }
 
 void UDPClient::setLineEnding(LineEnding lineEnding)
