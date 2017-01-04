@@ -124,7 +124,8 @@ void UDPClient::setReturnAddressPortNumber(uint16_t portNumber)
 void UDPClient::setReturnAddressHostName(const std::string &hostName)
 {
     using namespace GeneralUtilities;
-    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->returnAddressPortNumber()), reinterpret_cast<sockaddr_storage *>(&this->m_returnAddress)) != 0) {
+    sockaddr_storage temp{};
+    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->returnAddressPortNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     inet_pton(AF_INET, hostName.c_str(), &(this->m_returnAddress.sin_addr));
@@ -160,7 +161,8 @@ void UDPClient::setTimeout(unsigned long int timeout)
 void UDPClient::setHostName(const std::string &hostName)
 {
     using namespace GeneralUtilities;
-    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->portNumber()), reinterpret_cast<sockaddr_storage *>(&this->m_destinationAddress)) != 0) {
+    sockaddr_storage temp{};
+    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->portNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     inet_pton(AF_INET, hostName.c_str(), &(this->m_destinationAddress.sin_addr));
@@ -230,11 +232,13 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, con
     this->m_returnAddress.sin_port = htons(returnAddressPortNumber);
     inet_pton(AF_INET, returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
     
-    if (resolveAddressHelper (this->hostName(), AF_INET, std::to_string(this->portNumber()), reinterpret_cast<sockaddr_storage *>(&this->m_destinationAddress)) != 0) {
+    sockaddr_storage temp{};
+    if (resolveAddressHelper (this->hostName(), AF_INET, std::to_string(this->portNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->hostName()));
     }
 
-    if (resolveAddressHelper (this->returnAddressHostName(), AF_INET, std::to_string(this->returnAddressPortNumber()), reinterpret_cast<sockaddr_storage *>(&this->m_destinationAddress)) != 0) {
+    temp = sockaddr_storage{};
+    if (resolveAddressHelper (this->returnAddressHostName(), AF_INET, std::to_string(this->returnAddressPortNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->returnAddressHostName()));
     }
 
