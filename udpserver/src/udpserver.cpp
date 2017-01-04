@@ -103,7 +103,7 @@ void UDPServer::initialize()
        throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 
-    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_BROADCAST, &this->m_broadcast, sizeof(this->m_broadcast));
+    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &this->m_broadcast, sizeof(this->m_broadcast));
     memset(&this->m_socketAddress, 0, sizeof(this->m_socketAddress));
     this->m_socketAddress.sin_family = AF_INET;
     this->m_socketAddress.sin_port = htons(this->m_portNumber);
@@ -181,26 +181,26 @@ void UDPServer::asyncDatagramListener()
 void UDPServer::syncDatagramListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-        char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
-        memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
-        std::string receivedString{""};
-        sockaddr_in receivedAddress{};
-        platform_socklen_t socketSize{sizeof(sockaddr)};
-        ssize_t returnValue{recvfrom(this->m_setSocketResult,
-                            lowLevelReceiveBuffer,
-                            sizeof(lowLevelReceiveBuffer)-1,
-                            MSG_DONTWAIT,
-                            reinterpret_cast<sockaddr *>(&receivedAddress),
-                            &socketSize)};
-        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
-            return;
-        }
-        receivedString = std::string{lowLevelReceiveBuffer};
-        if (receivedString.length() > 0) {
-            ioMutexLock.lock();
-            this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
-            ioMutexLock.unlock();
-        }
+    char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
+    memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
+    std::string receivedString{""};
+    sockaddr_in receivedAddress{};
+    platform_socklen_t socketSize{sizeof(sockaddr)};
+    ssize_t returnValue{recvfrom(this->m_setSocketResult,
+                        lowLevelReceiveBuffer,
+                        sizeof(lowLevelReceiveBuffer)-1,
+                        MSG_DONTWAIT,
+                        reinterpret_cast<sockaddr *>(&receivedAddress),
+                        &socketSize)};
+    if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
+        return;
+    }
+    receivedString = std::string{lowLevelReceiveBuffer};
+    if (receivedString.length() > 0) {
+        ioMutexLock.lock();
+        this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
+        ioMutexLock.unlock();
+    }
 }
 
 std::string UDPServer::peek()

@@ -131,11 +131,6 @@ namespace std {
         }
         return returnValue;
     }
-    extern int stoi(const std::string &str);
-    extern double stof(const std::string &str);
-    extern double stod(const std::string &str);
-    extern long int stol(const std::string &str);
-    extern long long int stoll(const std::string &str);
     */
 }
 #endif

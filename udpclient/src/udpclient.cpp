@@ -234,7 +234,7 @@ void UDPClient::initialize()
     }
 
     if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
-       //throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
+       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
     }
 }
 
@@ -279,15 +279,9 @@ ssize_t UDPClient::writeString(const std::string &str)
                             reinterpret_cast<sockaddr*>(&this->m_destinationAddress),
                             sizeof(this->m_destinationAddress)) };
         if ((bytesWritten != -1) && (errno != EAGAIN) && (errno != EWOULDBLOCK))  {
-            this->initialize();
             return bytesWritten;
         }
     } while (retryCount++ < UDPClient::s_SEND_RETRY_COUNT);
-    try {
-        this->initialize();
-    } catch (std::exception &e) {
-        (void)e;
-    }
     return 0;
 }
 

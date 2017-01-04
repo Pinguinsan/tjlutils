@@ -153,7 +153,7 @@ private:
     void syncDatagramListener();
 
     static const constexpr uint16_t s_BROADCAST{1};
-    static const constexpr size_t s_RECEIVED_BUFFER_MAX{10000};
+    static const constexpr size_t s_RECEIVED_BUFFER_MAX{65535};
     static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
 
     static constexpr bool isValidPortNumber(int portNumber);
