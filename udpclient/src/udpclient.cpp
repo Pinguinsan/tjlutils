@@ -219,35 +219,23 @@ unsigned long int UDPClient::timeout() const
 
 void UDPClient::initialize()
 {
-    /*
-    uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
-    std::string hostName() const { return inet_ntoa(this->m_socketAddress.sin_addr); }
-    std::string message() const { return this->m_message; }
-    sockaddr_in socketAddress () const { return this->m_socketAddress; }
-    */
-    
     using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
     this->m_returnAddress.sin_family = AF_INET;
     this->m_returnAddress.sin_port = htons(this->m_returnAddressPortNumber);
-    //this->m_returnAddress.sin_addr = inet_aton(this->m_returnAddressHostName.c_str());
+    inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
     
     if (resolveAddressHelper (this->m_returnAddressHostName, AF_INET, std::to_string(this->m_returnAddressPortNumber), &this->m_returnAddressStorage) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->m_hostName));
     }
 
-    //this->m_returnAddress.sin_addr = this->m_returnAddressStorage.sin_addr;
-
-
-    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
-       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
-    }
-
-
     if (resolveAddressHelper (this->m_hostName, AF_INET, std::to_string(this->m_portNumber), &this->m_destinationAddress) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->m_hostName));
     }
 
+    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
+       //throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
+    }
 }
 
 int UDPClient::resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr)

@@ -59,9 +59,29 @@ public:
         m_message{""} { }
 
     uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
-    std::string hostName() const { return inet_ntoa(this->m_socketAddress.sin_addr); }
     std::string message() const { return this->m_message; }
     sockaddr_in socketAddress () const { return this->m_socketAddress; }
+    std::string hostName() const 
+    { 
+        char lowLevelTempBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &(this->m_socketAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
+        return std::string{lowLevelTempBuffer};
+        //{ return inet_ntoa(this->m_socketAddress.sin_addr); }
+    }
+    /*
+    // IPv4 demo of inet_ntop() and inet_pton()
+
+struct sockaddr_in sa;
+char str[INET_ADDRSTRLEN];
+
+// store this IP address in sa:
+inet_pton(AF_INET, "192.0.2.33", &(sa.sin_addr));
+
+// now get it back and print it
+inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);
+
+printf("%s\n", str); // prints "192.0.2.33"
+*/
 
 private:
     sockaddr_in m_socketAddress;
