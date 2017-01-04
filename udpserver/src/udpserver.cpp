@@ -60,7 +60,7 @@ void UDPServer::setPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->m_portNumber = portNumber;
-    this->initialize();
+    this->m_socketAddress.sin_port = htons(this->m_portNumber);
 }
 
 void UDPServer::setTimeout(unsigned long timeout)
@@ -106,8 +106,8 @@ void UDPServer::initialize()
     setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &this->m_broadcast, sizeof(this->m_broadcast));
     memset(&this->m_socketAddress, 0, sizeof(this->m_socketAddress));
     this->m_socketAddress.sin_family = AF_INET;
-    this->m_socketAddress.sin_port = htons(this->m_portNumber);
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
+    this->m_socketAddress.sin_port = htons(this->m_portNumber);
 
     if (bind(this->m_setSocketResult, reinterpret_cast<sockaddr *>(&this->m_socketAddress), sizeof(sockaddr)) == -1) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
