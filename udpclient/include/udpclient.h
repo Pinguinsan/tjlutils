@@ -48,22 +48,18 @@ public:
     UDPClient(uint16_t portNumber);
     UDPClient(const std::string &hostName);
     UDPClient(const std::string &hostName, uint16_t portNumber);
-    UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName);
     UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t clientReturnAddressPortNumber);
-    UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber);
 
     ssize_t writeByte(char toSend);
     ssize_t writeString(const char *str);
     ssize_t writeString(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
-    std::string returnAddressHostName() const;
     uint16_t returnAddressPortNumber() const;
     unsigned long int timeout() const;
     void setPortNumber(uint16_t portNumber);
     void setHostName(const std::string &hostName);
     void setReturnAddressPortNumber(uint16_t returnAddressPortNumber);
-    void setReturnAddressHostName(const std::string &returnAddressHostName);
     void setTimeout(unsigned long int timeout);
     LineEnding lineEnding() const;
     void setLineEnding(LineEnding lineEnding);
@@ -73,7 +69,6 @@ public:
     bool isOpen() const;
 
     static const char *s_DEFAULT_HOST_NAME;
-    static const char *s_DEFAULT_RETURN_ADDRESS_HOST_NAME;
     static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
     static const constexpr uint16_t s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER{1234};
     static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
@@ -82,7 +77,6 @@ public:
     static uint16_t doUserSelectPortNumber();
     static std::string doUserSelectHostName();
     static uint16_t doUserSelectReturnAddressPortNumber();
-    static std::string doUserSelectReturnAddressHostName();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
     
 
@@ -90,21 +84,16 @@ public:
     static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
     static std::string lineEndingToString(LineEnding lineEnding);
 
-
 private:
     sockaddr_in m_destinationAddress;
-    //sockaddr_storage m_destinationAddressStorage;
-    
     sockaddr_in m_returnAddress;
-    //sockaddr_storage m_returnAddressStorage;
     
     unsigned int m_timeout;
     int m_udpSocketIndex;
     std::string m_lineEnding;
     
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
-
-    void initialize(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber);
+    void initialize(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber);
 
     
     static constexpr bool isValidPortNumber(int portNumber);

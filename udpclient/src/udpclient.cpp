@@ -20,7 +20,6 @@
 
 //Loopback
 const char *UDPClient::s_DEFAULT_HOST_NAME{"127.0.0.1"};
-const char *UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME{"127.0.0.1"};
 
 const std::vector<const char *> UDPClient::s_AVAILABLE_LINE_ENDINGS{"None", "CR", "LF", "CRLF"};
 const std::vector<const char *> UDPClient::s_NO_LINE_ENDING_IDENTIFIERS{"n", "no", "none", "noline", "nolineending", "nolineendings"};
@@ -32,7 +31,6 @@ const std::vector<const char *> UDPClient::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIE
 UDPClient::UDPClient() :
     UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME),
               UDPClient::s_DEFAULT_PORT_NUMBER,
-              static_cast<std::string>(UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME),
               UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
     
@@ -41,7 +39,6 @@ UDPClient::UDPClient() :
 UDPClient::UDPClient(uint16_t portNumber) :
     UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME),
               portNumber,
-              static_cast<std::string>(UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME),
               UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
@@ -50,7 +47,6 @@ UDPClient::UDPClient(uint16_t portNumber) :
 UDPClient::UDPClient(const std::string &hostName) :
     UDPClient(hostName,
               UDPClient::s_DEFAULT_PORT_NUMBER,
-              static_cast<std::string>(UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME),
               UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
@@ -59,31 +55,12 @@ UDPClient::UDPClient(const std::string &hostName) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     UDPClient(hostName,
               portNumber,
-              static_cast<std::string>(UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME),
-              UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
-{
-
-}
-
-UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName) :
-    UDPClient(hostName,
-              portNumber,
-              returnAddressHostName,
               UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
 }
 
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber) :
-    UDPClient(hostName,
-              portNumber,
-              static_cast<std::string>(UDPClient::s_DEFAULT_RETURN_ADDRESS_HOST_NAME),
-              returnAddressPortNumber)
-{
-
-}
-
-UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber) :
     m_destinationAddress{},
     m_returnAddress{},
     m_udpSocketIndex{},
@@ -92,7 +69,6 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, const std
 {
     this->initialize(hostName,
                      portNumber,
-                     returnAddressHostName,
                      returnAddressPortNumber);
 
 }
@@ -100,13 +76,6 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, const std
 uint16_t UDPClient::returnAddressPortNumber() const
 {
     return ntohs(this->m_returnAddress.sin_port);
-}
-
-std::string UDPClient::returnAddressHostName() const
-{
-    char lowLevelTempBuffer[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(this->m_returnAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
-    return std::string{lowLevelTempBuffer};
 }
 
 void UDPClient::setReturnAddressPortNumber(uint16_t portNumber)
@@ -119,16 +88,6 @@ void UDPClient::setReturnAddressPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->m_returnAddress.sin_port = htons(portNumber);
-}
-
-void UDPClient::setReturnAddressHostName(const std::string &hostName)
-{
-    using namespace GeneralUtilities;
-    sockaddr_storage temp{};
-    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->returnAddressPortNumber()), &temp) != 0) {
-       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
-    }
-    inet_pton(AF_INET, hostName.c_str(), &(this->m_returnAddress.sin_addr));
 }
 
 void UDPClient::setPortNumber(uint16_t portNumber)
@@ -200,7 +159,7 @@ unsigned long int UDPClient::timeout() const
     return this->m_timeout;
 }
 
-void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, const std::string &returnAddressHostName, uint16_t returnAddressPortNumber)
+void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber)
 {
     using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
@@ -230,23 +189,25 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, con
     
     this->m_returnAddress.sin_family = AF_INET;
     this->m_returnAddress.sin_port = htons(returnAddressPortNumber);
-    inet_pton(AF_INET, returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
+    //This cannot be set with UDP sockets:
+    //inet_pton(AF_INET, returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
     
     sockaddr_storage temp{};
     if (resolveAddressHelper (this->hostName(), AF_INET, std::to_string(this->portNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->hostName()));
     }
 
+/*
     temp = sockaddr_storage{};
     if (resolveAddressHelper (this->returnAddressHostName(), AF_INET, std::to_string(this->returnAddressPortNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->returnAddressHostName()));
     }
+*/
 
     if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
     }
     
-    //inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
 }
 
 int UDPClient::resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr)
@@ -367,12 +328,6 @@ std::string UDPClient::doUserSelectHostName()
                                                         //TODO: Add validation for host name
 } 
 
-std::string UDPClient::doUserSelectReturnAddressHostName()
-{
-    return GeneralUtilities::doUserEnterStringParameter("Client Return Address Host Name", [](std::string str) -> bool { return true; });
-                                                        //TODO: Add validation for host name
-} 
-
 uint16_t UDPClient::doUserSelectPortNumber()
 {
     return GeneralUtilities::doUserEnterNumericParameter("Client Port Number",
@@ -394,10 +349,8 @@ std::shared_ptr<UDPClient> UDPClient::doUserSelectUDPClient()
     uint16_t portNumber{UDPClient::doUserSelectPortNumber()};
     std::string hostName{UDPClient::doUserSelectHostName()};
     uint16_t returnAddressPortNumber{UDPClient::doUserSelectReturnAddressPortNumber()};
-    std::string returnAddressHostName{UDPClient::doUserSelectReturnAddressHostName()};
     std::shared_ptr<UDPClient> udpClient{std::make_shared<UDPClient>(hostName, 
                                                                      portNumber, 
-                                                                     returnAddressHostName,
                                                                      returnAddressPortNumber)};
     return udpClient;
 }
