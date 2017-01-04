@@ -1,21 +1,20 @@
-/***********************************************************************
-*    udpclient.cpp:                                                    *
-*    UDPClient, for sending datagrams over a UDP port number           *
-*    Copyright (c) 2016 Tyler Lewis                                    *
-************************************************************************
-*    This is a header file for tjlutils:                               *
-*    https://github.serial/Pinguinsan/tjlutils                         *
-*    This file may be distributed with the entire tjlutils library,    *
-*    but may also be distributed as a standalone file                  *
-*    The source code is released under the GNU LGPL                    *
-*    This file holds the implementation of a UDPClient class           *
-*    It is used to send datagrams over a specified UDP port number,    *
-*    to a specified IP address, with DNS lookup supported              *
-*                                                                      *
-*    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
-*    If not, see <http://www.gnu.org/licenses/>                        *
-***********************************************************************/
+/*    udpclient.cpp:                                                    *
+ *    UDPClient, for sending datagrams over a UDP port number           *
+ *    Copyright (c) 2016 Tyler Lewis                                    *
+ ************************************************************************
+ *    This is a header file for tjlutils:                               *
+ *    https://github.serial/Pinguinsan/tjlutils                         *
+ *    This file may be distributed with the entire tjlutils library,    *
+ *    but may also be distributed as a standalone file                  *
+ *    The source code is released under the GNU LGPL                    *
+ *    This file holds the implementation of a UDPClient class           *
+ *    It is used to send datagrams over a specified UDP port number,    *
+ *    to a specified IP address, with DNS lookup supported              *
+ *                                                                      *
+ *    You should have received a copy of the GNU Lesser General         *
+ *    Public license along with libraryprojects                         *
+ *    If not, see <http://www.gnu.org/licenses/>                        *
+ ***********************************************************************/
 
 #include "udpclient.h"
 
@@ -146,8 +145,7 @@ void UDPClient::setReturnAddressHostName(const std::string &hostName)
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     this->m_returnAddressHostName = hostName;
-    sockaddr_in *temp{reinterpret_cast<sockaddr_in*>(&this->m_destinationAddress)};
-    inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(temp->sin_addr)));
+    inet_pton(AF_INET, this->m_returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
 }
 
 void UDPClient::setPortNumber(uint16_t portNumber)
@@ -160,7 +158,11 @@ void UDPClient::setPortNumber(uint16_t portNumber)
                                  + ")");
     }
     this->m_portNumber = portNumber;
-    reinterpret_cast<sockaddr*>(&this->m_destinationAddress)->sin_port = htons(this->m_portNumber);
+    sockaddr_in *temp{reinterpret_cast<sockaddr_in*>(&this->m_destinationAddress)};
+    if (!temp) {
+        throw std::runtime_error("ERROR: UDPClient::setPortNumber(uint16_t) cast to sockaddr_in* resulted in nullptr");
+    }
+    temp->sin_port = htons(this->m_portNumber);
 }
 
 void UDPClient::setLineEnding(LineEnding lineEnding)
@@ -185,7 +187,11 @@ void UDPClient::setHostName(const std::string &hostName)
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     }
     this->m_hostName = hostName;
-    inet_pton(AF_INET, this->m_hostName.c_str(), &(this->m_destinationAddress.sin_addr));
+    sockaddr_in *temp{reinterpret_cast<sockaddr_in*>(&this->m_destinationAddress)};
+    if (!temp) {
+        throw std::runtime_error("ERROR: UDPClient::setHostName(const std::string &) cast to sockaddr_in* resulted in nullptr");
+    }
+    inet_pton(AF_INET, this->m_hostName.c_str(), &(temp->sin_addr));
 }
 
 void UDPClient::openPort()
