@@ -54,7 +54,7 @@ private:
 
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-    using ssize_t = unsigned long;
+    //using ssize_t = unsigned long;
 #endif
 
 class TStream

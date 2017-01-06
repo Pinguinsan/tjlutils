@@ -22,14 +22,14 @@ const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
-const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_None};
+const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_CarriageReturn};
 const unsigned long SerialPort::DEFAULT_TIMEOUT{100};
 const unsigned long SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
 const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
-const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"None"};
+const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"CR"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"1", "2"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
@@ -1142,61 +1142,31 @@ bool SerialPort::isOpen() const
 {
     return this->m_isOpen;
 }
-#if defined(_WIN32)
 
-    unsigned long SerialPort::writeCString(const char *str)
-    {
-        ssize_t writtenBytes{0};
-        while(*str != 0) {
-            writtenBytes += (this->writeByte(*(str++)));
-        }
-        return writtenBytes;
+ssize_t SerialPort::writeCString(const char *str)
+{
+    ssize_t writtenBytes{0};
+    while(*str != 0) {
+        writtenBytes += (this->writeByte(*(str++)));
     }
+    return writtenBytes;
+}
 
 
-    unsigned long SerialPort::writeString(const std::string &str)
-    {
-        using namespace GeneralUtilities;
-        std::string copyString{str};
-        if (!endsWith(copyString, this->m_lineEnding)) {
-            copyString += this->m_lineEnding;
-        }
-        return this->writeCString(copyString.c_str());
+ssize_t SerialPort::writeString(const std::string &str)
+{
+    using namespace GeneralUtilities;
+    std::string copyString{str};
+    if (!endsWith(copyString, this->m_lineEnding)) {
+        copyString += this->m_lineEnding;
     }
+    return this->writeCString(copyString.c_str());
+}
 
-    unsigned long SerialPort::writeString(const char *str)
-    {
-        return this->writeString(static_cast<std::string>(str));
-    }
-
-#else
-
-    ssize_t SerialPort::writeCString(const char *str)
-    {
-        ssize_t writtenBytes{0};
-        while(*str != 0) {
-            writtenBytes += (this->writeByte(*(str++)));
-        }
-        return writtenBytes;
-    }
-
-
-    ssize_t SerialPort::writeString(const std::string &str)
-    {
-        using namespace GeneralUtilities;
-        std::string copyString{str};
-        if (!endsWith(copyString, this->m_lineEnding)) {
-            copyString += this->m_lineEnding;
-        }
-        return this->writeCString(copyString.c_str());
-    }
-
-    ssize_t SerialPort::writeString(const char *str)
-    {
-        return this->writeString(static_cast<std::string>(str));
-    }
-
-#endif
+ssize_t SerialPort::writeString(const char *str)
+{
+    return this->writeString(static_cast<std::string>(str));
+}
 
 std::string SerialPort::readStringUntil(char readUntil)
 {
