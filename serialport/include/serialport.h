@@ -194,7 +194,7 @@ public:
     static DataBits parseDataBitsFromRaw(const char *dataBits);
     static StopBits parseStopBitsFromRaw(const char *stopBits);
     static Parity parseParityFromRaw(const char *parity);
-    static LineEnding parseLineEndingFromRaw(const char *parity);
+    static LineEnding parseLineEndingFromRaw(const char *lineEnding);
 
     static const DataBits DEFAULT_DATA_BITS;
     static const StopBits DEFAULT_STOP_BITS;

@@ -22,14 +22,14 @@ const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
-const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_CarriageReturn};
+const LineEnding SerialPort::DEFAULT_LINE_ENDING{LineEnding::LE_None};
 const unsigned long SerialPort::DEFAULT_TIMEOUT{100};
 const unsigned long SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
 const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
-const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"cr"};
+const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"None"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"1", "2"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
@@ -1453,6 +1453,9 @@ std::string SerialPort::parseLineEnding(LineEnding lineEnding)
 
 LineEnding SerialPort::parseLineEndingFromRaw(const std::string &lineEnding)
 {
+    if (lineEnding.empty()) {
+        return LineEnding::LE_None;
+    }
     std::string copyString{lineEnding};
     std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
     for (auto &it : SerialPort::s_NO_LINE_ENDING_IDENTIFIERS) {
