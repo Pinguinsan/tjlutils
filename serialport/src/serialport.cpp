@@ -29,7 +29,7 @@ const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
 const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
-const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"CR"};
+const std::string SerialPort::DEFAULT_LINE_ENDING_STRING{"cr"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_STOP_BITS{"1", "2"};
 const std::vector<const char *> SerialPort::s_AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
@@ -37,9 +37,9 @@ const std::vector<const char *> SerialPort::s_AVAILABLE_LINE_ENDINGS{"None", "CR
 const char *SerialPort::s_SERIAL_PORT_HELPER_LONG_NAME{"\"C:/Users/Public/Public Programs/EnumerateSerial.exe\""};
 const char *SerialPort::s_SERIAL_PORT_HELPER_SHORT_NAME{"EnumerateSerial.exe"};
 const std::vector<const char *> SerialPort::s_NO_LINE_ENDING_IDENTIFIERS{"n", "no", "none", "noline", "nolineending", "nolineendings"};
-const std::vector<const char *> SerialPort::s_CARRIAGE_RETURN_IDENTIFIERS{"return", "carriagereturn", "carriage-return", "cr", "creturn"};
-const std::vector<const char *> SerialPort::s_LINE_FEED_IDENTIFIERS{"feed", "line", "linefeed", "line-feed", "lf", "f", "lfeed"};
-const std::vector<const char *> SerialPort::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS{"carriagereturnlinefeed", "crlf", "lfcr", "lfeedcreturn", "line-feed-carriage-return", "carriage-return-line-feed"};
+const std::vector<const char *> SerialPort::s_CARRIAGE_RETURN_IDENTIFIERS{"return", "carriagereturn", "carriage-return", "cr", "creturn", "\r"};
+const std::vector<const char *> SerialPort::s_LINE_FEED_IDENTIFIERS{"feed", "line", "linefeed", "line-feed", "lf", "f", "lfeed", "\n"};
+const std::vector<const char *> SerialPort::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS{"carriagereturnlinefeed", "crlf", "lfcr", "lfeedcreturn", "line-feed-carriage-return", "carriage-return-line-feed", "\r\n", "\n\r"};
 
 #if defined(_WIN32) || defined(__CYGWIN__)
     const std::vector<const char *> SerialPort::s_AVAILABLE_PORT_NAMES_BASE{"\\\\.\\COM"};
@@ -71,7 +71,7 @@ SerialPort::SerialPort(const std::string &name) :
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -88,7 +88,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate) :
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -105,7 +105,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -122,7 +122,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_stopBits{stopBits},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -139,7 +139,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{dataBits},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -156,7 +156,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_stopBits{stopBits},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -173,7 +173,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, DataBits data
     m_stopBits{stopBits},
     m_dataBits{dataBits},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -190,7 +190,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_stopBits{stopBits},
     m_dataBits{dataBits},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -207,7 +207,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits) :
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -224,7 +224,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_stopBits{stopBits},
     m_dataBits{dataBits},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -241,7 +241,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, StopBits stop
     m_stopBits{stopBits},
     m_dataBits{dataBits},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -258,7 +258,7 @@ SerialPort::SerialPort(const std::string &name, DataBits dataBits, Parity parity
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{dataBits},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -275,7 +275,7 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits) :
     m_stopBits{stopBits},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{DEFAULT_PARITY},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -292,7 +292,7 @@ SerialPort::SerialPort(const std::string &name, StopBits stopBits, Parity parity
     m_stopBits{stopBits},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
@@ -309,7 +309,7 @@ SerialPort::SerialPort(const std::string &name, Parity parity) :
     m_stopBits{DEFAULT_STOP_BITS},
     m_dataBits{DEFAULT_DATA_BITS},
     m_parity{parity},
-    m_lineEnding{""},
+    m_lineEnding{lineEndingToString(DEFAULT_LINE_ENDING)},
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false}
