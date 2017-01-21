@@ -64,8 +64,8 @@ public:
 
     virtual void setTimeout(unsigned long timeout) = 0;
     virtual unsigned long int timeout() const = 0;
-    LineEnding lineEnding() const;
-    void setLineEnding(LineEnding lineEnding);
+    virtual LineEnding lineEnding() const = 0;
+    virtual void setLineEnding(LineEnding lineEnding) = 0;
 
     virtual ssize_t writeString(const std::string &str) = 0;
     virtual ssize_t writeString(const char *str) = 0;

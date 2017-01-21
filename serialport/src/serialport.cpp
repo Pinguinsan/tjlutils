@@ -1158,6 +1158,7 @@ ssize_t SerialPort::writeString(const std::string &str)
     using namespace GeneralUtilities;
     std::string copyString{str};
     if (!endsWith(copyString, this->m_lineEnding)) {
+        std::cout << "Adding line ending" << std::endl;
         copyString += this->m_lineEnding;
     }
     return this->writeCString(copyString.c_str());

@@ -23,7 +23,6 @@ function cleanUp() {
     #suRemoveFile "$ui/serialport.h"
     #suRemoveFile "$ui/eventtimer.h"
     #suRemoveFile "$ui/prettyprinter.h"
-    #suRemoveFile "$ui/arduino.h"
     #suRemoveFile "$ui/udpserver.h"
     #suRemoveFile "$ui/udpclient.h"
     #suRemoveFile "$ui/tstream.h"
@@ -232,7 +231,6 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/serialport.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/eventtimer.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/prettyprinter.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/arduino.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -287,7 +285,6 @@ else
     suLinkFile "$sourceDir/eventtimer/include/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/prettyprinter/include/prettyprinter.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/templateobjects/templateobjects.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/arduino/include/arduino.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpserver/include/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpclient/include/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
