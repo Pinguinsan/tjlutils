@@ -43,6 +43,8 @@
 #include <cctype>
 #include <algorithm>
 #include <future>
+#include <deque>
+#include <mutex>
 
 #include <systemcommand.h>
 #include <fileutilities.h>
@@ -118,26 +120,14 @@ public:
 
     void openPort();
     void closePort();
-    unsigned char readByte();
-    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(char readUntil);
-    ssize_t writeString(const std::string &str);
-    ssize_t writeString(const char *str);
+    std::string readLine();
+    std::string readUntil(const std::string &readUntil);
+    std::string readUntil(const char *readUntil);
+    std::string readUntil(char readUntil);
+    ssize_t writeLine(const std::string &str);
+    ssize_t writeLine(const char *str);
     ssize_t available();
-
-#if !defined(__ANDROID__)
-    ssize_t asyncWriteString(const std::string &str);
-    ssize_t asyncWriteString(const char *str);
-    std::future<std::string> asyncReadString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::future<std::string> asyncReadStringUntil(const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::future<std::string> asyncReadStringUntil(const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::future<std::string> asyncReadStringUntil(char readUntil);
-private:
-    std::future<ssize_t> m_asyncFuture;
 public:
-#endif
     bool isDCDEnabled() const;
     bool isCTSEnabled() const;
     bool isDSREnabled() const;
@@ -156,7 +146,7 @@ public:
     void setStopBits(StopBits stopBits);
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
-    void setLineEnding(LineEnding lineEnding);
+    void setLineEnding(const std::string &lineEnding);
     void setTimeout(unsigned long int timeout);
     void setRetryCount(unsigned long retryCount);
 
@@ -167,53 +157,46 @@ public:
     DataBits dataBits() const;
     Parity parity() const;
     unsigned long int timeout() const;
-    LineEnding lineEnding() const;
+    std::string lineEnding() const;
     unsigned long retryCount() const;
     bool isOpen() const;
+    bool isListening() const;
 
     std::string baudRateToString() const;
     std::string stopBitsToString() const;
     std::string dataBitsToString() const;
     std::string parityToString() const;
-    std::string lineEndingToString() const;
     static std::string baudRateToString(BaudRate baudRate);
     static std::string stopBitsToString(StopBits stopBits);
     static std::string dataBitsToString(DataBits dataBits);
     static std::string parityToString(Parity parity);
-    static std::string lineEndingToString(LineEnding lineEnding);
-
-    static const std::vector<std::string> s_SERIAL_PORT_NAMES;
+    static const std::vector<std::string> SERIAL_PORT_NAMES;
 
     static BaudRate parseBaudRateFromRaw(const std::string &baudRate);
     static DataBits parseDataBitsFromRaw(const std::string &dataBits);
     static StopBits parseStopBitsFromRaw(const std::string &stopBits);
     static Parity parseParityFromRaw(const std::string &parity);
-    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
-
     static BaudRate parseBaudRateFromRaw(const char *baudRate);
     static DataBits parseDataBitsFromRaw(const char *dataBits);
     static StopBits parseStopBitsFromRaw(const char *stopBits);
     static Parity parseParityFromRaw(const char *parity);
-    static LineEnding parseLineEndingFromRaw(const char *lineEnding);
 
     static const DataBits DEFAULT_DATA_BITS;
     static const StopBits DEFAULT_STOP_BITS;
     static const Parity DEFAULT_PARITY;
     static const BaudRate DEFAULT_BAUD_RATE;
-    static const LineEnding DEFAULT_LINE_ENDING;
+    static const std::string DEFAULT_LINE_ENDING;
 
     static const std::string DEFAULT_DATA_BITS_STRING;
     static const std::string DEFAULT_STOP_BITS_STRING;
     static const std::string DEFAULT_PARITY_STRING;
     static const std::string DEFAULT_BAUD_RATE_STRING;
-    static const std::string DEFAULT_LINE_ENDING_STRING;
 
     static std::vector<std::string> availableSerialPorts();
     static std::vector<const char *> availableBaudRates();
     static std::vector<const char *> availableStopBits();
     static std::vector<const char *> availableDataBits();
     static std::vector<const char *> availableParity();
-    static std::vector<const char *> availableLineEndings();
     static bool isValidSerialPortName(const std::string &serialPortName);
 
     static const unsigned long DEFAULT_TIMEOUT;
@@ -224,7 +207,6 @@ public:
     static StopBits doUserSelectStopBits();
     static DataBits doUserSelectDataBits();
     static Parity doUserSelectParity();
-    static LineEnding doUserSelectLineEndings();
     static std::shared_ptr<SerialPort> doUserSelectSerialPort();
 
 private:
@@ -249,6 +231,24 @@ private:
     int m_retryCount;
     bool m_isOpen;
     int m_maximumReadSize;
+    bool m_isListening;
+    bool m_shutEmDown;
+    std::mutex m_ioMutex;
+    std::deque<std::string> m_stringQueue;
+    std::string m_stringBuilderQueue;
+
+    #if defined(__ANDROID__)
+        std::thread *m_asyncFuture;
+    #else
+        std::future<void> m_asyncFuture;
+    #endif
+
+    void asyncStringListener();
+    void syncStringListener();
+    void addToStringBuilderQueue(unsigned char byte);
+
+    void startAsyncListen();
+    void stopAsyncListen();
 
     static const unsigned long constexpr SERIAL_PORT_BUF_MAX{4025};
     static bool isAvailableSerialPort(const std::string &name);
@@ -260,33 +260,20 @@ private:
     ssize_t writeBufferedBytes(unsigned char *buffer, unsigned long bufferSize);
     unsigned char timedRead();
     unsigned char rawRead();
+    unsigned char readByte();
 
     static int parseDataBits(DataBits dataBits);
     static int parseStopBits(StopBits stopBits);
     static int parseBaudRate(BaudRate baudRate);
     static std::pair<int, int> parseParity(Parity parity);
-    static std::string parseLineEnding(LineEnding lineEnding);
-
-    static ssize_t staticWriteString(SerialPort *serialPort, const std::string &str);
-    static ssize_t staticWriteString(SerialPort *serialPort, const char *str);
-
-    static std::string staticReadString(SerialPort *serialPort, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const std::string &readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    static std::string staticReadStringUntil(SerialPort *serialPort, const char *readUntil, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    static std::string staticReadStringUntil(SerialPort *serialPort, char readUntil);
     
-    static const std::vector<const char *> s_AVAILABLE_PORT_NAMES_BASE;
-    static const std::vector<const char *> s_AVAILABLE_PARITY;
-    static const std::vector<const char *> s_AVAILABLE_STOP_BITS;
-    static const std::vector<const char *> s_AVAILABLE_DATA_BITS;
-    static const std::vector<const char *> s_AVAILABLE_BAUD_RATE;
-    static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;
-    static const std::vector<const char *> s_NO_LINE_ENDING_IDENTIFIERS;
-    static const std::vector<const char *> s_CARRIAGE_RETURN_IDENTIFIERS;
-    static const std::vector<const char *> s_LINE_FEED_IDENTIFIERS;
-    static const std::vector<const char *> s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS;
-    static const char *s_SERIAL_PORT_HELPER_LONG_NAME;
-    static const char *s_SERIAL_PORT_HELPER_SHORT_NAME;
+    static const std::vector<const char *> AVAILABLE_PORT_NAMES_BASE;
+    static const std::vector<const char *> AVAILABLE_PARITY;
+    static const std::vector<const char *> AVAILABLE_STOP_BITS;
+    static const std::vector<const char *> AVAILABLE_DATA_BITS;
+    static const std::vector<const char *> AVAILABLE_BAUD_RATE;
+    static const char *SERIAL_PORT_HELPER_LONG_NAME;
+    static const char *SERIAL_PORT_HELPER_SHORT_NAME;
 
 };
 

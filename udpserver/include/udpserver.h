@@ -95,15 +95,16 @@ public:
 
     char readByte();
     UDPDatagram readDatagram();
-    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(char until);
+    std::string readLine();
+    std::string readUntil(const std::string &until);
+    std::string readUntil(const char *until);
+    std::string readUntil(char until);
     ssize_t available();
     void startListening();
     void stopListening();
     bool isListening() const;
-    
+    std::string lineEnding() const;
+
     unsigned long timeout() const;
     void setPortNumber(uint16_t portNumber);
     uint16_t portNumber() const;
@@ -121,6 +122,8 @@ public:
     void putBack(char back);
     void putBack(const UDPDatagram &datagram);
 
+
+    void setLineEnding(const std::string &str);
     std::string peek();
     char peekByte();
     UDPDatagram peekDatagram();
@@ -128,8 +131,8 @@ public:
     static uint16_t doUserSelectPortNumber();
     static std::shared_ptr<UDPServer> doUserSelectUDPServer();
 
-    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
-    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
+    static const constexpr uint16_t DEFAULT_PORT_NUMBER{8888};
+    static const constexpr unsigned int DEFAULT_TIMEOUT{100};
 
 private:
     sockaddr_in m_socketAddress;
@@ -139,6 +142,7 @@ private:
     std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;
+    std::string m_lineEnding;
 
     void initialize(uint16_t portNumber);
 #if defined(__ANDROID__)
@@ -150,9 +154,9 @@ private:
     void asyncDatagramListener();
     void syncDatagramListener();
 
-    static const uint16_t s_BROADCAST;
-    static const constexpr size_t s_RECEIVED_BUFFER_MAX{65535};
-    static const constexpr size_t s_MAXIMUM_BUFFER_SIZE{65535};
+    static const uint16_t BROADCAST;
+    static const constexpr size_t RECEIVED_BUFFER_MAX{65535};
+    static const constexpr size_t MAXIMUM_BUFFER_SIZE{65535};
 
     static constexpr bool isValidPortNumber(int portNumber);
 

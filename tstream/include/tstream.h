@@ -22,14 +22,6 @@
 #include <iostream>
 #include <string>
 
-enum class LineEnding {
-    LE_None,
-    LE_CarriageReturn,
-    LE_LineFeed,
-    LE_CarriageReturnLineFeed
-};
-
-
 enum class TStreamCommandType { DELAY_SECONDS, DELAY_MILLISECONDS, DELAY_MICROSECONDS, WRITE, READ, FLUSH_RX, FLUSH_TX, FLUSH_RX_TX, LOOP_START, LOOP_END, COMMAND_UNSPECIFIED };
 enum class DelayType { SECONDS, MILLISECONDS, MICROSECONDS };
 enum class FlushType { RX, TX, RX_TX };
@@ -64,12 +56,11 @@ public:
 
     virtual void setTimeout(unsigned long timeout) = 0;
     virtual unsigned long int timeout() const = 0;
-    virtual LineEnding lineEnding() const = 0;
-    virtual void setLineEnding(LineEnding lineEnding) = 0;
+    virtual std::string lineEnding() const = 0;
+    virtual void setLineEnding(const std::string &str) = 0;
 
-    virtual ssize_t writeString(const std::string &str) = 0;
-    virtual ssize_t writeString(const char *str) = 0;
-    virtual ssize_t writeByte(char toSend) = 0;
+    virtual ssize_t writeLine(const std::string &str) = 0;
+    virtual ssize_t writeLine(const char *str) = 0;
     virtual ssize_t available() = 0;
     virtual bool isOpen() const = 0;
     virtual void openPort() = 0;
@@ -87,12 +78,10 @@ public:
     virtual void putBack(const char *str) = 0;
     virtual void putBack(char back) = 0;
 
-    virtual std::string readString(unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
-    virtual std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
-    virtual std::string readStringUntil(const char *until, unsigned long maximumReadSize = NO_MAXIMUM_READ_SIZE) = 0;
-    virtual std::string readStringUntil(char until) = 0;
-
-    static const constexpr unsigned long NO_MAXIMUM_READ_SIZE{0};
+    virtual std::string readLine() = 0;
+    virtual std::string readUntil(const std::string &until) = 0;
+    virtual std::string readUntil(const char *until) = 0;
+    virtual std::string readUntil(char until) = 0;
 
 };
 

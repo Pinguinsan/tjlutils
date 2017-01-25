@@ -17,8 +17,8 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
-#ifndef TJLUTILS_UDPCLIENT_H
-#define TJLUTILS_UDPCLIENT_H
+#ifndef TJLUTILUDPCLIENT_H
+#define TJLUTILUDPCLIENT_H
 
 #include <iostream>
 #include <cstdlib>
@@ -50,9 +50,8 @@ public:
     UDPClient(const std::string &hostName, uint16_t portNumber);
     UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t clientReturnAddressPortNumber);
 
-    ssize_t writeByte(char toSend);
-    ssize_t writeString(const char *str);
-    ssize_t writeString(const std::string &str);
+    ssize_t writeLine(const char *str);
+    ssize_t writeLine(const std::string &str);
     uint16_t portNumber() const;
     std::string hostName() const;
     uint16_t returnAddressPortNumber() const;
@@ -61,49 +60,40 @@ public:
     void setHostName(const std::string &hostName);
     void setReturnAddressPortNumber(uint16_t returnAddressPortNumber);
     void setTimeout(unsigned long int timeout);
-    LineEnding lineEnding() const;
-    void setLineEnding(LineEnding lineEnding);
+    std::string lineEnding() const;
+    void setLineEnding(const std::string &lineEnding);
 
     void openPort();
     void closePort();
     bool isOpen() const;
 
-    static const char *s_DEFAULT_HOST_NAME;
-    static const constexpr uint16_t s_DEFAULT_PORT_NUMBER{8888};
-    static const constexpr uint16_t s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER{1234};
-    static const constexpr unsigned int s_DEFAULT_TIMEOUT{100};
-    static const constexpr unsigned int s_SEND_RETRY_COUNT{3};
+    static const char *DEFAULT_HOST_NAME;
+    static const std::string DEFAULT_LINE_ENDING;
+    static const constexpr uint16_t DEFAULT_PORT_NUMBER{8888};
+    static const constexpr uint16_t DEFAULT_RETURN_ADDRESS_PORT_NUMBER{1234};
+    static const constexpr unsigned int DEFAULT_TIMEOUT{100};
+    static const constexpr unsigned int SEND_RETRY_COUNT{3};
 
     static uint16_t doUserSelectPortNumber();
     static std::string doUserSelectHostName();
     static uint16_t doUserSelectReturnAddressPortNumber();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
-    
-
-    static std::string parseLineEnding(LineEnding lineEnding);
-    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
-    static std::string lineEndingToString(LineEnding lineEnding);
-
 private:
     sockaddr_in m_destinationAddress;
     sockaddr_in m_returnAddress;
-    
+
     unsigned int m_timeout;
     int m_udpSocketIndex;
     std::string m_lineEnding;
     
+    ssize_t writeByte(char toSend);
     int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
     void initialize(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber);
 
     
     static constexpr bool isValidPortNumber(int portNumber);
-    static const std::vector<const char *> s_AVAILABLE_LINE_ENDINGS;
-    static const std::vector<const char *> s_NO_LINE_ENDING_IDENTIFIERS;
-    static const std::vector<const char *> s_CARRIAGE_RETURN_IDENTIFIERS;
-    static const std::vector<const char *> s_LINE_FEED_IDENTIFIERS;
-    static const std::vector<const char *> s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS;
 
 
 };
 
-#endif //TJLUTILS_UDPCLIENT_H
+#endif //TJLUTILUDPCLIENT_H

@@ -18,10 +18,10 @@
 
 #include "udpserver.h"
 
-const uint16_t UDPServer::s_BROADCAST{1};
+const uint16_t UDPServer::BROADCAST{1};
 
 UDPServer::UDPServer() :
-    UDPServer{UDPServer::s_DEFAULT_PORT_NUMBER}
+    UDPServer{UDPServer::DEFAULT_PORT_NUMBER}
 {
 
 }
@@ -30,7 +30,7 @@ UDPServer::UDPServer(uint16_t portNumber) :
     m_socketAddress{},
     m_isListening{false},
     m_setSocketResult{0},
-    m_timeout{UDPServer::s_DEFAULT_TIMEOUT},
+    m_timeout{UDPServer::DEFAULT_TIMEOUT},
     m_datagramQueue{},
     m_shutEmDown{false}
 {
@@ -90,7 +90,7 @@ void UDPServer::initialize(uint16_t portNumber)
 {
     using namespace GeneralUtilities;
     if (!this->isValidPortNumber(portNumber)) {
-        portNumber = UDPServer::s_DEFAULT_PORT_NUMBER;
+        portNumber = UDPServer::DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<uint16_t>::max())
                                  + "("
@@ -104,7 +104,7 @@ void UDPServer::initialize(uint16_t portNumber)
        throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
     }
 
-    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &UDPServer::s_BROADCAST, sizeof(UDPServer::s_BROADCAST));
+    setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &UDPServer::BROADCAST, sizeof(UDPServer::BROADCAST));
     memset(&this->m_socketAddress, 0, sizeof(this->m_socketAddress));
     this->m_socketAddress.sin_family = AF_INET;
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
@@ -153,8 +153,8 @@ void UDPServer::asyncDatagramListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     do {
-        char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
-        memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
+        char lowLevelReceiveBuffer[UDPServer::RECEIVED_BUFFER_MAX];
+        memset(lowLevelReceiveBuffer, 0, UDPServer::RECEIVED_BUFFER_MAX);
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
         platform_socklen_t socketSize{sizeof(sockaddr)};
@@ -182,8 +182,8 @@ void UDPServer::asyncDatagramListener()
 void UDPServer::syncDatagramListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-    char lowLevelReceiveBuffer[UDPServer::s_RECEIVED_BUFFER_MAX];
-    memset(lowLevelReceiveBuffer, 0, UDPServer::s_RECEIVED_BUFFER_MAX);
+    char lowLevelReceiveBuffer[UDPServer::RECEIVED_BUFFER_MAX];
+    memset(lowLevelReceiveBuffer, 0, UDPServer::RECEIVED_BUFFER_MAX);
     std::string receivedString{""};
     sockaddr_in receivedAddress{};
     platform_socklen_t socketSize{sizeof(sockaddr)};
@@ -272,7 +272,17 @@ UDPDatagram UDPServer::readDatagram()
     }
 }
 
-std::string UDPServer::readString(unsigned long maximumReadSize)
+void UDPServer::setLineEnding(const std::string &lineEnding)
+{
+    this->m_lineEnding = lineEnding;
+}
+
+std::string UDPServer::lineEnding() const
+{
+    return this->m_lineEnding;
+}
+
+std::string UDPServer::readLine()
 {
     this->syncDatagramListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
@@ -299,17 +309,17 @@ bool UDPServer::isOpen() const
     return this->m_isListening;
 }
 
-std::string UDPServer::readStringUntil(char until)
+std::string UDPServer::readUntil(char until)
 {
-    return this->readStringUntil(std::string{1, until});
+    return this->readUntil(std::string{1, until});
 }
 
-std::string UDPServer::readStringUntil(const char *until, unsigned long maximumReadSize)
+std::string UDPServer::readUntil(const char *until)
 {
-    return this->readStringUntil(static_cast<std::string>(until), maximumReadSize);
+    return this->readUntil(static_cast<std::string>(until));
 }
 
-std::string UDPServer::readStringUntil(const std::string &until, unsigned long maximumReadSize)
+std::string UDPServer::readUntil(const std::string &until)
 {
 
     using namespace GeneralUtilities;
@@ -317,21 +327,11 @@ std::string UDPServer::readStringUntil(const std::string &until, unsigned long m
     EventTimer eventTimer;
     eventTimer.start();
     int readCount{0};
-    if (maximumReadSize == TStream::NO_MAXIMUM_READ_SIZE) {
-        maximumReadSize = std::numeric_limits<unsigned long>::max();
-    }
     do {
         std::string tempString{""};
-        tempString = this->readString();
-        if ((returnString.size() + tempString.size()) > maximumReadSize) {
-            int amountToAdd = (returnString.size() + tempString.size()) - maximumReadSize;
-            this->putBack(tempString.substr(amountToAdd));
-            returnString += tempString.substr(0, amountToAdd);
-            break;
-        } else {
-            readCount += tempString.size();
-            returnString += tempString;
-        }
+        tempString = this->readLine();
+        readCount += tempString.size();
+        returnString += tempString;
         eventTimer.update();
     } while (!endsWith(returnString, until) && (eventTimer.totalTime() < this->m_timeout));
     return returnString;

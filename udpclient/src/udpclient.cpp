@@ -19,35 +19,29 @@
 #include "udpclient.h"
 
 //Loopback
-const char *UDPClient::s_DEFAULT_HOST_NAME{"127.0.0.1"};
-
-const std::vector<const char *> UDPClient::s_AVAILABLE_LINE_ENDINGS{"None", "CR", "LF", "CRLF"};
-const std::vector<const char *> UDPClient::s_NO_LINE_ENDING_IDENTIFIERS{"n", "no", "none", "noline", "nolineending", "nolineendings"};
-const std::vector<const char *> UDPClient::s_CARRIAGE_RETURN_IDENTIFIERS{"return", "carriagereturn", "carriage-return", "cr", "creturn"};
-const std::vector<const char *> UDPClient::s_LINE_FEED_IDENTIFIERS{"feed", "line", "linefeed", "line-feed", "lf", "f", "lfeed"};
-const std::vector<const char *> UDPClient::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS{"carriagereturnlinefeed", "crlf", "lfcr", "lfeedcreturn", "line-feed-carriage-return", "carriage-return-line-feed"};
-
+const char *UDPClient::DEFAULT_HOST_NAME{"127.0.0.1"};
+const std::string UDPClient::DEFAULT_LINE_ENDING{"\r"};
 
 UDPClient::UDPClient() :
-    UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME),
-              UDPClient::s_DEFAULT_PORT_NUMBER,
-              UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
+    UDPClient(static_cast<std::string>(UDPClient::DEFAULT_HOST_NAME),
+              UDPClient::DEFAULT_PORT_NUMBER,
+              UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
     
 }
 
 UDPClient::UDPClient(uint16_t portNumber) :
-    UDPClient(static_cast<std::string>(UDPClient::s_DEFAULT_HOST_NAME),
+    UDPClient(static_cast<std::string>(UDPClient::DEFAULT_HOST_NAME),
               portNumber,
-              UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
+              UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
 }
 
 UDPClient::UDPClient(const std::string &hostName) :
     UDPClient(hostName,
-              UDPClient::s_DEFAULT_PORT_NUMBER,
-              UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
+              UDPClient::DEFAULT_PORT_NUMBER,
+              UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
 }
@@ -55,7 +49,7 @@ UDPClient::UDPClient(const std::string &hostName) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
     UDPClient(hostName,
               portNumber,
-              UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
+              UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER)
 {
 
 }
@@ -64,8 +58,8 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t 
     m_destinationAddress{},
     m_returnAddress{},
     m_udpSocketIndex{},
-    m_timeout{UDPClient::s_DEFAULT_TIMEOUT},
-    m_lineEnding{""}
+    m_timeout{DEFAULT_TIMEOUT},
+    m_lineEnding{DEFAULT_LINE_ENDING}
 {
     this->initialize(hostName,
                      portNumber,
@@ -102,14 +96,14 @@ void UDPClient::setPortNumber(uint16_t portNumber)
     this->m_destinationAddress.sin_port = htons(portNumber);
 }
 
-void UDPClient::setLineEnding(LineEnding lineEnding)
+void UDPClient::setLineEnding(const std::string &lineEnding)
 {
-    this->m_lineEnding = parseLineEnding(lineEnding);
+    this->m_lineEnding = lineEnding;
 }
 
-LineEnding UDPClient::lineEnding() const
+std::string UDPClient::lineEnding() const
 {
-    return UDPClient::parseLineEndingFromRaw(this->m_lineEnding);
+    return this->m_lineEnding;
 }
 
 void UDPClient::setTimeout(unsigned long int timeout)
@@ -166,7 +160,7 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
 
     if (!this->isValidPortNumber(portNumber)) {
         uint16_t temp{portNumber};
-        portNumber = UDPClient::s_DEFAULT_PORT_NUMBER;
+        portNumber = UDPClient::DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
@@ -175,7 +169,7 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
     }
     if (!this->isValidPortNumber(returnAddressPortNumber)) {
         uint16_t temp{returnAddressPortNumber};
-        returnAddressPortNumber = UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER;
+        returnAddressPortNumber = UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
                                  std::to_string(std::numeric_limits<uint16_t>::max()) 
                                  + "("
@@ -227,15 +221,15 @@ int UDPClient::resolveAddressHelper(const std::string &hostName, int family, con
 
 ssize_t UDPClient::writeByte(char toSend) 
 { 
-    return this->writeString(std::string{1, toSend}); 
+    return this->writeLine(std::string{1, toSend}); 
 }
 
-ssize_t UDPClient::writeString(const char *str) 
+ssize_t UDPClient::writeLine(const char *str) 
 { 
-    return this->writeString(static_cast<std::string>(str)); 
+    return this->writeLine(static_cast<std::string>(str)); 
 }
 
-ssize_t UDPClient::writeString(const std::string &str)
+ssize_t UDPClient::writeLine(const std::string &str)
 {
     using namespace GeneralUtilities;
     std::string copyString{str};
@@ -253,73 +247,13 @@ ssize_t UDPClient::writeString(const std::string &str)
         if ((bytesWritten != -1) && (errno != EAGAIN) && (errno != EWOULDBLOCK))  {
             return bytesWritten;
         }
-    } while (retryCount++ < UDPClient::s_SEND_RETRY_COUNT);
+    } while (retryCount++ < UDPClient::SEND_RETRY_COUNT);
     return 0;
 }
 
 bool constexpr UDPClient::isValidPortNumber(int portNumber)
 {
     return ((portNumber > 0) && (portNumber < std::numeric_limits<uint16_t>::max()));
-}
-
-
-std::string UDPClient::parseLineEnding(LineEnding lineEnding)
-{
-    if (lineEnding == LineEnding::LE_CarriageReturn) {
-        return "\r";
-    } else if (lineEnding == LineEnding::LE_LineFeed) {
-        return "\n";
-    } else if (lineEnding == LineEnding::LE_CarriageReturnLineFeed) {
-        return "\r\n";
-    } else if (lineEnding == LineEnding::LE_None) {
-        return "";
-    } else {
-        throw std::runtime_error("Unknown line ending passed to parseLineEnding(LineEnding): ");
-    }
-}
-
-LineEnding UDPClient::parseLineEndingFromRaw(const std::string &lineEnding)
-{
-    std::string copyString{lineEnding};
-    std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
-    for (auto &it : UDPClient::s_NO_LINE_ENDING_IDENTIFIERS) {
-        std::string tempString{static_cast<std::string>(it)};
-        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
-            return LineEnding::LE_None;
-        }
-    }
-    for (auto &it : UDPClient::s_CARRIAGE_RETURN_IDENTIFIERS) {
-        std::string tempString{static_cast<std::string>(it)};
-        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
-            return LineEnding::LE_CarriageReturn;
-        }
-    }
-    for (auto &it : UDPClient::s_LINE_FEED_IDENTIFIERS) {
-        std::string tempString{static_cast<std::string>(it)};
-        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
-            return LineEnding::LE_LineFeed;
-        }
-    }
-    for (auto &it : UDPClient::s_CARRIAGE_RETURN_LINE_FEED_IDENTIFIERS) {
-        std::string tempString{static_cast<std::string>(it)};
-        if ((copyString == tempString) && (copyString.length() == tempString.length()) && (copyString.find(tempString) == 0)) {
-            return LineEnding::LE_CarriageReturnLineFeed;
-        }
-    }
-    throw std::runtime_error("Invalid line ending passed to parseLineEndingFromRaw(const std::string &): " + lineEnding);
-}
-
-std::string UDPClient::lineEndingToString(LineEnding lineEnding)
-{
-    if (lineEnding == LineEnding::LE_CarriageReturn) {
-        return "\r";
-    } else if (lineEnding == LineEnding::LE_LineFeed) {
-        return "\n";
-    } else if (lineEnding == LineEnding::LE_CarriageReturnLineFeed) {
-        return "\r\n";
-    } else {
-        return "";
-    }
 }
 
 std::string UDPClient::doUserSelectHostName()

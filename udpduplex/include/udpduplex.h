@@ -59,9 +59,8 @@ public:
     UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_DUPLEX);
 
     /*Client/Sender*/
-    ssize_t writeByte(char toSend);
-    ssize_t writeString(const std::string &str);
-    ssize_t writeString(const char *str);
+    ssize_t writeLine(const std::string &str);
+    ssize_t writeLine(const char *str);
 
     void setClientHostName(const std::string &hostName);
     void setClientTimeout(unsigned long timeout);
@@ -76,10 +75,10 @@ public:
     /*Host/Server*/
     char readByte();
     UDPDatagram readDatagram();
-    std::string readString(unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const std::string &until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(const char *until, unsigned long maximumReadSize = TStream::NO_MAXIMUM_READ_SIZE);
-    std::string readStringUntil(char until);
+    std::string readLine();
+    std::string readUntil(const std::string &until);
+    std::string readUntil(const char *until);
+    std::string readUntil(char until);
     ssize_t available();
     void startListening();
     void stopListening();
@@ -110,16 +109,12 @@ public:
     unsigned long timeout() const;
     std::string portName() const;
     void setTimeout(unsigned long timeout);
-
-    static std::string parseLineEnding(LineEnding lineEnding);
-    static LineEnding parseLineEndingFromRaw(const std::string &lineEnding);
-    static std::string lineEndingToString(LineEnding lineEnding);
     
     static UDPObjectType parseUDPObjectTypeFromRaw(const std::string &udpObjectType);
     static std::string udpObjectTypeToString(UDPObjectType udpObjectType);
     
-    void setLineEnding(LineEnding lineEnding);
-    LineEnding lineEnding() const;
+    void setLineEnding(const std::string &lineEnding);
+    std::string lineEnding() const;
 
     UDPObjectType udpObjectType() const;
 
@@ -130,14 +125,14 @@ public:
     static UDPObjectType doUserSelectUDPObjectType();
     static std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex();
     
-    static const char *s_DEFAULT_CLIENT_HOST_NAME;
+    static const char *DEFAULT_CLIENT_HOST_NAME;
 
-    static const constexpr uint16_t s_DEFAULT_CLIENT_PORT_NUMBER{UDPClient::s_DEFAULT_PORT_NUMBER};
-    static const constexpr uint16_t s_DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER{UDPClient::s_DEFAULT_RETURN_ADDRESS_PORT_NUMBER};
-    static const constexpr unsigned long s_DEFAULT_CLIENT_TIMEOUT{UDPClient::s_DEFAULT_TIMEOUT};
+    static const constexpr uint16_t DEFAULT_CLIENT_PORT_NUMBER{UDPClient::DEFAULT_PORT_NUMBER};
+    static const constexpr uint16_t DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER{UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER};
+    static const constexpr unsigned long DEFAULT_CLIENT_TIMEOUT{UDPClient::DEFAULT_TIMEOUT};
 
-    static const constexpr uint16_t s_DEFAULT_SERVER_PORT_NUMBER{UDPServer::s_DEFAULT_PORT_NUMBER};
-    static const constexpr unsigned long s_DEFAULT_SERVER_TIMEOUT{UDPServer::s_DEFAULT_TIMEOUT};
+    static const constexpr uint16_t DEFAULT_SERVER_PORT_NUMBER{UDPServer::DEFAULT_PORT_NUMBER};
+    static const constexpr unsigned long DEFAULT_SERVER_TIMEOUT{UDPServer::DEFAULT_TIMEOUT};
 
 private:
     std::unique_ptr<UDPServer> m_udpServer;

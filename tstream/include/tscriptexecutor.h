@@ -66,10 +66,10 @@ public:
         for (auto &it : this->m_tScriptCommands) {
             try {
                 if (it.commandType() == TStreamCommandType::WRITE) {
-                    ioStream->writeString(it.commandArgument());
+                    ioStream->writeLine(it.commandArgument());
                     printTxResult(it.commandArgument());
                 } else if (it.commandType() == TStreamCommandType::READ) {
-                    printRxResult(ioStream->readString());
+                    printRxResult(ioStream->readLine());
                 } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
                     printDelayResult(DelayType::SECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delaySeconds(GeneralUtilities::decStringToInt(it.commandArgument()));
@@ -127,10 +127,10 @@ public:
         for (auto &it : this->m_tScriptCommands) {
             try {
                 if (it.commandType() == TStreamCommandType::WRITE) {
-                    ioStream->writeString(it.commandArgument());
+                    ioStream->writeLine(it.commandArgument());
                     printTxResult(instanceArg, it.commandArgument());
                 } else if (it.commandType() == TStreamCommandType::READ) {
-                    printRxResult(instanceArg, ioStream->readString());
+                    printRxResult(instanceArg, ioStream->readLine());
                 } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
                     printDelayResult(instanceArg, DelayType::SECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delaySeconds(GeneralUtilities::decStringToInt(it.commandArgument()));
