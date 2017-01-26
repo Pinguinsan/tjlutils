@@ -508,11 +508,7 @@ unsigned char SerialPort::rawRead()
             return charToReturn;
         }
     }
-    if (std::isprint(charToReturn)) {
-        return charToReturn;
-    } else {
-        return 0;
-    }
+    return charToReturn;
 #endif
 }
 
@@ -523,11 +519,11 @@ unsigned char SerialPort::timedRead()
     auto endTime = std::chrono::high_resolution_clock::now();
     do {
         byteRead = this->rawRead();
-        if (std::isprint(byteRead)) {
+        if (byteRead != 0) {
             return byteRead;
-        } 
+        }
         endTime = std::chrono::high_resolution_clock::now();
-    } while(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() < this->m_timeout);
+    } while (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() < this->m_timeout);
     return 0;
 }
 /*
@@ -842,7 +838,7 @@ bool SerialPort::isOpen() const
 ssize_t SerialPort::writeCString(const char *str)
 {
     ssize_t writtenBytes{0};
-    while(*str != 0) {
+    while (*str != 0) {
         writtenBytes += (this->writeByte(*(str++)));
     }
     return writtenBytes;
@@ -872,6 +868,15 @@ std::string SerialPort::readUntil(char readUntil)
 std::string SerialPort::readUntil(const char *readUntil)
 {
     return this->readUntil(static_cast<std::string>(readUntil));
+}
+
+std::string SerialPort::readUntil(const std::string &str)
+{
+    std::string tempLineEnding{this->m_lineEnding};
+    this->m_lineEnding = str;
+    std::string readString{this->readLine()};
+    this->m_lineEnding = tempLineEnding;
+    return readString;
 }
 
 
@@ -1174,8 +1179,6 @@ ssize_t SerialPort::available()
 void SerialPort::asyncStringListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-    int i{0};
-    bool exitBool{false};
     do {
         unsigned char byteRead = this->timedRead();
         if (byteRead != 0) {
@@ -1191,8 +1194,6 @@ void SerialPort::asyncStringListener()
 void SerialPort::syncStringListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-    int i{0};
-    bool exitBool{false};
     EventTimer eventTimer;
     eventTimer.start();
     do {
@@ -1201,6 +1202,7 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
+            eventTimer.restart();
         } else {
             break;
         }
@@ -1215,6 +1217,7 @@ void SerialPort::addToStringBuilderQueue(unsigned char byte)
     this->m_stringBuilderQueue += static_cast<char>(byte);
     while (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
         this->m_stringQueue.push_back(this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding)));
+        this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
     }
 }
 
@@ -1281,17 +1284,6 @@ unsigned char SerialPort::readByte()
     return charToReturn;
 }
 
-std::string SerialPort::readLine()
-{
-    this->syncStringListener();
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_stringQueue.size() == 0) {
-        return "";
-    }
-    std::string stringToReturn{this->m_stringQueue.front()};
-    this->m_stringQueue.pop_front();
-    return stringToReturn;
-}
 
 void SerialPort::putBack(char back)
 {
