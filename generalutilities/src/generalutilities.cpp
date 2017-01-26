@@ -321,6 +321,8 @@ namespace GeneralUtilities
         for (std::string::const_iterator iter = stringToCheck.begin(); iter != stringToCheck.end(); iter++) {
             if (static_cast<unsigned>(*iter) > ASCII_WHITESPACE_MAXIMUM_VALUE) {
                 return false;
+            } else if (((*iter) != '\r') || ((*iter) != '\n')) {
+                return false;
             }
         }
         return true;

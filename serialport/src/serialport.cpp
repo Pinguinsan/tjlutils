@@ -860,6 +860,17 @@ ssize_t SerialPort::writeLine(const char *str)
     return this->writeLine(static_cast<std::string>(str));
 }
 
+std::string SerialPort::readLine()
+{
+    this->syncStringListener();
+    if (this->m_stringQueue.size() == 0) {
+        return "";
+    }
+    std::string stringToReturn{this->m_stringQueue.front()};
+    this->m_stringQueue.pop_front();
+    return stringToReturn;
+}
+
 std::string SerialPort::readUntil(char readUntil)
 {
     return this->readUntil(std::string{1, readUntil});
@@ -929,6 +940,9 @@ void SerialPort::setParity(Parity parity)
 
 void SerialPort::setLineEnding(const std::string &lineEnding)
 {
+    if ((lineEnding.length() == 0) || (GeneralUtilities::isWhitespace(lineEnding))) {
+        throw std::runtime_error("ERROR: Cannot set SerialPort::lineEnding() to whitespace or an empty string");
+    }
     this->m_lineEnding = lineEnding;
 }
 
