@@ -236,6 +236,7 @@ private:
     std::mutex m_ioMutex;
     std::deque<std::string> m_stringQueue;
     std::string m_stringBuilderQueue;
+    std::unique_ptr<EventTimer> m_lastTransmissionTimer;
 
     #if defined(__ANDROID__)
         std::thread *m_asyncFuture;

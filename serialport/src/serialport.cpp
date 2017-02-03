@@ -149,7 +149,8 @@ SerialPort::SerialPort(SerialPort &&other) :
     m_lineEnding{std::move(other.m_lineEnding)},
     m_timeout{std::move(other.m_timeout)},
     m_retryCount{std::move(other.m_retryCount)},
-    m_isOpen{std::move(other.m_isOpen)}
+    m_isOpen{std::move(other.m_isOpen)},
+    m_lastTransmissionTimer{std::move(other.m_lastTransmissionTimer)}
 {
 
 }
@@ -167,7 +168,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
     m_shutEmDown{false},
-    m_isListening{false}
+    m_isListening{false},
+    m_lastTransmissionTimer{std::make_unique<EventTimer>()}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -1211,12 +1213,13 @@ void SerialPort::syncStringListener()
     EventTimer eventTimer;
     eventTimer.start();
     do {
-        unsigned char byteRead = this->timedRead();
+        unsigned char byteRead{this->timedRead()};
         if (byteRead != 0) {
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
             eventTimer.restart();
+            this->m_lastTransmissionTimer->restart();
         } else {
             break;
         }
@@ -1229,9 +1232,19 @@ void SerialPort::addToStringBuilderQueue(unsigned char byte)
         this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(1);
     }
     this->m_stringBuilderQueue += static_cast<char>(byte);
-    while (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
-        this->m_stringQueue.push_back(this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding)));
-        this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
+    if (this->m_stringBuilderQueue.length() == 0) {
+        return;
+    } else if (this->m_stringBuilderQueue.find(this->m_lineEnding) == std::string::npos) {
+        this->m_lastTransmissionTimer->update();
+        if (this->m_lastTransmissionTimer->totalMilliseconds() >= this->m_timeout) {
+            this->m_stringQueue.push_back(this->m_stringBuilderQueue);
+            this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
+        }
+    } else {
+        while (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
+            this->m_stringQueue.push_back(this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding)));
+            this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
+        }
     }
 }
 
