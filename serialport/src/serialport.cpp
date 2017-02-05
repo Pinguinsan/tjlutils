@@ -1160,7 +1160,6 @@ void SerialPort::syncStringListener()
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     unsigned long tempTimeout{this->m_timeout};
     unsigned long splitTimeout{this->m_timeout};
-    size_t startingStringQueueLength{this->m_stringQueue.size()};
     EventTimer eventTimer;
     eventTimer.start();
     do {
@@ -1174,7 +1173,7 @@ void SerialPort::syncStringListener()
         splitTimeout = (tempTimeout - eventTimer.totalMilliseconds());
         if (byteRead != 0) {
             ioMutexLock.lock();
-            bool result{addToStringBuilderQueue(byteRead)};
+            addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
             this->m_lastTransmissionTimer->restart();
         } else {
@@ -1185,17 +1184,17 @@ void SerialPort::syncStringListener()
     this->m_timeout = tempTimeout;
 }
 
-bool SerialPort::addToStringBuilderQueue(unsigned char byte)
+void SerialPort::addToStringBuilderQueue(unsigned char byte)
 {
     if (this->m_stringBuilderQueue.size() >= SINGLE_MESSAGE_BUFFER_MAX) {
         this->m_stringQueue.push_back(this->m_stringBuilderQueue);
         this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
         this->m_lastTransmissionTimer->stop();
-        return true;
+        return;
     }
     this->m_stringBuilderQueue += static_cast<char>(byte);
     if (this->m_stringBuilderQueue.length() == 0) {
-        return false;
+        return;
     } else if (this->m_stringBuilderQueue.find(this->m_lineEnding) == std::string::npos) {
         if ((this->m_timeout != 0) && (this->m_lastTransmissionTimer->isRunning())) {
             this->m_lastTransmissionTimer->update();
@@ -1203,18 +1202,12 @@ bool SerialPort::addToStringBuilderQueue(unsigned char byte)
                 this->m_stringQueue.push_back(this->m_stringBuilderQueue);
                 this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
                 this->m_lastTransmissionTimer->stop();
-                return true;
             }
         }
     } else {
-        int stringsAdded{0};
         while (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
             this->m_stringQueue.push_back(this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding)));
             this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
-            stringsAdded++;
-        }
-        if (stringsAdded > 0) {
-            return true;
         }
     }
 }

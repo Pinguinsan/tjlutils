@@ -245,7 +245,7 @@ private:
 
     void asyncStringListener();
     void syncStringListener();
-    bool addToStringBuilderQueue(unsigned char byte);
+    void addToStringBuilderQueue(unsigned char byte);
 
     void startAsyncListen();
     void stopAsyncListen();
