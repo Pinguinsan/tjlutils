@@ -1175,6 +1175,9 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
+            if (!this->m_stringQueue.empty()) {
+                break;
+            }
             this->m_lastTransmissionTimer->restart();
         } else {
             this->m_lastTransmissionTimer->stop();
