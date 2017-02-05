@@ -1193,7 +1193,7 @@ void SerialPort::addToStringBuilderQueue(unsigned char byte)
     if (this->m_stringBuilderQueue.length() == 0) {
         return;
     } else if (this->m_stringBuilderQueue.find(this->m_lineEnding) == std::string::npos) {
-        if (this->m_lastTransmissionTimer->isRunning()) { 
+        if ((this->m_timeout != 0) && (this->m_lastTransmissionTimer->isRunning())) {
             this->m_lastTransmissionTimer->update();
             if (this->m_lastTransmissionTimer->totalMilliseconds() >= this->m_timeout) {
                 this->m_stringQueue.push_back(this->m_stringBuilderQueue);
