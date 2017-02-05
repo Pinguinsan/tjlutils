@@ -480,13 +480,6 @@ std::pair<int, int> SerialPort::parseParity(Parity parity)
 #endif
 }
 
-/*
-unsigned char SerialPort::readByte()
-{
-    return this->timedRead();
-}
-*/
-
 unsigned char SerialPort::rawRead()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
@@ -1165,10 +1158,19 @@ void SerialPort::asyncStringListener()
 void SerialPort::syncStringListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
+    unsigned long tempTimeout{this->m_timeout};
+    unsigned long splitTimeout{this->m_timeout};
     EventTimer eventTimer;
     eventTimer.start();
     do {
+        this->setTimeout(splitTimeout);
         unsigned char byteRead{this->timedRead()};
+        if ((tempTimeout - eventTimer.totalMilliseconds()) < 0) {
+            splitTimeout = 0;
+        } else {
+            splitTimeout = tempTimeout - eventTimer.totalMilliseconds();
+        }
+        splitTimeout = (tempTimeout - eventTimer.totalMilliseconds());
         if (byteRead != 0) {
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
@@ -1179,6 +1181,7 @@ void SerialPort::syncStringListener()
             break;
         }
     } while (eventTimer.totalMilliseconds() <= this->m_timeout);
+    this->m_timeout = tempTimeout;
 }
 
 void SerialPort::addToStringBuilderQueue(unsigned char byte)
