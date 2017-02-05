@@ -1160,6 +1160,7 @@ void SerialPort::syncStringListener()
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     unsigned long tempTimeout{this->m_timeout};
     unsigned long splitTimeout{this->m_timeout};
+    size_t startingStringQueueLength{this->m_stringQueue.size()};
     EventTimer eventTimer;
     eventTimer.start();
     do {
@@ -1175,6 +1176,9 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
+            if (this->m_stringQueue.size() > startingStringQueueLength) {
+                break;
+            }
             this->m_lastTransmissionTimer->restart();
         } else {
             this->m_lastTransmissionTimer->stop();
