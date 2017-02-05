@@ -50,6 +50,7 @@ public:
     long long int seconds();
     long long int milliseconds();
     bool isPaused() const;
+    bool isRunning() const;
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;

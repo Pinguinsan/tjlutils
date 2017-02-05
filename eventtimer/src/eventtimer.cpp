@@ -119,6 +119,11 @@ bool EventTimer::isPaused() const
     return this->m_isPaused;
 }
 
+bool EventTimer::isRunning() const
+{
+    return !(this->isPaused());
+}
+
 void EventTimer::update()
 {
     using namespace GeneralUtilities;
