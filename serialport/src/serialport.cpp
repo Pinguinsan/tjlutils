@@ -490,7 +490,7 @@ unsigned char SerialPort::readByte()
 unsigned char SerialPort::rawRead()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
-    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUF_MAX]};
+    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUFFER_MAX]};
     unsigned char charToReturn{0};
     long int returnedBytes{0};
     ReadFile(this->m_serialPort[this->m_portNumber], buffer.get(), 1, (LPDWORD)((void *)&returnedBytes), NULL);
@@ -499,17 +499,19 @@ unsigned char SerialPort::rawRead()
     }
     return charToReturn;
 #else
-    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUF_MAX]};
+    std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUFFER_MAX]};
     unsigned char charToReturn{0};
     long int returnedBytes{read(this->m_serialPort[this->m_portNumber], buffer.get(), 1)};
-    if (returnedBytes == 1) {
-        charToReturn = buffer.get()[0];
-    }
     if(returnedBytes < 0) {
         if(errno == EAGAIN)  {
             return charToReturn;
         }
+    } else if (returnedBytes == 1) {
+        charToReturn = buffer.get()[0];
+    } else {
+        return charToReturn;
     }
+
     return charToReturn;
 #endif
 }
@@ -1229,8 +1231,11 @@ void SerialPort::syncStringListener()
 
 void SerialPort::addToStringBuilderQueue(unsigned char byte)
 {
-    if (this->m_stringBuilderQueue.size() >= SERIAL_PORT_BUF_MAX) {
-        this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(1);
+    if (this->m_stringBuilderQueue.size() >= SINGLE_MESSAGE_BUFFER_MAX) {
+        this->m_stringQueue.push_back(this->m_stringBuilderQueue);
+        this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
+        this->m_lastTransmissionTimer->stop();
+        return;
     }
     this->m_stringBuilderQueue += static_cast<char>(byte);
     if (this->m_stringBuilderQueue.length() == 0) {

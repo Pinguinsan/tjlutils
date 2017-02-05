@@ -29,7 +29,6 @@
     #endif
 #endif
 
-
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -251,7 +250,8 @@ private:
     void startAsyncListen();
     void stopAsyncListen();
 
-    static const unsigned long constexpr SERIAL_PORT_BUF_MAX{4025};
+    static const unsigned long constexpr SERIAL_PORT_BUFFER_MAX{4096};
+    static const unsigned long constexpr SINGLE_MESSAGE_BUFFER_MAX{50};
     static bool isAvailableSerialPort(const std::string &name);
     static std::pair<int, std::string> getPortNameAndNumber(const std::string &name);
     static std::vector<std::string> generateSerialPortNames();
