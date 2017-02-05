@@ -530,53 +530,6 @@ unsigned char SerialPort::timedRead()
     } while (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() < this->m_timeout);
     return 0;
 }
-/*
-
-std::string SerialPort::readLine(unsigned long maximumReadSize)
-{
-    std::string returnString{""};
-    int i{0};
-    bool exitBool{false};
-    do {
-        unsigned char byteRead = this->timedRead();
-        if (std::isprint(byteRead)) {
-            i = 0;
-            returnString += byteRead;
-        } else {
-            if (++i > this->m_retryCount) {
-                exitBool = true;
-            }
-        }
-        if (returnString.size() == maximumReadSize) {
-            exitBool = true;
-        }
-    } while (!exitBool);
-    return returnString;
-}
-
-std::string SerialPort::readUntil(const std::string &readUntil, unsigned long maximumReadSize)
-{
-    using namespace GeneralUtilities;
-    std::string returnString{""};
-    int i{0};
-    bool exitBool{false};
-    do {
-        unsigned char byteRead = this->timedRead();
-        if (std::isprint(byteRead)) {
-            i = 0;
-            returnString += byteRead;
-        } else {
-            if (++i > this->m_retryCount) {
-                exitBool = true;
-            }
-        }
-        if (returnString.length() == maximumReadSize) {
-            exitBool = true;
-        }
-    } while (!exitBool && !GeneralUtilities::endsWith(returnString, readUntil));
-    return returnString;
-}
-*/
 
 ssize_t SerialPort::writeByte(char byteToSend)
 {
@@ -1220,7 +1173,6 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
-            eventTimer.restart();
             this->m_lastTransmissionTimer->restart();
         } else {
             this->m_lastTransmissionTimer->stop();
