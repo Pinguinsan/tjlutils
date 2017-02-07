@@ -1180,7 +1180,15 @@ void SerialPort::syncStringListener()
             }
             this->m_lastTransmissionTimer->restart();
         } else {
-            this->m_lastTransmissionTimer->stop();
+            if ((this->m_timeout != 0) && (this->m_lastTransmissionTimer->isRunning())) {
+                this->m_lastTransmissionTimer->update();
+                if (this->m_lastTransmissionTimer->totalMilliseconds() >= this->m_timeout) {
+                    this->m_stringQueue.push_back(this->m_stringBuilderQueue);
+                    this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
+                    this->m_lastTransmissionTimer->stop();
+                }
+                this->m_lastTransmissionTimer->stop();
+            }
             break;
         }
     } while (eventTimer.totalMilliseconds() <= this->m_timeout);
