@@ -50,7 +50,7 @@
 class UDPDatagram
 {
 public:
-    UDPDatagram(sockaddr_in socketAddress, const std::string &message) :
+    UDPDatagram(struct sockaddr_in socketAddress, const std::string &message) :
         m_socketAddress{socketAddress},
         m_message{message} { }
 
@@ -58,7 +58,7 @@ public:
         m_socketAddress{sockaddr_in{}},
         m_message{""} { }
 
-    sockaddr_in socketAddress () const { return this->m_socketAddress; }
+    struct sockaddr_in socketAddress () const { return this->m_socketAddress; }
     uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
     std::string message() const { return this->m_message; }
     std::string hostName() const 
@@ -83,7 +83,7 @@ printf("%s\n", str); // prints "192.0.2.33"
 */
 
 private:
-    sockaddr_in m_socketAddress;
+    struct sockaddr_in m_socketAddress;
     std::string m_message;
 };
 
@@ -135,7 +135,7 @@ public:
     static const constexpr unsigned int DEFAULT_TIMEOUT{100};
 
 private:
-    sockaddr_in m_socketAddress;
+    struct sockaddr_in m_socketAddress;
     int m_setSocketResult;
     bool m_isListening;
     unsigned long m_timeout;

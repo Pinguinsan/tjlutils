@@ -169,16 +169,40 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_isOpen{false},
     m_shutEmDown{false},
     m_isListening{false},
-    m_lastTransmissionTimer{std::make_unique<EventTimer>()}
+    m_lastTransmissionTimer{new EventTimer()}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
     this->m_portName = truePortNameAndNumber.second;
 }
 
+void SerialPort::begin(unsigned long baud)
+{
+    this->closePort();
+    BaudRate newBaudRate{BaudRate::BAUD115200};
+    try {
+        newBaudRate = parseBaudRateFromRaw(std::to_string(baud));
+    } catch (std::exception &e) {
+        std::cout << e.what();
+        throw e;   
+    }
+    this->setBaudRate(newBaudRate);
+    this->openPort();
+}
+
+void SerialPort::end()
+{
+    this->closePort();
+}
+
 bool operator==(const SerialPort &lhs, const SerialPort &rhs)
 {
     return (lhs.portName() == rhs.portName());
+}
+
+char SerialPort::read()
+{
+    return this->rawRead();
 }
 
 void SerialPort::openPort()
@@ -494,7 +518,7 @@ unsigned char SerialPort::rawRead()
 #else
     std::unique_ptr<unsigned char> buffer{new unsigned char[SERIAL_PORT_BUFFER_MAX]};
     unsigned char charToReturn{0};
-    long int returnedBytes{read(this->m_serialPort[this->m_portNumber], buffer.get(), 1)};
+    long int returnedBytes{::read(this->m_serialPort[this->m_portNumber], buffer.get(), 1)};
     if(returnedBytes < 0) {
         if(errno == EAGAIN)  {
             return charToReturn;
@@ -524,6 +548,22 @@ unsigned char SerialPort::timedRead()
     return 0;
 }
 
+ssize_t SerialPort::write(char byteToSend)
+{
+    return this->writeByte(byteToSend);
+}
+
+ssize_t SerialPort::write(const uint8_t *message, uint8_t messageLength)
+{
+    ssize_t bytesWritten{0};
+    for (int i = 0; i < messageLength; i++) {
+        this->writeByte(static_cast<char>(message[i]));
+        bytesWritten++;
+    }
+    return bytesWritten;
+}
+
+
 ssize_t SerialPort::writeByte(char byteToSend)
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
@@ -531,7 +571,7 @@ ssize_t SerialPort::writeByte(char byteToSend)
     WriteFile(this->m_serialPort[this->m_portNumber], &byteToSend, 1, (LPDWORD)((void *)&writtenBytes), NULL);
     return ( (writtenBytes < 0) ? 1 : 0);
 #else
-    long int writtenBytes{write(this->m_serialPort[this->m_portNumber], &byteToSend, 1)};
+    long int writtenBytes{::write(this->m_serialPort[this->m_portNumber], &byteToSend, 1)};
     if(writtenBytes < 0) {
         return (errno == EAGAIN ? 0 : 1);
     }
@@ -545,7 +585,7 @@ ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, unsigned long int 
     long int writtenBytes;
     return (WriteFile(this->m_serialPort[this->m_portNumber], buffer, bufferSize, (LPDWORD)((void *)&writtenBytes), NULL) ? writtenBytes : -1);
 #else
-    long int writtenBytes{write(this->m_serialPort[this->m_portNumber], buffer, bufferSize)};
+    long int writtenBytes{::write(this->m_serialPort[this->m_portNumber], buffer, bufferSize)};
     if(writtenBytes < 0) {
         return (errno == EAGAIN ? 0 : 1);
     }
@@ -1134,12 +1174,6 @@ bool SerialPort::isListening() const
     return this->m_isListening;
 }
 
-ssize_t SerialPort::available() 
-{
-    this->syncStringListener();
-    return this->m_stringQueue.size();
-}
-
 void SerialPort::asyncStringListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
@@ -1221,6 +1255,21 @@ void SerialPort::addToStringBuilderQueue(unsigned char byte)
             this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
         }
     }
+}
+
+int SerialPort::available()
+{
+    this->syncStringListener();
+    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
+    if (this->m_stringQueue.empty()) {
+        if (this->m_stringBuilderQueue.size() == 0) {
+            return 0;
+        } else {
+            return this->m_stringBuilderQueue.length();
+        }
+     } else {
+        return this->m_stringQueue.front().length();
+    }  
 }
 
 std::string SerialPort::peek()

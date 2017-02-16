@@ -235,7 +235,7 @@ namespace FileUtilities
 
     unsigned int getInstanceCount(const std::string &str)
     {
-        std::unique_ptr<SystemCommand> systemCommand{std::make_unique<SystemCommand>()};
+        std::unique_ptr<SystemCommand> systemCommand{new SystemCommand()};
         systemCommand->setCommand("ps aux | grep " + str);
         systemCommand->execute();
         if (systemCommand->hasError()) {

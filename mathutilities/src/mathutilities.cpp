@@ -38,7 +38,7 @@ namespace MathUtilities
     int randomBetween(int lowLimit, int highLimit)
     {
         if (!MathUtilities::randomDevice) {
-            randomDevice = std::make_unique<MathUtilities::Random>();
+            randomDevice = std::unique_ptr<MathUtilities::Random>{new MathUtilities::Random()};
         }
         return randomDevice->drawNumber(lowLimit, highLimit);
         

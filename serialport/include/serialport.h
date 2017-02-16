@@ -49,7 +49,6 @@
 #include <fileutilities.h>
 #include <generalutilities.h>
 #include <eventtimer.h>
-#include <tstream.h>
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
@@ -84,7 +83,7 @@ enum class BaudRate { BAUD50, BAUD75, BAUD110, BAUD134, BAUD150,
                       BAUD3000000, BAUD3500000, BAUD4000000 };
 #endif
 
-class SerialPort : public TStream
+class SerialPort
 {
 public:
     SerialPort(const std::string &name);
@@ -117,14 +116,19 @@ public:
     SerialPort &operator=(const SerialPort &rhs) = delete;
     SerialPort(const SerialPort &other) = delete;
 
+    void begin(unsigned long baud);
+    void end();
     void openPort();
     void closePort();
+    char read();
     std::string readLine();
     std::string readUntil(const std::string &readUntil);
     std::string readUntil(const char *readUntil);
     std::string readUntil(char readUntil);
     ssize_t writeLine(const std::string &str);
     ssize_t writeLine(const char *str);
+    ssize_t write(char byteToSend);
+    ssize_t write(const uint8_t *message, uint8_t messageLength);
     ssize_t available();
 public:
     bool isDCDEnabled() const;
