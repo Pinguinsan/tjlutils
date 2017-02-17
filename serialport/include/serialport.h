@@ -83,7 +83,7 @@ enum class BaudRate { BAUD50, BAUD75, BAUD110, BAUD134, BAUD150,
                       BAUD3000000, BAUD3500000, BAUD4000000 };
 #endif
 
-class SerialPort
+class SerialPort : public TStream
 {
 public:
     SerialPort(const std::string &name);

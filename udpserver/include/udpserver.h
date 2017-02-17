@@ -51,7 +51,7 @@ class UDPDatagram
 {
 public:
     UDPDatagram(struct sockaddr_in socketAddress, const std::string &message) :
-        m_socketAddress{socketAddress},
+        m_socketAddress{static_cast<sockaddr_in>(socketAddress)},
         m_message{message} { }
 
     UDPDatagram() :
