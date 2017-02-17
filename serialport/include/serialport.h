@@ -49,6 +49,7 @@
 #include <fileutilities.h>
 #include <generalutilities.h>
 #include <eventtimer.h>
+#include <tstream.h>
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
