@@ -1257,7 +1257,7 @@ void SerialPort::addToStringBuilderQueue(unsigned char byte)
     }
 }
 
-int SerialPort::available()
+ssize_t SerialPort::available()
 {
     this->syncStringListener();
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
