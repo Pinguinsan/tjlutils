@@ -5,10 +5,10 @@
 ************************************************************************
 *    This is a header file for tjlutils:                               *
 *    https://github.serial/Pinguinsan/tjlutils                         *
-*    This file may be distributed with the entire tjlutils library,    *
+*    this file may be distributed with the entire tjlutils library,    *
 *    but may also be distributed as a standalone file                  *
 *    The source code is released under the GNU LGPL                    *
-*    This file holds the declarations of a UDPServer class             *
+*    this file holds the declarations of a UDPServer class             *
 *    It is used to receive datagrams over a specified UDP port number  *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
@@ -51,14 +51,30 @@ class UDPDatagram
 {
 public:
     UDPDatagram(struct sockaddr_in socketAddress, const std::string &message) :
-        m_socketAddress{static_cast<sockaddr_in>(socketAddress)},
-        m_message{message} { }
+        m_message{message}
+    { 
+       this->m_socketAddress.sin_family = socketAddress.sin_family;
+       this->m_socketAddress.sin_port = socketAddress.sin_port;
+       this->m_socketAddress.sin_addr.s_addr = socketAddress.sin_addr.s_addr;
+    }
 
     UDPDatagram() :
-        m_socketAddress{sockaddr_in{}},
-        m_message{""} { }
+        m_message{""} 
+    { 
+       this->m_socketAddress.sin_family = 0;
+       this->m_socketAddress.sin_port = 0;
+       this->m_socketAddress.sin_addr.s_addr = 0;
+    }
 
-    struct sockaddr_in socketAddress () const { return this->m_socketAddress; }
+    struct sockaddr_in socketAddress () const 
+    {
+        sockaddr_in returnSocket;
+        returnSocket.sin_family = this->m_socketAddress.sin_family;
+        returnSocket.sin_port = this->m_socketAddress.sin_port;
+        returnSocket.sin_addr.s_addr = this->m_socketAddress.sin_addr.s_addr; 
+        return returnSocket;
+    }
+
     uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
     std::string message() const { return this->m_message; }
     std::string hostName() const 
@@ -67,20 +83,6 @@ public:
         inet_ntop(AF_INET, &(this->m_socketAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
         return std::string{lowLevelTempBuffer};
     }
-    /*
-    // IPv4 demo of inet_ntop() and inet_pton()
-
-struct sockaddr_in sa;
-char str[INET_ADDRSTRLEN];
-
-// store this IP address in sa:
-inet_pton(AF_INET, "192.0.2.33", &(sa.sin_addr));
-
-// now get it back and print it
-inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);
-
-printf("%s\n", str); // prints "192.0.2.33"
-*/
 
 private:
     struct sockaddr_in m_socketAddress;

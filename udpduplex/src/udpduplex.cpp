@@ -83,14 +83,14 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
 {
 
     if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
-        this->m_udpServer = std::make_unique<UDPServer>(serverPortNumber);
+        this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{serverPortNumber}};
     }
 
 
     if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
-        this->m_udpClient = std::make_unique<UDPClient>(clientHostName, 
-                                                        clientPortNumber,
-                                                        clientReturnAddressPortNumber);
+        this->m_udpClient = std::unique_ptr<UDPClient>{new UDPClient{clientHostName, 
+                                                                     clientPortNumber,
+                                                                     clientReturnAddressPortNumber}};
     }
 }
 

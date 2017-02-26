@@ -252,7 +252,10 @@ char UDPServer::readByte()
     }
     char charToReturn{str.at(0)};
     std::string newDatagramMessage{str.substr(1)};
-    struct sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};
+    struct sockaddr_in newDatagramAddress;
+    newDatagramAddress.sin_family = this->m_datagramQueue.front().socketAddress().sin_family;
+    newDatagramAddress.sin_port = this->m_datagramQueue.front().socketAddress().sin_port;
+    newDatagramAddress.sin_addr.s_addr = this->m_datagramQueue.front().socketAddress().sin_addr.s_addr;
     this->m_datagramQueue.pop_front();
     this->m_datagramQueue.emplace_front(newDatagramAddress, newDatagramMessage);
     return charToReturn;
@@ -360,7 +363,10 @@ void UDPServer::putBack(const std::string &str)
     }
     std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
     std::string newDatagramMessage{str + this->m_datagramQueue.front().message()};
-    struct sockaddr_in newDatagramAddress{this->m_datagramQueue.front().socketAddress()};
+    struct sockaddr_in newDatagramAddress;
+    newDatagramAddress.sin_family = this->m_datagramQueue.front().socketAddress().sin_family;
+    newDatagramAddress.sin_port = this->m_datagramQueue.front().socketAddress().sin_port;
+    newDatagramAddress.sin_addr.s_addr = this->m_datagramQueue.front().socketAddress().sin_addr.s_addr;
     this->m_datagramQueue.pop_front();
     this->m_datagramQueue.emplace_front(newDatagramAddress, newDatagramMessage);
 }
