@@ -199,27 +199,21 @@ long long int EventTimer::totalTime()
     return this->m_totalTime;
 }
 
-std::string EventTimer::toString()
+std::string EventTimer::toString(uint8_t millisecondDigits)
 {
     if (!this->cacheIsValid()) {
         this->validateCache();
         this->update();
     }
     std::string returnString{""};
-    if (this->hours() == 0) {
-        returnString = GeneralUtilities::toString(this->minutes())
-                       + ':'
-                       + GeneralUtilities::toString(this->seconds())
-                       + '.'
-                       + GeneralUtilities::toString(this->milliseconds());
-    } else {
-        returnString = GeneralUtilities::toString(this->hours())
-                       + ':'
-                       + GeneralUtilities::toString(this->minutes())
-                       + ':'
-                       + GeneralUtilities::toString(this->seconds())
-                       + '.'
-                       + GeneralUtilities::toString(this->milliseconds());
+    if (this->hours() != 0) {
+        returnString = GeneralUtilities::toString(this->hours()) + ':';
     }
+    returnString += GeneralUtilities::toString(this->minutes())
+                    + ':'
+                    + GeneralUtilities::toString(this->seconds())
+                    + '.'
+                    + GeneralUtilities::toString(this->milliseconds()).substr(0, millisecondDigits);
+    
     return returnString;
 }

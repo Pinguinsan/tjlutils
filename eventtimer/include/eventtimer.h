@@ -54,7 +54,7 @@ public:
     bool isPaused() const;
     bool isRunning() const;
 
-    std::string toString();
+    std::string toString(uint8_t millisecondDigits = 3);
 
 private:
     std::chrono::time_point<platform_clock_t> m_startTime;
