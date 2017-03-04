@@ -26,6 +26,8 @@
 #include "generalutilities.h"
 #include "mathutilities.h"
 
+using platform_clock_t = std::chrono::steady_clock;
+
 class EventTimer
 {
 public:
