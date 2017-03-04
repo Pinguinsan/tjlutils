@@ -1,3 +1,23 @@
+/***********************************************************************
+*    pythoncrypto.cpp:                                                 *
+*    Namespace PythonCrypto, for using Python hashing tools            *
+*    Copyright (c) 2016 Tyler Lewis                                    *
+************************************************************************
+*    This is a source file for tjlutils:                               *
+*    https://github.com/Pinguinsan/tjlutils                            *
+*    This file may be distributed with the entire tjlutils library,    *
+*    but may also be distributed as a standalone file                  *
+*    The source code is released under the GNU LGPL                    *
+*    This file holds the implementation of a PythonCrypto namespace    *
+*    It is used to enable expose some Python hashing tools, allowing   *
+*    one to pass strings to a Python function and receive a hash back, *
+*    such as sha256, enabling cryptographically strong security        *
+*                                                                      *
+*    You should have received a copy of the GNU Lesser General         *
+*    Public license along with tjlutils                                *
+*    If not, see <http://www.gnu.org/licenses/>                        *
+***********************************************************************/
+
 #include "pythoncrypto.h"
 
 const std::string PythonCrypto::SYSTEM_PYTHON_COMMAND{"python "};

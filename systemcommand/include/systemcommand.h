@@ -14,7 +14,7 @@
 *    retrieve the stdout/stderr from a call to the command interpreter *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
+*    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 

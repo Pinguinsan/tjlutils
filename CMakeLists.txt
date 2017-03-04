@@ -19,7 +19,6 @@ else()
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/crypto/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/pythoncrypto/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/generalutilities/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/fileutilities/include/"
@@ -39,7 +38,6 @@ set(SOURCE_BASE /opt/GitHub/tjlutils)
 
 set (SYSTEMCOMMAND_SOURCES "${SOURCE_BASE}/systemcommand/src/systemcommand.cpp")
 set (PYTHONCRYPTO_SOURCES "${SOURCE_BASE}/pythoncrypto/src/pythoncrypto.cpp")
-set (CRYPTO_SOURCES "${SOURCE_BASE}/crypto/src/crypto.cpp")
 set (GENERALUTILITIES_SOURCES "${SOURCE_BASE}/generalutilities/src/generalutilities.cpp")
 set (FILEUTILITIES_SOURCES "${SOURCE_BASE}/fileutilities/src/fileutilities.cpp")
 set (DATETIME_SOURCES "${SOURCE_BASE}/datetime/src/datetime.cpp")
@@ -56,7 +54,6 @@ set (TSTREAM_SOURCES "${SOURCE_BASE}/tstream/src/tscriptexecutor.cpp"
 
 add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                             "${PYTHONCRYPTO_SOURCES}"
-                            "${CRYPTO_SOURCES}"
                             "${GENERALUTILITIES_SOURCES}"
                             "${FILEUTILITIES_SOURCES}"
                             "${DATETIME_SOURCES}"
@@ -71,7 +68,6 @@ add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                         
 add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${PYTHONCRYPTO_SOURCES}"
-                                  "${CRYPTO_SOURCES}"
                                   "${GENERALUTILITIES_SOURCES}"
                                   "${FILEUTILITIES_SOURCES}"
                                   "${DATETIME_SOURCES}"

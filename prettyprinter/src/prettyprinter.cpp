@@ -12,7 +12,7 @@
 *    It is used to print colored text to a POSIX terminal              *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
+*    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 

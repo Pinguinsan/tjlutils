@@ -17,8 +17,6 @@ function cleanUp() {
     #suRemoveFile "$ui/mathutilities.h"
     #suRemoveFile "$ui/datetime.h"
     #suRemoveFile "$ui/pythoncrypto.h"
-    #suRemoveFile "$ui/crypto.h"
-    #suRemoveFile "$ui/hash.h"
     #suRemoveFile "$ui/templateobjects.h"
     #suRemoveFile "$ui/serialport.h"
     #suRemoveFile "$ui/eventtimer.h"
@@ -219,15 +217,12 @@ function buildDependancy() {
 if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninstall" || "$1" == "uninstall" ]]; then
     
     suRemoveDirectory "$buildDir/" || { echo "Could not remove directory, bailing out"; exit 1;}
-    suRemoveFile "$ui/tjlutils.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/systecommand.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/generalutilities.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/fileutilities.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/mathutilities.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/datetime.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/pythoncrypto.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/crypto.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/hash.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/templateobjects.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/serialport.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/eventtimer.h" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -281,8 +276,6 @@ else
     suLinkFile "$sourceDir/mathutilities/include/mathutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/datetime/include/datetime.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/pythoncrypto/include/pythoncrypto.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/crypto/include/crypto.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/crypto/include/hash.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/serialport/include/serialport.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/eventtimer/include/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/prettyprinter/include/prettyprinter.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
@@ -290,7 +283,6 @@ else
     suLinkFile "$sourceDir/udpserver/include/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpclient/include/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/common/tjlutils.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}

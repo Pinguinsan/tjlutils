@@ -11,7 +11,7 @@
 *    This file holds the definitions for the strings used in tstream.h * 
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
+*    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 

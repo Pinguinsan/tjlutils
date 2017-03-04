@@ -14,7 +14,7 @@
 *    suitable for a running game timer (eg 00:01.295)                  *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
+*    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 

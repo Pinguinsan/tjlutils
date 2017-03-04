@@ -3,7 +3,7 @@
 *    Namespace DateTime, for time/date stamps                          *
 *    Copyright (c) 2016 Tyler Lewis                                    *
 ************************************************************************
-*    This is a header file for tjlutils:                               *
+*    This is a source file for tjlutils:                               *
 *    https://github.com/Pinguinsan/tjlutils                            *
 *    This file may be distributed with the entire tjlutils library,    *
 *    but may also be distributed as a standalone file                  *
@@ -13,7 +13,7 @@
 *    individual time/date components (current minute, etc)             *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
-*    Public license along with libraryprojects                         *
+*    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
