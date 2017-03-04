@@ -52,6 +52,8 @@ public:
     bool isPaused() const;
     bool isRunning() const;
 
+    std::string toString();
+
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
