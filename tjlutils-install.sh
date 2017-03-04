@@ -28,6 +28,7 @@ function cleanUp() {
     #suRemoveFile "$ui/tstream.h"
     #suRemoveFile "$ui/tscriptreader.h"
     #suRemoveFile "$ui/tscriptexecutor.h"
+    #suRemoveFile "$ui/stringformat.h"
     echo "All cleaned up"
 }
 
@@ -237,6 +238,7 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/tstream.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tscriptexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tscriptreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/stringformat.h" || { echo "Could not remove file, bailing out"; exit 1;}
 
     if [[ -z "$cygwinCheck" ]]; then
         suRemoveFile "$ul/libtjlutils.so" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -292,7 +294,7 @@ else
     suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-
+    suLinkFile "$sourceDir/stringformat/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed, bailing out"; exit 1;}
