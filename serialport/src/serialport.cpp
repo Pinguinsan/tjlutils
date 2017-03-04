@@ -169,7 +169,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_isOpen{false},
     m_shutEmDown{false},
     m_isListening{false},
-    m_lastTransmissionTimer{new EventTimer()}
+    m_lastTransmissionTimer{new EventTimer<std::chrono::steady_clock>()}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -1194,7 +1194,7 @@ void SerialPort::syncStringListener()
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
     unsigned long tempTimeout{this->m_timeout};
     unsigned long splitTimeout{this->m_timeout};
-    EventTimer eventTimer;
+    EventTimer<std::chrono::steady_clock> eventTimer;
     eventTimer.start();
     do {
         this->setTimeout(splitTimeout);

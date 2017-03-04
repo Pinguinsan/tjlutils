@@ -327,7 +327,7 @@ std::string UDPServer::readUntil(const std::string &until)
 
     using namespace GeneralUtilities;
     std::string returnString{""};
-    EventTimer eventTimer;
+    EventTimer<std::chrono::steady_clock> eventTimer;
     eventTimer.start();
     int readCount{0};
     do {

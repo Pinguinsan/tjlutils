@@ -25,14 +25,13 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/datetime/include/"  
                     "${CMAKE_CURRENT_SOURCE_DIR}/mathutilities/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/serialport/include/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/prettyprinter/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpserver/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpclient/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpduplex/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/tstream/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/common/")
+                    "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/")
 
 set(SOURCE_BASE /opt/GitHub/tjlutils)
 
@@ -43,7 +42,6 @@ set (FILEUTILITIES_SOURCES "${SOURCE_BASE}/fileutilities/src/fileutilities.cpp")
 set (DATETIME_SOURCES "${SOURCE_BASE}/datetime/src/datetime.cpp")
 set (MATHUTILITIES_SOURCES "${SOURCE_BASE}/mathutilities/src/mathutilities.cpp")
 set (SERIALPORT_SOURCES "${SOURCE_BASE}/serialport/src/serialport.cpp")
-set (EVENTTIMER_SOURCES "${SOURCE_BASE}/eventtimer/src/eventtimer.cpp")
 set (PRETTYPRINTER_SOURCES "${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp")
 set (UDPSERVER_SOURCES "${SOURCE_BASE}/udpserver/src/udpserver.cpp")
 set (UDPCLIENT_SOURCES "${SOURCE_BASE}/udpclient/src/udpclient.cpp")
@@ -59,7 +57,6 @@ add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                             "${DATETIME_SOURCES}"
                             "${MATHUTILITIES_SOURCES}"
                             "${SERIALPORT_SOURCES}"
-                            "${EVENTTIMER_SOURCES}"
                             "${PRETTYPRINTER_SOURCES}"
                             "${UDPSERVER_SOURCES}"
                             "${UDPCLIENT_SOURCES}"
@@ -73,7 +70,6 @@ add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${DATETIME_SOURCES}"
                                   "${MATHUTILITIES_SOURCES}"
                                   "${SERIALPORT_SOURCES}"
-                                  "${EVENTTIMER_SOURCES}"
                                   "${PRETTYPRINTER_SOURCES}"
                                   "${UDPSERVER_SOURCES}"
                                   "${UDPCLIENT_SOURCES}"
