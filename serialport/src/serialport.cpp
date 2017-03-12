@@ -166,8 +166,8 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_timeout{DEFAULT_TIMEOUT},
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
-    m_shutEmDown{false},
     m_isListening{false},
+    m_shutEmDown{false},
     m_lastTransmissionTimer{new EventTimer<std::chrono::steady_clock>()}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
@@ -1552,7 +1552,7 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 #if (defined(_WIN32) || defined(__CYGWIN__))
     std::vector<std::string> returnVector;
 	HKEY hRegistryKey;
-	LONG operationResult{ RegOpenKeyEx(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
+    LONG operationResult{ RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
 	if (operationResult != ERROR_SUCCESS) {
         throw std::runtime_error("ERROR: Could not open registry path " + static_cast<std::string>(SERIAL_PORT_REGISTRY_PATH) + " for reading values");
 	}
@@ -1562,11 +1562,11 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 		DWORD cName{ PATH_MAX };
 		DWORD cbData{ PATH_MAX };
 		char hRegistryKeyValue[PATH_MAX];
-		operationResult = RegEnumValue(hRegistryKey, index, SubKeyName, &cName, NULL, NULL, NULL, NULL);
+        operationResult = RegEnumValueA(hRegistryKey, index, SubKeyName, &cName, NULL, NULL, NULL, NULL);
 		if (operationResult != ERROR_SUCCESS) {
 			break;
 		}
-		operationResult = RegGetValue(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, SubKeyName, RRF_RT_REG_SZ, NULL, hRegistryKeyValue, &cbData);
+        operationResult = RegGetValueA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, SubKeyName, RRF_RT_REG_SZ, NULL, hRegistryKeyValue, &cbData);
 		if (operationResult != ERROR_SUCCESS) {
             break;
 		}
