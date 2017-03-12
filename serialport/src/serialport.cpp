@@ -32,12 +32,11 @@ const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
 const std::vector<const char *> SerialPort::AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::AVAILABLE_STOP_BITS{"1", "2"};
 const std::vector<const char *> SerialPort::AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
-const char *SerialPort::SERIAL_PORT_HELPER_LONG_NAME{"\"C:/Users/Public/Public Programs/EnumerateSerial.exe\""};
-const char *SerialPort::SERIAL_PORT_HELPER_SHORT_NAME{"EnumerateSerial.exe"};
 
 #if defined(_WIN32) || defined(__CYGWIN__)
     const std::vector<const char *> SerialPort::AVAILABLE_PORT_NAMES_BASE{"\\\\.\\COM"};
-    const std::string SerialPort::DTR_RTS_ON_IDENTIFIER{"dtr=on rts=on"};
+    const char *SerialPort::DTR_RTS_ON_IDENTIFIER{"dtr=on rts=on"};
+    const char *SerialPort::SERIAL_PORT_REGISTRY_PATH{"HARDWARE\\DEVICEMAP\\SERIALCOMM\\"};
 #else
     const std::vector<const char *> SerialPort::AVAILABLE_PORT_NAMES_BASE{"/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", 
                                                                             "/dev/ttyAMA", "/dev/ttyrfserialm", "/dev/irserialm",
@@ -1552,41 +1551,28 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     std::vector<std::string> returnVector;
-    /*
-    const std::string BASE{"COM"};
-    //const std::string BASE{"\\\\.\\COM"};
-    for (int i = 1; i < 256; i++) {
-        BOOL bSuccess{false};
-        std::string check{BASE + std::to_string(i)};
-        HANDLE Port = CreateFileA(check.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-        if (Port == INVALID_HANDLE_VALUE) {
-            DWORD dwError = GetLastError();
-
-            //Check to see if the error was because some other app had the port open or a general failure
-            if (dwError == ERROR_ACCESS_DENIED || dwError == ERROR_GEN_FAILURE || dwError == ERROR_SHARING_VIOLATION || dwError == ERROR_SEM_TIMEOUT) {
-                bSuccess = FALSE;
-            } else {
-                //The port was opened successfully
-                bSuccess = TRUE;
-            }
-        }
-        if (!bSuccess) {
-            returnVector.emplace_back(check);
-        }
-        CloseHandle(Port);
-    }
-    */
-    SystemCommand systemCommand;
-    systemCommand.setCommand(static_cast<std::string>(SerialPort::SERIAL_PORT_HELPER_LONG_NAME));
-    systemCommand.execute();
-    if (systemCommand.hasError()) {
-        systemCommand.setCommand(static_cast<std::string>(SerialPort::SERIAL_PORT_HELPER_SHORT_NAME));
-        systemCommand.execute();
-        if (systemCommand.hasError()) {
-            return returnVector;
-        }
-    }
-    returnVector = systemCommand.outputAsVector();
+	HKEY hRegistryKey;
+	LONG operationResult{ RegOpenKeyEx(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
+	if (operationResult != ERROR_SUCCESS) {
+        throw std::runtime_error("ERROR: Could not open registry path " + static_cast<std::string>(SERIAL_PORT_REGISTRY_PATH) + " for reading values");
+	}
+	// error checking by testing res omitted
+	for (DWORD index = 0; ; index++) {
+		char SubKeyName[PATH_MAX];
+		DWORD cName{ PATH_MAX };
+		DWORD cbData{ PATH_MAX };
+		char hRegistryKeyValue[PATH_MAX];
+		operationResult = RegEnumValue(hRegistryKey, index, SubKeyName, &cName, NULL, NULL, NULL, NULL);
+		if (operationResult != ERROR_SUCCESS) {
+			break;
+		}
+		operationResult = RegGetValue(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, SubKeyName, RRF_RT_REG_SZ, NULL, hRegistryKeyValue, &cbData);
+		if (operationResult != ERROR_SUCCESS) {
+            break;
+		}
+		returnVector.emplace_back(hRegistryKeyValue);
+	}
+	RegCloseKey(hRegistryKey);
     std::set<std::string> uniques;
     for (auto &it : returnVector) {
         uniques.emplace(it);

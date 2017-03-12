@@ -44,6 +44,7 @@
 #include <future>
 #include <deque>
 #include <mutex>
+#include <wchar.h>
 
 #include <systemcommand.h>
 #include <fileutilities.h>
@@ -215,8 +216,9 @@ public:
 
 private:
     #if (defined(_WIN32) || defined(__CYGWIN__))
-        static const std::string DTR_RTS_ON_IDENTIFIER;
+        static const char *DTR_RTS_ON_IDENTIFIER;
         static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{256};
+        static const char *SERIAL_PORT_REGISTRY_PATH;
         HANDLE m_serialPort[NUMBER_OF_POSSIBLE_SERIAL_PORTS];
     #else
         static const int constexpr NUMBER_OF_POSSIBLE_SERIAL_PORTS{256*9};
