@@ -75,9 +75,6 @@ public:
 
     void start()
     {
-        if (!this->m_isPaused) {
-            return;
-        }
         this->m_totalTime = 0;
         this->m_hours = 0;
         this->m_minutes = 0;
@@ -111,7 +108,7 @@ public:
         return this->pause();
     }
     
-    void unpause()
+    void resume()
     {
         this->m_isPaused = false;
     }
@@ -381,7 +378,6 @@ private:
     long long int m_seconds;
     long long int m_milliseconds;
     bool m_isPaused;
-    bool m_monitor;
     std::list<CallbackHandlePair> m_registeredMillisecondsChangeCallback;
     std::list<CallbackHandlePair> m_registeredSecondsChangeCallback;
     std::list<CallbackHandlePair> m_registeredMinutesChangeCallback;
