@@ -39,9 +39,10 @@ class EventTimer
     using platform_clock_t = ClockType;
     using StandardFunctionCallback = std::function<void(long long int)>;
     using FunctionPointerCallback = void(*)(long long int);
+    using CallbackHandlePair = std::pair<std::future<void>, StandardFunctionCallback>;
 
 public:
-    EventTimer() :
+    EventTimer<ClockType>() :
         m_startTime{platform_clock_t::now()},
         m_endTime{platform_clock_t::now()},
         m_cacheStartTime{platform_clock_t::now()},
@@ -51,30 +52,52 @@ public:
         m_seconds{0},
         m_milliseconds{0},
         m_isPaused{false},
-        m_monitor{false},
-        m_monitoringAsyncHandle{}
+        m_monitoringAsyncHandle{nullptr},
+        m_exitMonitorTicks{false}
+    {
 
+    }
+
+    EventTimer<ClockType>(const EventTimer<ClockType> &other) :
+        m_startTime{other.m_startTime},
+        m_endTime{other.m_endTime},
+        m_cacheStartTime{other.m_cacheStartTime},
+        m_totalTime{other.m_totalTime},
+        m_hours{other.m_hours},
+        m_minutes{other.m_minutes},
+        m_seconds{other.m_seconds},
+        m_milliseconds{other.m_milliseconds},
+        m_isPaused{other.m_isPaused},
+        m_monitoringAsyncHandle{nullptr}
     {
 
     }
 
     void start()
     {
+        if (!this->m_isPaused) {
+            return;
+        }
         this->m_totalTime = 0;
         this->m_hours = 0;
         this->m_minutes = 0;
         this->m_seconds = 0;
         this->m_milliseconds = 0;
         this->m_startTime = platform_clock_t::now();
+        this->m_endTime = this->m_startTime;
+        this->m_cacheStartTime = this->m_startTime;
+
+        if (!this->m_monitoringAsyncHandle) {
+            this->m_monitoringAsyncHandle = std::unique_ptr<std::future<void>>(new std::future<void>{std::async(std::launch::async, &EventTimer::monitorTicks, this)});
+        }
+        this->m_startTime = platform_clock_t::now();
         this->m_cacheStartTime = platform_clock_t::now();
         this->m_isPaused = false;
-        this->m_monitoringAsyncHandle = std::async(std::launch::async,
-                                                   &EventTimer::monitorTicks,
-                                                   this);
     }
 
     void restart() 
     { 
+        this->m_isPaused = true;
         return this->start(); 
     }
 
@@ -100,7 +123,11 @@ public:
         long long int currentMinutes{this->minutes()};
         long long int currentHours{this->hours()};
 
-        while (!this->m_isPaused) {
+        while (!this->m_exitMonitorTicks) {
+            if (this->m_isPaused) {
+                std::this_thread::sleep_for(this->getSleepDuration());
+                std::this_thread::yield();
+            }
             this->update();
             long long int updatedMilliseconds{this->milliseconds()};
             long long int updatedSeconds{this->seconds()};
@@ -109,29 +136,33 @@ public:
             if (updatedMilliseconds != currentMilliseconds) {
                 currentMilliseconds = updatedMilliseconds;
                 for (auto &it : this->m_registeredMillisecondsChangeCallback) {
-                    std::thread runAsync{it, updatedMilliseconds};
-                    runAsync.detach();
+                    if (it.first.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        it.first = std::async(std::launch::async, it.second, updatedMilliseconds);
+                    }
                 }
             }
             if (updatedSeconds != currentSeconds) {
                 currentSeconds = updatedSeconds;
                 for (auto &it : this->m_registeredSecondsChangeCallback) {
-                    std::thread runAsync{it, updatedSeconds};
-                    runAsync.detach();
+                    if (it.first.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        it.first = std::async(std::launch::async, it.second, updatedSeconds);
+                    }
                 }
             }
             if (updatedMinutes != currentMinutes) {
                 currentMinutes = updatedMinutes;
                 for (auto &it : this->m_registeredMinutesChangeCallback) {
-                    std::thread runAsync{it, updatedMinutes};
-                    runAsync.detach();
+                    if (it.first.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        it.first = std::async(std::launch::async, it.second, updatedMinutes);
+                    }
                 }
             }
             if (updatedHours != currentHours) {
                 currentHours = updatedHours;
                 for (auto &it : this->m_registeredHoursChangeCallback) {
-                    std::thread runAsync{it, updatedHours};
-                    runAsync.detach();
+                    if (it.first.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        it.first = std::async(std::launch::async, it.second, updatedHours);
+                    }
                 }
             } 
             std::this_thread::sleep_for(this->getSleepDuration());
@@ -159,19 +190,7 @@ public:
     {
         auto returnValue = std::chrono::microseconds(0);
         if (this->m_registeredMillisecondsChangeCallback.empty()) {
-            if (this->m_registeredSecondsChangeCallback.empty()) {
-                if (this->m_registeredMinutesChangeCallback.empty()) {
-                    if (this->m_registeredHoursChangeCallback.empty()) {
-                        returnValue = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::minutes(60));
-                    } else {
-                        returnValue = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::minutes(59));
-                    }
-                } else {
-                    returnValue = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::seconds(59));
-                }
-            } else {
-                returnValue = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(990));
-            }
+            returnValue = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(990));
         } else {
             returnValue = std::chrono::microseconds(990);
         }
@@ -303,22 +322,22 @@ public:
 
     void registerMillisecondsChangedCallback(StandardFunctionCallback callback)
     {
-        this->m_registeredMillisecondsChangeCallback.push_back(callback);
+        this->m_registeredMillisecondsChangeCallback.push_back(std::make_pair(std::future<void>(), callback));
     }
 
     void registerSecondsChangedCallback(StandardFunctionCallback callback)
     {
-        this->m_registeredSecondsChangeCallback.push_back(callback);
+        this->m_registeredSecondsChangeCallback.push_back(std::make_pair(std::future<void>(), callback));
     }
 
     void registerMinutesChangedCallback(StandardFunctionCallback callback)
     {
-        this->m_registeredMinutesChangeCallback.push_back(callback);
+        this->m_registeredMinutesChangeCallback.push_back(std::make_pair(std::future<void>(), callback));
     }
 
     void registerHoursChangedCallback(StandardFunctionCallback callback)
     {
-        this->m_registeredHoursChangeCallback.push_back(callback);
+        this->m_registeredHoursChangeCallback.push_back(std::make_pair(std::future<void>(), callback));
     }
 
     void registerMillisecondsChangedCallback(FunctionPointerCallback callback)
@@ -341,6 +360,16 @@ public:
         this->registerHoursChangedCallback(static_cast<StandardFunctionCallback>(callback));
     }
 
+    ~EventTimer<ClockType>()
+    {
+        if (this->m_monitoringAsyncHandle) {
+            this->m_exitMonitorTicks = true;
+            do {
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            } while (this->m_monitoringAsyncHandle->wait_for(std::chrono::milliseconds(0)) != std::future_status::ready);
+        }
+    }
+
 private:
     std::chrono::time_point<platform_clock_t> m_startTime;
     std::chrono::time_point<platform_clock_t> m_endTime;
@@ -353,11 +382,12 @@ private:
     long long int m_milliseconds;
     bool m_isPaused;
     bool m_monitor;
-    std::list<StandardFunctionCallback> m_registeredMillisecondsChangeCallback;
-    std::list<StandardFunctionCallback> m_registeredSecondsChangeCallback;
-    std::list<StandardFunctionCallback> m_registeredMinutesChangeCallback;
-    std::list<StandardFunctionCallback> m_registeredHoursChangeCallback;
-    std::future<void> m_monitoringAsyncHandle;
+    std::list<CallbackHandlePair> m_registeredMillisecondsChangeCallback;
+    std::list<CallbackHandlePair> m_registeredSecondsChangeCallback;
+    std::list<CallbackHandlePair> m_registeredMinutesChangeCallback;
+    std::list<CallbackHandlePair> m_registeredHoursChangeCallback;
+    std::unique_ptr<std::future<void>> m_monitoringAsyncHandle;
+    bool m_exitMonitorTicks;
 
     inline bool cacheIsValid()
     {
