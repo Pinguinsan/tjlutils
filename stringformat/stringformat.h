@@ -26,6 +26,14 @@
 #include <algorithm>
 #include <utility>
 
+template <typename T>
+std::string toStdString(const T &rhs)
+{
+    std::stringstream stringStream{};
+    stringStream << rhs;
+    return stringStream.str();
+}
+
 template<typename ... Args>
 std::string PStringFormat(const char *format, Args ... args)
 {
@@ -35,10 +43,15 @@ std::string PStringFormat(const char *format, Args ... args)
     return std::string{stringBuffer.get(), stringBuffer.get() + size - 1}; 
 }
 
+std::string TStringFormat(const char *formatting)
+{
+    return std::string{formatting};
+}
+
 template <typename First, typename ... Args>
 std::string TStringFormat(const char *formatting, First first, Args ... args)
 {
-    static const targetRegex{"\\{[0-9]+\\}"};
+    static const std::regex targetRegex{"\\{[0-9]+\\}"};
     std::smatch match;
     std::string returnString{formatting};
     std::string copyString{returnString};
@@ -72,15 +85,4 @@ std::string TStringFormat(const char *formatting, First first, Args ... args)
     return TStringFormat(returnString.c_str(), args...);
 }
 
-std::string TStringFormat(const char *formatting)
-{
-    return std::string{formatting};
-}
 
-template <typename T>
-std::string toStdString(const T &rhs)
-{
-    std::stringstream stringStream{};
-    stringStream << rhs;
-    return stringStream.str();
-}
