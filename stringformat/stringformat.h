@@ -22,12 +22,65 @@
 #include <memory>
 #include <string>
 #include <cstdio>
+#include <regex>
+#include <algorithm>
+#include <utility>
 
 template<typename ... Args>
-std::string stringFormat(const char *format, Args ... args)
+std::string PStringFormat(const char *format, Args ... args)
 {
     ssize_t size = std::snprintf(nullptr, 0, format, args ...) + 1;
     std::unique_ptr<char[]> stringBuffer{new char[size]}; 
     snprintf(stringBuffer.get(), size, format, args ...);
     return std::string{stringBuffer.get(), stringBuffer.get() + size - 1}; 
+}
+
+template <typename First, typename ... Args>
+std::string TStringFormat(const char *formatting, First first, Args ... args)
+{
+    static const targetRegex{"\\{[0-9]+\\}"};
+    std::smatch match;
+    std::string returnString{formatting};
+    std::string copyString{returnString};
+
+    //Found position, length
+    std::vector<std::pair<size_t, size_t>> foundPositions{};
+    while(std::regex_search(copyString, match, targetRegex)) {
+        size_t foundPosition{match.position() + (returnString.length() - copyString.length())};
+        foundPositions.emplace_back(foundPosition, match.str().length());
+        copyString = match.suffix();
+    }
+    if (foundPositions.empty()) {
+        throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
+    }
+    //<{value}, position>
+    std::vector<std::pair<int, size_t>> foundValues{};
+    try {
+        for (const auto &it : foundPositions) {
+            //Find value in curly brackets, and convert to integer (
+            foundValues.emplace_back(std::stoi(returnString.substr(it.first + 1, it.second - 2)), it.first);
+        }
+    } catch (std::exception &e) {
+        throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
+    }
+    //Sort them
+    std::sort(foundValues.begin(), foundValues.end(), [](const std::pair<int, size_t> &lhs, const std::pair<int, size_t> &rhs) { return lhs.first < rhs.first; });
+    size_t sizeOfToken{toStdString(foundValues.at(0).first).length() + 2};
+    returnString = returnString.substr(0, foundValues.at(0).second)
+                   + toStdString(first)
+                   + returnString.substr(foundValues.at(0).second + sizeOfToken);
+    return TStringFormat(returnString.c_str(), args...);
+}
+
+std::string TStringFormat(const char *formatting)
+{
+    return std::string{formatting};
+}
+
+template <typename T>
+std::string toStdString(const T &rhs)
+{
+    std::stringstream stringStream{};
+    stringStream << rhs;
+    return stringStream.str();
 }
