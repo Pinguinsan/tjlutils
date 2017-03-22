@@ -48,7 +48,8 @@ public:
         m_minutes{0},
         m_seconds{0},
         m_milliseconds{0},
-        m_isPaused{false}
+        m_isPaused{false},
+        m_isStopped{false}
     {
 
     }
@@ -62,7 +63,8 @@ public:
         m_minutes{other.m_minutes},
         m_seconds{other.m_seconds},
         m_milliseconds{other.m_milliseconds},
-        m_isPaused{other.m_isPaused}
+        m_isPaused{other.m_isPaused},
+        m_isStopped{other.m_isStopped}
     {
 
     }
@@ -78,36 +80,55 @@ public:
         this->m_startTime = platform_clock_t::now();
         this->m_endTime = this->m_startTime;
         this->m_isPaused = false;
+        this->m_isStopped = false;
     }
 
     void restart() 
     { 
-        this->m_isPaused = true;
         return this->start(); 
     }
 
     void pause()
     {
+        bool stopped{this->m_isStopped};
+        this->m_isStopped = false;
+        this->m_isPaused = false;
+        this->update();
+        this->m_isStopped = stopped;
         this->m_isPaused = true;
     }
 
     void stop()
     {
-        return this->pause();
+        bool paused{this->m_isPaused};
+        this->m_isPaused = false;
+        this->m_isStopped = false;
+        this->update();
+        this->m_isPaused = paused;
+        this->m_isStopped = true;
     }
     
     void resume()
     {
-        this->m_isPaused = false;
+        if (this->m_isStopped) {
+            return this->start();
+        } else {
+            this->m_isPaused = false;
+        }
     }
 
     void update()
     {
         using namespace GeneralUtilities;
-        if (!this->m_isPaused) {
+        if ((!this->m_isPaused) && (!this->m_isStopped)) {
             this->m_endTime = platform_clock_t::now();
             this->m_totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(this->m_endTime-this->m_startTime).count();
             this->m_rawTime = std::chrono::duration_cast<std::chrono::milliseconds>(this->m_endTime - this->m_startTime);
+            this->m_hours = (this->m_totalTime/MILLISECONDS_PER_HOUR);
+            this->m_minutes = (this->m_totalTime - (this->m_hours * MILLISECONDS_PER_HOUR)) / MILLISECONDS_PER_MINUTE;
+            this->m_seconds = (this->m_totalTime - (this->m_hours * MILLISECONDS_PER_HOUR) - (this->m_minutes * MILLISECONDS_PER_MINUTE)) / MILLISECONDS_PER_SECOND;
+            this->m_milliseconds = (this->m_totalTime - (this->m_hours * MILLISECONDS_PER_HOUR) - (this->m_minutes * MILLISECONDS_PER_MINUTE) - (this->m_seconds * MILLISECONDS_PER_SECOND));
+        } else if (this->m_isStopped) {
             this->m_hours = (this->m_totalTime/MILLISECONDS_PER_HOUR);
             this->m_minutes = (this->m_totalTime - (this->m_hours * MILLISECONDS_PER_HOUR)) / MILLISECONDS_PER_MINUTE;
             this->m_seconds = (this->m_totalTime - (this->m_hours * MILLISECONDS_PER_HOUR) - (this->m_minutes * MILLISECONDS_PER_MINUTE)) / MILLISECONDS_PER_SECOND;
@@ -234,10 +255,15 @@ public:
     {
         return this->m_isPaused;
     }
+
+    inline bool isStopped() const
+    {
+        return this->m_isStopped;
+    }
     
     inline bool isRunning() const
     {
-        return !this->isPaused();
+        return ((!this->isPaused()) && (!this->isStopped()));
     }
 
 private:
@@ -251,6 +277,7 @@ private:
     long long int m_seconds;
     long long int m_milliseconds;
     bool m_isPaused;
+    bool m_isStopped;
 
     inline bool cacheIsValid()
     {
