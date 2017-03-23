@@ -33,7 +33,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/")
 
-set(SOURCE_BASE /opt/GitHub/tjlutils)
+set(SOURCE_BASE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SYSTEMCOMMAND_SOURCES "${SOURCE_BASE}/systemcommand/src/systemcommand.cpp")
 set (PYTHONCRYPTO_SOURCES "${SOURCE_BASE}/pythoncrypto/src/pythoncrypto.cpp")

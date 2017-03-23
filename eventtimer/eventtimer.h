@@ -209,8 +209,17 @@ public:
         returnString += GeneralUtilities::toString(this->minutes())
                         + ':'
                         + GeneralUtilities::toString(this->seconds())
-                        + '.'
-                        + GeneralUtilities::toString(this->milliseconds()).substr(0, millisecondDigits);
+                        + '.';
+        long long int millisecond{this->milliseconds()};
+        std::string millisecondsString{""};
+        if (millisecond < 10) {
+            millisecondsString = "00" + GeneralUtilities::toString(millisecond);
+        } else if (millisecond < 100) {
+            millisecondsString = "0" + GeneralUtilities::toString(millisecond);
+        } else {
+            millisecondsString = GeneralUtilities::toString(millisecond);
+        }
+        returnString += millisecondsString.substr(0, millisecondDigits);
         
         return returnString;
     }
