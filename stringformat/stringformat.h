@@ -17,8 +17,8 @@
 *    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
-#ifndef STRINGFORMAT_H
-#define STRINGFORMAT_H
+#ifndef TJLUTILS_STRINGFORMAT_H
+#define TJLUTILS_STRINGFORMAT_H
 
 #include <iostream>
 #include <memory>
@@ -99,4 +99,4 @@ std::string TStringFormat(const char *formatting, First first, Args ... args)
     return TStringFormat(returnString.c_str(), args...);
 }
 
-#endif //STRINGFORMAT_H
+#endif //TJLUTILS_STRINGFORMAT_H
