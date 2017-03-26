@@ -74,25 +74,31 @@ std::string TStringFormat(const char *formatting, First& first, Args& ... args)
      * current match from the string and find the next match */
     std::string copyString{formatting};
 
-    /*[Absolute position, length]*/
-    std::vector<std::pair<size_t, size_t>> foundPositions{};
-
-    std::vector<std::tuple<int, size_t, size_t>> smallestValueInformation{std::make_tuple(-1, 0, 0)};
+    /* std::tuple to hold the current smallest valued brace token,
+     * wrapped in a std::vector because there can be multiple brace
+     * tokens with the same value. For example, in the following format string:
+     * "There were {0} books found matching the title {1}, {0}/{2}",
+     * this pass will save the locations of the first and second {0} */
+    using TokenInformation = std::tuple<int, size_t, size_t>;
+    std::vector<TokenInformation> smallestValueInformation{std::make_tuple(-1, 0, 0)};
 
     /*Iterate through string, finding position and lengths of all matches {x}*/
     while(std::regex_search(copyString, match, targetRegex)) {
         /*Get the absolute position of the match in the original return string*/
         size_t foundPosition{match.position() + (returnString.length() - copyString.length())};
-        //size_t foundPosition{match.position()};
         int regexMatchNumericValue{0};
         try {
+            /*Convert the integer value between the opening and closing braces to an int to compare */
             regexMatchNumericValue = std::stoi(returnString.substr(foundPosition + 1, (foundPosition + match.str().length())));
+            
+            /*Do not allow negative numbers, although this should never get picked up the regex anyway*/
             if (regexMatchNumericValue < 0) {
                 throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
             }
             /* If the numeric value in the curly brace token is smaller than
              * the current smallest (or if the smallest value has not yet been set,
-             * ie it is the first match), set the corresponding smallestX variables */
+             * ie it is the first match), set the corresponding smallestX variables
+             * and wrap them up into a TokenInformation and add it to the std::vector */
             int smallestValue{std::get<0>(smallestValueInformation.at(0))};
             if ((smallestValue == -1) || (regexMatchNumericValue < smallestValue)) {
                 smallestValueInformation.clear();
@@ -105,12 +111,9 @@ std::string TStringFormat(const char *formatting, First& first, Args& ... args)
                                                                    match.str().length()));
             }
         } catch (std::exception e) {
-            //TODO: Throw instead of just output exception */
+            //TODO: Throw instead of just output exception 
             std::cout << e.what() << std::endl;
         }
-        
-        
-        //copyString.replace(foundPosition, match.str().length(), std::string{match.str().length(), '-'});
         copyString = match.suffix();
     }
     int smallestValue{std::get<0>(smallestValueInformation.at(0))};
@@ -124,11 +127,11 @@ std::string TStringFormat(const char *formatting, First& first, Args& ... args)
     
     std::string firstString{toStdString(first)};
     int index{0};
-    for (auto &it : smallestValueInformation) {
+    for (const auto &it : smallestValueInformation) {
         size_t smallestValueLength{std::get<2>(it)};
 
 
-        /*Since the original string will be modified, the adjusted position must be 
+        /* Since the original string will be modified, the adjusted position must be 
           calculated for any repeated brace tokens, kept track of by index.
           The length of string representation of first mutiplied by which the iterationn count
           is added, and the length of the brace token multiplied by the iteration count is
