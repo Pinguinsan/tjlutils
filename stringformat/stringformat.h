@@ -1,7 +1,7 @@
 /***********************************************************************
 *    stringformat.h:                                                   *
 *    Template function for using printf formatting for std::string     *
-*    Copyright (c) 2016 Tyler Lewis                                    *
+*    Copyright (c) 2017 Tyler Lewis                                    *
 ************************************************************************
 *    This is a header file for tjlutils:                               *
 *    https://github.com/Pinguinsan/tjlutils                            *
@@ -186,7 +186,7 @@ QString StringFormat(const QString &format)
 /*Overload base case for formatting*/
 QString StringFormat(const std::string &format)
 {
-    return format;
+    return QString::fromStdString(format);
 }
 
 /*Overload base case for formatting*/
@@ -216,7 +216,4 @@ QString QStringFormat(const QString &formatting, const First& first, const Args&
 }
 #endif
 
-
 #endif //TJLUTILS_STRINGFORMAT_H
-
-
