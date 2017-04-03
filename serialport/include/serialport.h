@@ -126,6 +126,7 @@ public:
     std::string readUntil(char readUntil);
     ssize_t writeLine(const std::string &str);
     ssize_t writeLine(const char *str);
+    ssize_t writeLine(char chr);
     ssize_t write(char byteToSend);
     ssize_t write(const uint8_t *message, uint8_t messageLength);
     ssize_t available();

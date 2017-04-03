@@ -851,6 +851,11 @@ ssize_t SerialPort::writeLine(const char *str)
     return this->writeLine(std::string{str});
 }
 
+ssize_t SerialPort::writeLine(char chr)
+{
+    return this->writeLine(std::string{1, chr});
+}
+
 std::string SerialPort::readLine()
 {
     this->syncStringListener();
