@@ -46,9 +46,6 @@
 #include <mutex>
 #include <wchar.h>
 
-#include <systemcommand.h>
-#include <fileutilities.h>
-#include <generalutilities.h>
 #include <eventtimer.h>
 #include <tstream.h>
 
@@ -257,6 +254,15 @@ private:
     void startAsyncListen();
     void stopAsyncListen();
 
+
+    static bool isWhitespace(const std::string &stringToCheck);
+    static bool isWhitespace(char charToCheck);
+    static bool endsWith(const std::string &stringToCheck, const std::string &matchString);
+    static bool endsWith(const std::string &stringToCheck, char matchChar);
+
+    static bool fileExists(const std::string &fileToCheck);
+    static bool fileExists(const char *fileToCheck);
+
     static const unsigned long constexpr SERIAL_PORT_BUFFER_MAX{4096};
     static const unsigned long constexpr SINGLE_MESSAGE_BUFFER_MAX{50};
     static bool isAvailableSerialPort(const std::string &name);
@@ -282,6 +288,9 @@ private:
     static const std::vector<const char *> AVAILABLE_BAUD_RATE;
     static const char *SERIAL_PORT_HELPER_LONG_NAME;
     static const char *SERIAL_PORT_HELPER_SHORT_NAME;
+    static const unsigned int ASCII_WHITESPACE_MAXIMUM_VALUE;
+    static const unsigned int ASCII_HIGH_LIMIT;
+    static const unsigned int ASCII_LOW_LIMIT;
 
 };
 

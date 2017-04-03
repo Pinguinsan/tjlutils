@@ -32,6 +32,9 @@ const std::string SerialPort::DEFAULT_BAUD_RATE_STRING{"115200"};
 const std::vector<const char *> SerialPort::AVAILABLE_PARITY{"None", "Even", "Odd"};
 const std::vector<const char *> SerialPort::AVAILABLE_STOP_BITS{"1", "2"};
 const std::vector<const char *> SerialPort::AVAILABLE_DATA_BITS{"5", "6", "7", "8"};
+const unsigned int SerialPort::ASCII_WHITESPACE_MAXIMUM_VALUE{32};
+const unsigned int SerialPort::ASCII_HIGH_LIMIT{128};
+const unsigned int SerialPort::ASCII_LOW_LIMIT{0};
 
 #if defined(_WIN32) || defined(__CYGWIN__)
     const std::vector<const char *> SerialPort::AVAILABLE_PORT_NAMES_BASE{"\\\\.\\COM"};
@@ -836,9 +839,8 @@ ssize_t SerialPort::writeCString(const char *str)
 
 ssize_t SerialPort::writeLine(const std::string &str)
 {
-    using namespace GeneralUtilities;
     std::string copyString{str};
-    if (!endsWith(copyString, this->m_lineEnding)) {
+    if (!SerialPort::endsWith(copyString, this->m_lineEnding)) {
         copyString += this->m_lineEnding;
     }
     return this->writeCString(copyString.c_str());
@@ -846,7 +848,7 @@ ssize_t SerialPort::writeLine(const std::string &str)
 
 ssize_t SerialPort::writeLine(const char *str)
 {
-    return this->writeLine(static_cast<std::string>(str));
+    return this->writeLine(std::string{str});
 }
 
 std::string SerialPort::readLine()
@@ -867,7 +869,7 @@ std::string SerialPort::readUntil(char readUntil)
 
 std::string SerialPort::readUntil(const char *readUntil)
 {
-    return this->readUntil(static_cast<std::string>(readUntil));
+    return this->readUntil(std::string{readUntil});
 }
 
 std::string SerialPort::readUntil(const std::string &str)
@@ -929,11 +931,64 @@ void SerialPort::setParity(Parity parity)
 
 void SerialPort::setLineEnding(const std::string &lineEnding)
 {
-    if ((lineEnding.length() == 0) || (GeneralUtilities::isWhitespace(lineEnding))) {
+    if ((lineEnding.length() == 0) || (SerialPort::isWhitespace(lineEnding))) {
         throw std::runtime_error("ERROR: Cannot set SerialPort::lineEnding() to whitespace or an empty string");
     }
     this->m_lineEnding = lineEnding;
 }
+
+bool SerialPort::isWhitespace(const std::string &stringToCheck)
+{
+    for (std::string::const_iterator iter = stringToCheck.begin(); iter != stringToCheck.end(); iter++) {
+        if (static_cast<unsigned>(*iter) > ASCII_WHITESPACE_MAXIMUM_VALUE) {
+            return false;
+        } else if (((*iter) != '\r') || ((*iter) != '\n')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SerialPort::isWhitespace(char charToCheck)
+{
+    return SerialPort::isWhitespace(std::string{1, charToCheck});
+}
+
+bool SerialPort::endsWith(const std::string &stringToCheck, const std::string &matchString)
+{
+    if (matchString.size() > stringToCheck.size()) {
+        return false;
+    }
+    return std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
+}
+
+bool SerialPort::endsWith(const std::string &stringToCheck, char matchChar)
+{
+    return SerialPort::endsWith(stringToCheck, std::string{1, matchChar});
+}
+
+bool SerialPort::fileExists(const std::string &fileToCheck)
+{
+    #if defined(_WIN32) && !defined(__CYGWIN__)
+        std::ifstream readFromFile;
+        readFromFile.open(fileToCheck);
+        if (readFromFile.good()) {
+            readFromFile.close();
+            return true;
+        } else {
+            return false;
+        }
+    #else
+        return (access(fileToCheck.c_str(),F_OK) != -1);
+    #endif
+}
+
+bool SerialPort::fileExists(const char *fileToCheck)
+{
+    return fileExists(std::string{fileToCheck});
+}
+
+
 
 BaudRate SerialPort::baudRate() const
 {
@@ -1342,7 +1397,7 @@ void SerialPort::putBack(char back)
 
 void SerialPort::putBack(const char *str)
 {
-    return SerialPort::putBack(static_cast<std::string>(str));
+    return SerialPort::putBack(std::string{str});
 }
 
 void SerialPort::putBack(const std::string &str)
@@ -1361,10 +1416,10 @@ void SerialPort::putBack(const std::string &str)
     this->m_stringQueue.push_front(newString);
 }
 
-BaudRate SerialPort::parseBaudRateFromRaw(const char *baudRate) { return parseBaudRateFromRaw(static_cast<std::string>(baudRate)); }
-DataBits SerialPort::parseDataBitsFromRaw(const char *dataBits) { return parseDataBitsFromRaw(static_cast<std::string>(dataBits)); }
-StopBits SerialPort::parseStopBitsFromRaw(const char *stopBits) { return parseStopBitsFromRaw(static_cast<std::string>(stopBits)); }
-Parity SerialPort::parseParityFromRaw(const char *parity) { return parseParityFromRaw(static_cast<std::string>(parity)); }
+BaudRate SerialPort::parseBaudRateFromRaw(const char *baudRate) { return parseBaudRateFromRaw(std::string{baudRate}); }
+DataBits SerialPort::parseDataBitsFromRaw(const char *dataBits) { return parseDataBitsFromRaw(std::string{dataBits}); }
+StopBits SerialPort::parseStopBitsFromRaw(const char *stopBits) { return parseStopBitsFromRaw(std::string{stopBits}); }
+Parity SerialPort::parseParityFromRaw(const char *parity) { return parseParityFromRaw(std::string{parity}); }
 
 std::string SerialPort::baudRateToString(BaudRate baudRate)
 {
@@ -1554,7 +1609,7 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 	HKEY hRegistryKey;
     LONG operationResult{ RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
 	if (operationResult != ERROR_SUCCESS) {
-        throw std::runtime_error("ERROR: Could not open registry path " + static_cast<std::string>(SERIAL_PORT_REGISTRY_PATH) + " for reading values");
+        throw std::runtime_error("ERROR: Could not open registry path " + std::string{SERIAL_PORT_REGISTRY_PATH} + " for reading values");
 	}
 	// error checking by testing res omitted
 	for (DWORD index = 0; ; index++) {
@@ -1585,7 +1640,7 @@ std::vector<std::string> SerialPort::availableSerialPorts()
 #else
     std::vector<std::string> returnVector;
     for (auto &it : SerialPort::SERIAL_PORT_NAMES) {
-        if (FileUtilities::fileExists(it)) {
+        if (SerialPort::fileExists(it)) {
             returnVector.emplace_back(it);
         }
     }
