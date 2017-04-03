@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <cstdio>
 #include <regex>
@@ -40,7 +41,7 @@ std::string toStdString(const T &rhs)
 
 /*snprintf style*/
 template<typename ... Args>
-std::string PStringFormat(const char *format, Args& ... args)
+std::string PStringFormat(const char *format, const Args& ... args)
 {
     ssize_t size = std::snprintf(nullptr, 0, format, args ...) + 1;
     std::unique_ptr<char[]> stringBuffer{new char[size]};
@@ -56,7 +57,7 @@ std::string TStringFormat(const char *formatting)
 
 /*C# style String.Format()*/
 template <typename First, typename ... Args>
-std::string TStringFormat(const char *formatting, First& first, Args& ... args)
+std::string TStringFormat(const char *formatting, const First& first, const Args& ... args)
 {
     /* Match exactly one opening brace, one or more numeric digit,
      * then exactly one closing brace, identifying a token */
