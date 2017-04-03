@@ -55,6 +55,12 @@ std::string TStringFormat(const char *formatting)
     return std::string{formatting};
 }
 
+/*Overload base case for formatting*/
+std::string TStringFormat(const std::string &format)
+{
+    return format;
+}
+
 /*C# style String.Format()*/
 template <typename First, typename ... Args>
 std::string TStringFormat(const char *formatting, const First& first, const Args& ... args)
@@ -63,7 +69,7 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
      * then exactly one closing brace, identifying a token */
     static const std::regex targetRegex{"\\{[0-9]+\\}"};
     std::smatch match;
-    
+
     /* Copy the formatting string to a std::string, to
      * make for easier processing, which will eventually
      * be used (the .c_str() method) to pass the remainder
@@ -91,7 +97,7 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
         try {
             /*Convert the integer value between the opening and closing braces to an int to compare */
             regexMatchNumericValue = std::stoi(returnString.substr(foundPosition + 1, (foundPosition + match.str().length())));
-            
+
             /*Do not allow negative numbers, although this should never get picked up the regex anyway*/
             if (regexMatchNumericValue < 0) {
                 throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
@@ -112,7 +118,7 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
                                                                    match.str().length()));
             }
         } catch (std::exception e) {
-            //TODO: Throw instead of just output exception 
+            //TODO: Throw instead of just output exception
             std::cout << e.what() << std::endl;
         }
         copyString = match.suffix();
@@ -125,14 +131,14 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
      * representation of current argument in line (first), then the remainder
      * of the format string, effectively removing the token and replacing it
      * with the requested item in the final string, then pass it off recursively */
-    
+
     std::string firstString{toStdString(first)};
     int index{0};
     for (const auto &it : smallestValueInformation) {
         size_t smallestValueLength{std::get<2>(it)};
 
 
-        /* Since the original string will be modified, the adjusted position must be 
+        /* Since the original string will be modified, the adjusted position must be
           calculated for any repeated brace tokens, kept track of by index.
           The length of string representation of first mutiplied by which the iterationn count
           is added, and the length of the brace token multiplied by the iteration count is
@@ -148,5 +154,69 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
     return TStringFormat(returnString.c_str(), args...);
 }
 
+template <typename First, typename ... Args>
+std::string TStringFormat(const std::string &formatting, const First& first, const Args& ... args)
+{
+    return TStringFormat(formatting.c_str(), first, args...);
+}
+
+
+#if defined(QT_VERSION)
+    #include <QString>
+    std::string toStdString(const QString &str)
+    {
+        return str.toStdString();
+    }
+#endif
+
+
+#if defined(QT_VERSION)
+/*Overload base case for formatting*/
+std::string TStringFormat(const QString &format)
+{
+    return format.toStdString();
+}
+
+/*Overload base case for formatting*/
+QString StringFormat(const QString &format)
+{
+    return format;
+}
+
+/*Overload base case for formatting*/
+QString StringFormat(const std::string &format)
+{
+    return format;
+}
+
+/*Overload base case for formatting*/
+QString StringFormat(const char *format)
+{
+    return format;
+}
+
+
+template <typename First, typename ... Args>
+QString QStringFormat(const char *formatting, const First& first, const Args& ... args)
+{
+    return QString{TStringFormat(formatting, first, args...).c_str()};
+}
+
+template <typename First, typename ... Args>
+QString QStringFormat(const std::string &formatting, const First& first, const Args& ... args)
+{
+    return QString{TStringFormat(formatting, first, args...).c_str()};
+}
+
+
+template <typename First, typename ... Args>
+QString QStringFormat(const QString &formatting, const First& first, const Args& ... args)
+{
+    return QString{TStringFormat(formatting.toStdString(), first, args...).c_str()};
+}
+#endif
+
+
 #endif //TJLUTILS_STRINGFORMAT_H
+
 
