@@ -107,10 +107,10 @@ public:
     bool isListening() const;
     std::string lineEnding() const;
 
-    unsigned long timeout() const;
+    long timeout() const;
     void setPortNumber(uint16_t portNumber);
     uint16_t portNumber() const;
-    void setTimeout(unsigned long timeout);
+    void setTimeout(long timeout);
     void flushRXTX();
     void flushRX();
     void flushTX();
@@ -140,7 +140,7 @@ private:
     struct sockaddr_in m_socketAddress;
     int m_setSocketResult;
     bool m_isListening;
-    unsigned long m_timeout;
+    long m_timeout;
     std::deque<UDPDatagram> m_datagramQueue;
     std::mutex m_ioMutex;
     bool m_shutEmDown;

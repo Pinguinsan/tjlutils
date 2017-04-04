@@ -63,12 +63,12 @@ public:
     ssize_t writeLine(const char *str);
 
     void setClientHostName(const std::string &hostName);
-    void setClientTimeout(unsigned long timeout);
+    void setClientTimeout(long timeout);
     void setClientPortNumber(uint16_t portNumber);
     void setClientReturnAddressPortNumber(uint16_t returnAddressPortNumber);
 
     std::string clientHostName() const;
-    unsigned long clientTimeout() const;
+    long clientTimeout() const;
     uint16_t clientPortNumber() const;
     uint16_t clientReturnAddressPortNumber() const;
 
@@ -96,19 +96,19 @@ public:
     void flushRX();
     void flushTX();
     
-    unsigned long int serverTimeout() const;
+    long serverTimeout() const;
     void setServerPortNumber(uint16_t portNumber);
     uint16_t serverPortNumber() const;
-    void setServerTimeout(unsigned long timeout);
+    void setServerTimeout(long timeout);
     void flush();
 
     /*Both - TStream interface compliance*/
     void openPort();
     void closePort();
     bool isOpen() const;
-    unsigned long timeout() const;
+    long timeout() const;
     std::string portName() const;
-    void setTimeout(unsigned long timeout);
+    void setTimeout(long timeout);
     
     static UDPObjectType parseUDPObjectTypeFromRaw(const std::string &udpObjectType);
     static std::string udpObjectTypeToString(UDPObjectType udpObjectType);
@@ -129,10 +129,10 @@ public:
 
     static const constexpr uint16_t DEFAULT_CLIENT_PORT_NUMBER{UDPClient::DEFAULT_PORT_NUMBER};
     static const constexpr uint16_t DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER{UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER};
-    static const constexpr unsigned long DEFAULT_CLIENT_TIMEOUT{UDPClient::DEFAULT_TIMEOUT};
+    static const constexpr long DEFAULT_CLIENT_TIMEOUT{UDPClient::DEFAULT_TIMEOUT};
 
     static const constexpr uint16_t DEFAULT_SERVER_PORT_NUMBER{UDPServer::DEFAULT_PORT_NUMBER};
-    static const constexpr unsigned long DEFAULT_SERVER_TIMEOUT{UDPServer::DEFAULT_TIMEOUT};
+    static const constexpr long DEFAULT_SERVER_TIMEOUT{UDPServer::DEFAULT_TIMEOUT};
 
 private:
     std::unique_ptr<UDPServer> m_udpServer;

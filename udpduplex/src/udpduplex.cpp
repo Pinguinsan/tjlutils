@@ -173,14 +173,14 @@ void UDPDuplex::setClientReturnAddressPortNumber(uint16_t portNumber)
     }
 }
 
-void UDPDuplex::setClientTimeout(unsigned long int timeout)
+void UDPDuplex::setClientTimeout(long timeout)
 {
     if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
         this->m_udpClient->setTimeout(timeout);   
     }
 }
 
-void UDPDuplex::setTimeout(unsigned long int timeout)
+void UDPDuplex::setTimeout(long timeout)
 {
     if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
         this->m_udpServer->setTimeout(timeout);
@@ -219,7 +219,7 @@ uint16_t UDPDuplex::clientReturnAddressPortNumber() const
     }
 }
 
-unsigned long int UDPDuplex::clientTimeout() const
+long UDPDuplex::clientTimeout() const
 {
     if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpClient->timeout();
@@ -237,7 +237,7 @@ uint16_t UDPDuplex::serverPortNumber() const
     }
 }
 
-unsigned long UDPDuplex::serverTimeout() const
+long UDPDuplex::serverTimeout() const
 {
     if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
         return this->m_udpServer->timeout();
@@ -253,14 +253,14 @@ void UDPDuplex::setServerPortNumber(uint16_t portNumber)
     }
 }
 
-void UDPDuplex::setServerTimeout(unsigned long timeout)
+void UDPDuplex::setServerTimeout(long timeout)
 {
     if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
         this->m_udpServer->setTimeout(timeout);
     }
 }
 
-unsigned long int UDPDuplex::timeout() const
+long UDPDuplex::timeout() const
 {
     if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
         return this->m_udpServer->timeout();

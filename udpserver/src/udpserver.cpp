@@ -55,12 +55,12 @@ void UDPServer::setPortNumber(uint16_t portNumber)
     }
 }
 
-void UDPServer::setTimeout(unsigned long timeout)
+void UDPServer::setTimeout(long timeout)
 {
     this->m_timeout = timeout;
 }
 
-unsigned long int UDPServer::timeout() const
+long UDPServer::timeout() const
 {
     return this->m_timeout;
 }

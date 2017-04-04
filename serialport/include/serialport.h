@@ -115,7 +115,7 @@ public:
     SerialPort &operator=(const SerialPort &rhs) = delete;
     SerialPort(const SerialPort &other) = delete;
 
-    void begin(unsigned long baud);
+    void begin(long baud);
     void end();
     void openPort();
     void closePort();
@@ -150,8 +150,8 @@ public:
     void setParity(Parity parity);
     void setDataBits(DataBits dataBits);
     void setLineEnding(const std::string &lineEnding);
-    void setTimeout(unsigned long int timeout);
-    void setRetryCount(unsigned long retryCount);
+    void setTimeout(long timeout);
+    void setRetryCount(long retryCount);
 
     std::string portName() const;
     int portNumber() const;
@@ -159,9 +159,9 @@ public:
     StopBits stopBits() const;
     DataBits dataBits() const;
     Parity parity() const;
-    unsigned long int timeout() const;
+    long timeout() const;
     std::string lineEnding() const;
-    unsigned long retryCount() const;
+    long retryCount() const;
     bool isOpen() const;
     bool isListening() const;
 
@@ -202,8 +202,8 @@ public:
     static std::vector<const char *> availableParity();
     static bool isValidSerialPortName(const std::string &serialPortName);
 
-    static const unsigned long DEFAULT_TIMEOUT;
-    static const unsigned long DEFAULT_RETRY_COUNT;
+    static const long DEFAULT_TIMEOUT;
+    static const long DEFAULT_RETRY_COUNT;
 
     static std::string doUserSelectSerialPortName();
     static BaudRate doUserSelectBaudRate();
@@ -231,7 +231,7 @@ private:
     DataBits m_dataBits;
     Parity m_parity;
     std::string m_lineEnding;
-    unsigned long int m_timeout;
+    long m_timeout;
     int m_retryCount;
     bool m_isOpen;
     int m_maximumReadSize;
@@ -264,15 +264,15 @@ private:
     static bool fileExists(const std::string &fileToCheck);
     static bool fileExists(const char *fileToCheck);
 
-    static const unsigned long constexpr SERIAL_PORT_BUFFER_MAX{4096};
-    static const unsigned long constexpr SINGLE_MESSAGE_BUFFER_MAX{4096};
+    static const long constexpr SERIAL_PORT_BUFFER_MAX{4096};
+    static const long constexpr SINGLE_MESSAGE_BUFFER_MAX{4096};
     static bool isAvailableSerialPort(const std::string &name);
     static std::pair<int, std::string> getPortNameAndNumber(const std::string &name);
     static std::vector<std::string> generateSerialPortNames();
 
     ssize_t writeCString(const char *str);
     ssize_t writeByte(char byteToSend);
-    ssize_t writeBufferedBytes(unsigned char *buffer, unsigned long bufferSize);
+    ssize_t writeBufferedBytes(unsigned char *buffer, long bufferSize);
     unsigned char timedRead();
     unsigned char rawRead();
     unsigned char readByte();

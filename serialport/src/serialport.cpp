@@ -23,8 +23,8 @@ const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
 const std::string SerialPort::DEFAULT_LINE_ENDING{"\r"};
-const unsigned long SerialPort::DEFAULT_TIMEOUT{100};
-const unsigned long SerialPort::DEFAULT_RETRY_COUNT{0};
+const long SerialPort::DEFAULT_TIMEOUT{100};
+const long SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
 const std::string SerialPort::DEFAULT_STOP_BITS_STRING{"1"};
 const std::string SerialPort::DEFAULT_PARITY_STRING{"None"};
@@ -178,7 +178,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     this->m_portName = truePortNameAndNumber.second;
 }
 
-void SerialPort::begin(unsigned long baud)
+void SerialPort::begin(long baud)
 {
     this->closePort();
     BaudRate newBaudRate{BaudRate::BAUD115200};
@@ -581,7 +581,7 @@ ssize_t SerialPort::writeByte(char byteToSend)
 #endif
 }
 
-ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, unsigned long int bufferSize)
+ssize_t SerialPort::writeBufferedBytes(unsigned char *buffer, long bufferSize)
 {
 #if (defined(_WIN32) || defined(__CYGWIN__))
     long int writtenBytes;
@@ -1025,22 +1025,22 @@ std::string SerialPort::lineEnding() const
     return this->m_lineEnding;
 }
 
-unsigned long SerialPort::timeout() const
+long SerialPort::timeout() const
 {
     return this->m_timeout;
 }
 
-unsigned long SerialPort::retryCount() const
+long SerialPort::retryCount() const
 {
     return this->m_retryCount;
 }
 
-void SerialPort::setTimeout(unsigned long timeout)
+void SerialPort::setTimeout(long timeout)
 {
     this->m_timeout = timeout;
 }
 
-void SerialPort::setRetryCount(unsigned long retryCount)
+void SerialPort::setRetryCount(long retryCount)
 {
     this->m_retryCount = retryCount;
 }
@@ -1251,8 +1251,8 @@ void SerialPort::asyncStringListener()
 void SerialPort::syncStringListener()
 {
     std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-    unsigned long tempTimeout{this->m_timeout};
-    unsigned long splitTimeout{this->m_timeout};
+    long tempTimeout{this->m_timeout};
+    long splitTimeout{this->m_timeout};
     EventTimer<std::chrono::steady_clock> eventTimer;
     eventTimer.start();
     do {

@@ -46,7 +46,7 @@ private:
 
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-    //using ssize_t = unsigned long;
+    //using ssize_t = long;
 #endif
 
 class TStream
@@ -54,8 +54,8 @@ class TStream
 public:
     virtual ~TStream() { }
 
-    virtual void setTimeout(unsigned long timeout) = 0;
-    virtual unsigned long int timeout() const = 0;
+    virtual void setTimeout(long timeout) = 0;
+    virtual long timeout() const = 0;
     virtual std::string lineEnding() const = 0;
     virtual void setLineEnding(const std::string &str) = 0;
 
