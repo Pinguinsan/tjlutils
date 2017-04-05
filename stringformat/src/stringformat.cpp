@@ -3,6 +3,9 @@
 /*Base case to break recursion*/
 std::string TStringFormat(const char *formatting)
 {
+    if (!formatting) {
+        return "";
+    }
     return std::string{formatting};
 }
 
@@ -27,6 +30,9 @@ std::string toStdString(const std::string &rhs)
 
 std::string toStdString(char *rhs)
 {
+    if (!rhs) {
+        return "";
+    }
     return std::string{rhs};
 }
 
@@ -63,11 +69,17 @@ QString QStringFormat(const std::string &format)
 /*Overload base case for formatting*/
 QString QStringFormat(const char *format)
 {
+    if (!format) {
+        return "";
+    }
     return format;
 }
 
 QString toQString(const char *rhs)
 {
+    if (!rhs) {
+        return "";
+    }
     return QString{rhs};
 }
 
@@ -78,6 +90,9 @@ QString toQString(const std::string &rhs)
 
 QString toQString(char *rhs)
 {
+    if (!rhs) {
+        return "";
+    }
     return QString{rhs};
 }
 
