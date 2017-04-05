@@ -282,11 +282,11 @@ else
     suLinkFile "$sourceDir/udpserver/include/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpclient/include/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/stringformat/include/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/eventtimer/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/stringformat/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed, bailing out"; exit 1;}
