@@ -171,7 +171,7 @@ std::string TStringFormat(const std::string &formatting, const First& first, con
     return TStringFormat(formatting.c_str(), first, args...);
 }
 
-#if defined(QT_VERSION)
+#if defined(QT_CORE_LIB)
 
 #include <QString>
 std::string toStdString(const QString &rhs);
@@ -219,6 +219,6 @@ QString QStringFormat(const QString &formatting, const First& first, const Args&
 {
     return QString::fromStdString(TStringFormat(formatting, first, args...));
 }
-#endif
+#endif //QT_CORE_LIB
 
 #endif //TJLUTILS_STRINGFORMAT_H

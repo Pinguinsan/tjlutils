@@ -35,7 +35,7 @@ std::string toStdString(char rhs)
     return std::string{1, rhs};
 }
 
-#if defined(QT_VERSION)
+#if defined(QT_CORE_LIB)
 
 std::string toStdString(const QString &str)
 {
@@ -86,4 +86,4 @@ QString toQString(char rhs)
     return QString{1, rhs};
 }
 
-#endif //QT_VERSION
+#endif //QT_CORE_LIB
