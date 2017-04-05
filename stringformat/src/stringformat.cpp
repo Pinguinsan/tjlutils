@@ -15,6 +15,12 @@ std::string TStringFormat(const std::string &format)
     return format;
 }
 
+/*Overload base case for formatting*/
+std::string TStringFormat(std::string format)
+{
+    return format;
+}
+
 std::string toStdString(const char *rhs)
 {
     if (!rhs) {
@@ -54,6 +60,13 @@ std::string TStringFormat(const QString &format)
     return format.toStdString();
 }
 
+
+/*Overload base case for formatting*/
+std::string TStringFormat(QString format)
+{
+    return format.toStdString();
+}
+
 /*Overload base case for formatting*/
 QString QStringFormat(const QString &format)
 {
@@ -61,7 +74,19 @@ QString QStringFormat(const QString &format)
 }
 
 /*Overload base case for formatting*/
+QString QStringFormat(QString format)
+{
+    return format;
+}
+
+/*Overload base case for formatting*/
 QString QStringFormat(const std::string &format)
+{
+    return QString::fromStdString(format);
+}
+
+/*Overload base case for formatting*/
+QString QStringFormat(std::string format)
 {
     return QString::fromStdString(format);
 }

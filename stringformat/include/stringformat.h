@@ -31,56 +31,7 @@
 #include <utility>
 #include <tuple>
 
-#if defined(QT_CORE_LIB)
-
-#include <QString>
-std::string toStdString(const QString &rhs);
-
-template <typename T>
-QString toQString(const T &rhs)
-{
-    std::stringstream stringStream;
-    stringStream << rhs;
-    return QString::fromStdString(stringStream.str());
-}
-
-/*Template specializations for toQString*/
-QString toQString(const char *rhs);
-QString toQString(const std::string &rhs);
-QString toQString(char *rhs);
-QString toQString(char rhs);
-
-
-/*C# style String.Format()*/
-template <typename First, typename ... Args>
-std::string TStringFormat(const QString &formatting, const First& first, const Args& ... args)
-{
-    return TStringFormat(formatting.toStdString().c_str(), first, args...);
-}
-
-/*C# style String.Format()*/
-template <typename First, typename ... Args>
-QString QStringFormat(const char *formatting, const First& first, const Args& ... args)
-{
-    return QString::fromStdString(TStringFormat(formatting, first, args...));
-}
-
-
-/*C# style String.Format()*/
-template <typename First, typename ... Args>
-QString QStringFormat(const std::string &formatting, const First& first, const Args& ... args)
-{
-    return QString::fromStdString(TStringFormat(formatting, first, args...));
-}
-
-/*C# style String.Format()*/
-template <typename First, typename ... Args>
-QString QStringFormat(const QString &formatting, const First& first, const Args& ... args)
-{
-    return QString::fromStdString(TStringFormat(formatting, first, args...));
-}
-#endif //QT_CORE_LIB
-
+#
 /*snprintf style*/
 template<typename ... Args>
 std::string PStringFormat(const char *format, Args& ... args)
@@ -111,6 +62,9 @@ std::string TStringFormat(const char *formatting);
 
 /*Base case to break recursion*/
 std::string TStringFormat(const std::string &formatting);
+
+/*Base case to break recursion*/
+std::string TStringFormat(std::string formatting);
 
 /*C# style String.Format()*/
 template <typename First, typename ... Args>
@@ -222,6 +176,70 @@ std::string TStringFormat(const std::string &formatting, const First& first, con
 {
     return TStringFormat(formatting.c_str(), first, args...);
 }
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+std::string TStringFormat(std::string formatting, const First& first, const Args& ... args)
+{
+    return TStringFormat(formatting.c_str(), first, args...);
+}
+
+#if defined(QT_CORE_LIB)
+
+#include <QString>
+std::string toStdString(const QString &rhs);
+
+template <typename T>
+QString toQString(const T &rhs)
+{
+    std::stringstream stringStream;
+    stringStream << rhs;
+    return QString::fromStdString(stringStream.str());
+}
+
+/*Template specializations for toQString*/
+QString toQString(const char *rhs);
+QString toQString(const std::string &rhs);
+QString toQString(std::string rhs);
+QString toQString(char *rhs);
+QString toQString(char rhs);
+
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+std::string TStringFormat(const QString &formatting, const First& first, const Args& ... args)
+{
+    return TStringFormat(formatting.toStdString(), first, args...);
+}
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+QString QStringFormat(const char *formatting, const First& first, const Args& ... args)
+{
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
+}
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+QString QStringFormat(const std::string &formatting, const First& first, const Args& ... args)
+{
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
+}
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+QString QStringFormat(std::string formatting, const First& first, const Args& ... args)
+{
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
+}
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+QString QStringFormat(const QString &formatting, const First& first, const Args& ... args)
+{
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
+}
+#endif //QT_CORE_LIB
 
 
 #endif //TJLUTILS_STRINGFORMAT_H
