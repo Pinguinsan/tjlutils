@@ -17,6 +17,7 @@
 *    Public license along with tjlutils                                *
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
+
 #ifndef TJLUTILS_STRINGFORMAT_H
 #define TJLUTILS_STRINGFORMAT_H
 
@@ -31,17 +32,9 @@
 #include <tuple>
 
 
-template <typename T>
-std::string toStdString(const T &rhs)
-{
-    std::stringstream stringStream{};
-    stringStream << rhs;
-    return stringStream.str();
-}
-
 /*snprintf style*/
 template<typename ... Args>
-std::string PStringFormat(const char *format, const Args& ... args)
+std::string PStringFormat(const char *format, Args& ... args)
 {
     ssize_t size = std::snprintf(nullptr, 0, format, args ...) + 1;
     std::unique_ptr<char[]> stringBuffer{new char[size]};
@@ -50,23 +43,33 @@ std::string PStringFormat(const char *format, const Args& ... args)
 }
 
 /*Base case to break recursion*/
-std::string TStringFormat(const char *formatting)
+std::string TStringFormat(const char *formatting);
+
+/*Base case to break recursion*/
+std::string TStringFormat(const std::string &formatting);
+
+
+template <typename T>
+std::string toStdString(const T &rhs)
 {
-    return std::string{formatting};
+    std::stringstream stringStream;
+    stringStream << rhs;
+    return stringStream.str();
 }
 
-/*Overload base case for formatting*/
-std::string TStringFormat(const std::string &format)
-{
-    return format;
-}
+/*Template specializations for toStdString*/
+std::string toStdString(const char *rhs);
+std::string toStdString(const std::string &rhs);
+std::string toStdString(char *rhs);
+std::string toStdString(char rhs);
 
 /*C# style String.Format()*/
 template <typename First, typename ... Args>
 std::string TStringFormat(const char *formatting, const First& first, const Args& ... args)
 {
     /* Match exactly one opening brace, one or more numeric digit,
-     * then exactly one closing brace, identifying a token */
+     * then exactly one closing brace, identifying a token
+     * Ex: {0} will match, {-1} will not */
     static const std::regex targetRegex{"\\{[0-9]+\\}"};
     std::smatch match;
 
@@ -97,33 +100,39 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
         try {
             /*Convert the integer value between the opening and closing braces to an int to compare */
             regexMatchNumericValue = std::stoi(returnString.substr(foundPosition + 1, (foundPosition + match.str().length())));
-
-            /*Do not allow negative numbers, although this should never get picked up the regex anyway*/
-            if (regexMatchNumericValue < 0) {
-                throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
-            }
-            /* If the numeric value in the curly brace token is smaller than
-             * the current smallest (or if the smallest value has not yet been set,
-             * ie it is the first match), set the corresponding smallestX variables
-             * and wrap them up into a TokenInformation and add it to the std::vector */
-            int smallestValue{std::get<0>(smallestValueInformation.at(0))};
-            if ((smallestValue == -1) || (regexMatchNumericValue < smallestValue)) {
-                smallestValueInformation.clear();
-                smallestValueInformation.push_back(std::make_tuple(regexMatchNumericValue,
-                                                                   foundPosition,
-                                                                   match.str().length()));
-            } else if (regexMatchNumericValue == smallestValue) {
-                smallestValueInformation.push_back(std::make_tuple(regexMatchNumericValue,
-                                                                   foundPosition,
-                                                                   match.str().length()));
-            }
-        } catch (std::exception e) {
-            //TODO: Throw instead of just output exception
-            std::cout << e.what() << std::endl;
+        } catch (std::exception &e) {
+            /*The value between the braces was not an integer value, so throw an
+             * exception. Is this check actually necessary? I am not familiar enough with
+             * regex to know whether it is even possible to have a non-numeric value picked up */
+            throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string contains non-numeric token(formatting = {0})", formatting));
         }
+        /*Do not allow negative numbers, although this should never get picked up the regex anyway*/
+        if (regexMatchNumericValue < 0) {
+            throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
+        }
+        /* If the numeric value in the curly brace token is smaller than
+         * the current smallest (or if the smallest value has not yet been set,
+         * ie it is the first match), set the corresponding smallestX variables
+         * and wrap them up into a TokenInformation and add it to the std::vector */
+        int smallestValue{std::get<0>(smallestValueInformation.at(0))};
+        if ((smallestValue == -1) || (regexMatchNumericValue < smallestValue)) {
+            smallestValueInformation.clear();
+            smallestValueInformation.push_back(std::make_tuple(regexMatchNumericValue,
+                                                               foundPosition,
+                                                               match.str().length()));
+        } else if (regexMatchNumericValue == smallestValue) {
+            smallestValueInformation.push_back(std::make_tuple(regexMatchNumericValue,
+                                                               foundPosition,
+                                                               match.str().length()));
+        }
+        /*Set the copy string to just past the match token, so we don't accidentally
+         * match it again on the next iteration */
         copyString = match.suffix();
     }
     int smallestValue{std::get<0>(smallestValueInformation.at(0))};
+    /*If the smallest value is still the initialized value of -1, no other value was
+     *found. This is also checking whether not we found ANY tokens (the smallestValueInformation
+     *will receive whatever the first match is by default) */
     if (smallestValue == -1) {
         throw std::runtime_error(TStringFormat("ERROR: In TStringFormat() - Formatted string is invalid (formatting = {0})", formatting));
     }
@@ -151,68 +160,64 @@ std::string TStringFormat(const char *formatting, const First& first, const Args
                        + returnString.substr(smallestValueAdjustedPosition + smallestValueLength);
         index++;
     }
+    /*Call template recursively with newly replaced string*/
     return TStringFormat(returnString.c_str(), args...);
 }
 
+/*C# style String.Format()*/
 template <typename First, typename ... Args>
 std::string TStringFormat(const std::string &formatting, const First& first, const Args& ... args)
 {
     return TStringFormat(formatting.c_str(), first, args...);
 }
 
-
 #if defined(QT_VERSION)
-    #include <QString>
-    std::string toStdString(const QString &str)
-    {
-        return str.toStdString();
-    }
-#endif
 
+#include <QString>
+std::string toStdString(const QString &rhs);
 
-#if defined(QT_VERSION)
-/*Overload base case for formatting*/
-std::string TStringFormat(const QString &format)
+template <typename T>
+QString toQString(const T &rhs)
 {
-    return format.toStdString();
+    std::stringstream stringStream;
+    stringStream << rhs;
+    return QString::fromStdString(stringStream.str());
 }
 
-/*Overload base case for formatting*/
-QString StringFormat(const QString &format)
+/*Template specializations for toQString*/
+QString toQString(const char *rhs);
+QString toQString(const std::string &rhs);
+QString toQString(char *rhs);
+QString toQString(char rhs);
+
+
+/*C# style String.Format()*/
+template <typename First, typename ... Args>
+std::string TStringFormat(const QString &formatting, const First& first, const Args& ... args)
 {
-    return format;
+    return TStringFormat(formatting.toStdString(), first, args...);
 }
 
-/*Overload base case for formatting*/
-QString StringFormat(const std::string &format)
-{
-    return QString::fromStdString(format);
-}
-
-/*Overload base case for formatting*/
-QString StringFormat(const char *format)
-{
-    return format;
-}
-
-
+/*C# style String.Format()*/
 template <typename First, typename ... Args>
 QString QStringFormat(const char *formatting, const First& first, const Args& ... args)
 {
-    return QString{TStringFormat(formatting, first, args...).c_str()};
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
 }
 
+
+/*C# style String.Format()*/
 template <typename First, typename ... Args>
 QString QStringFormat(const std::string &formatting, const First& first, const Args& ... args)
 {
-    return QString{TStringFormat(formatting, first, args...).c_str()};
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
 }
 
-
+/*C# style String.Format()*/
 template <typename First, typename ... Args>
 QString QStringFormat(const QString &formatting, const First& first, const Args& ... args)
 {
-    return QString{TStringFormat(formatting.toStdString(), first, args...).c_str()};
+    return QString::fromStdString(TStringFormat(formatting, first, args...));
 }
 #endif
 

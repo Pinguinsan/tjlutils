@@ -30,6 +30,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpclient/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpduplex/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/tstream/include/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/stringformat/include/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/")
 
@@ -46,6 +47,7 @@ set (PRETTYPRINTER_SOURCES "${SOURCE_BASE}/prettyprinter/src/prettyprinter.cpp")
 set (UDPSERVER_SOURCES "${SOURCE_BASE}/udpserver/src/udpserver.cpp")
 set (UDPCLIENT_SOURCES "${SOURCE_BASE}/udpclient/src/udpclient.cpp")
 set (UDPDUPLEX_SOURCES "${SOURCE_BASE}/udpduplex/src/udpduplex.cpp")
+set (STRINGFORMAT_SOURCES "${SOURCE_BASE}/stringformat/src/stringformat.cpp")
 set (TSTREAM_SOURCES "${SOURCE_BASE}/tstream/src/tscriptexecutor.cpp" 
                      "${SOURCE_BASE}/tstream/src/tscriptreader.cpp")
 
@@ -61,6 +63,7 @@ add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                             "${UDPSERVER_SOURCES}"
                             "${UDPCLIENT_SOURCES}"
                             "${UDPDUPLEX_SOURCES}"
+                            "${STRINGFORMAT_SOURCES}"
                             "${TSTREAM_SOURCES}")
                         
 add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
@@ -74,6 +77,7 @@ add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${UDPSERVER_SOURCES}"
                                   "${UDPCLIENT_SOURCES}"
                                   "${UDPDUPLEX_SOURCES}"
+                                  "${STRINGFORMAT_SOURCES}"
                                   "${TSTREAM_SOURCES}")
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)
