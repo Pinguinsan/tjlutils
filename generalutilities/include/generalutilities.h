@@ -785,6 +785,13 @@ namespace std {
             }
         }
 
+        template <typename StringType>
+        inline constexpr bool isLineEnding(const StringType &stringType)
+        {
+            return ((toString(stringType) == "\r") || (toString(stringType) == "\n") || (toString(stringType) == "\r\n") || (toString(stringType) == "\n\r"));
+        }
+
+
     }
 
 #if (__cplusplus < 201402L)
