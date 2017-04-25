@@ -141,26 +141,6 @@ namespace std {
         const int constexpr ASCII_WHITESPACE_MAXIMUM_VALUE{32};
         const unsigned int constexpr ASCII_HIGH_LIMIT{128};
         const unsigned int constexpr ASCII_LOW_LIMIT{0};
-        const long long int constexpr NANOSECONDS_PER_MICROSECOND{1000};
-        const long long int constexpr NANOSECONDS_PER_MILLISECOND{1000000};
-        const long long int constexpr NANOSECONDS_PER_SECOND{1000000000};
-        const long long int constexpr NANOSECONDS_PER_MINUTE{60000000000};
-        const long long int constexpr NANOSECONDS_PER_HOUR{3600000000000};
-        const long long int constexpr NANOSECONDS_PER_DAY{86400000000000};
-        const long long int constexpr MICROSECONDS_PER_MILLISECOND{1000};
-        const long long int constexpr MICROSECONDS_PER_SECOND{1000000};
-        const long long int constexpr MICROSECONDS_PER_MINUTE{60000000};
-        const long long int constexpr MICROSECONDS_PER_HOUR{3600000000};
-        const long long int constexpr MICROSECONDS_PER_DAY{86400000000};
-        const long long int constexpr MILLISECONDS_PER_SECOND{1000};
-        const long long int constexpr MILLISECONDS_PER_MINUTE{60000};
-        const long long int constexpr MILLISECONDS_PER_HOUR{3600000};
-        const long long int constexpr MILLISECONDS_PER_DAY{86400000};
-        const long long int constexpr SECONDS_PER_MINUTE{60};
-        const long long int constexpr SECONDS_PER_HOUR{3600};
-        const long long int constexpr MINUTES_PER_HOUR{60};
-        const long long int constexpr MINUTES_PER_DAY{1440};
-        const long long int constexpr HOURS_PER_DAY{24};
         const long long int constexpr MERSENNE_TWISTER_DISCARD_THRESHOLD{700000};
 
         template<typename Container>

@@ -30,8 +30,6 @@
 #include <future>
 #include <list>
 #include <functional>
-#include "generalutilities.h"
-#include "mathutilities.h"
 
 template <typename ClockType = std::chrono::steady_clock>
 class EventTimer
@@ -119,7 +117,6 @@ public:
 
     void update()
     {
-        using namespace GeneralUtilities;
         if ((!this->m_isPaused) && (!this->m_isStopped)) {
             this->m_endTime = platform_clock_t::now();
             this->m_totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(this->m_endTime-this->m_startTime).count();
@@ -140,7 +137,6 @@ public:
 
     long long int totalMicroseconds()
     {
-        using namespace GeneralUtilities;
         if  (!this->cacheIsValid()) {
             this->validateCache();
             this->update();
@@ -159,7 +155,6 @@ public:
 
     long long int totalSeconds()
     {
-        using namespace GeneralUtilities;
         if  (!this->cacheIsValid()) {
             this->validateCache();
             this->update();
@@ -169,7 +164,6 @@ public:
 
     long long int totalMinutes()
     {
-        using namespace GeneralUtilities;
         if  (!this->cacheIsValid()) {
             this->validateCache();
             this->update();
@@ -179,7 +173,6 @@ public:
 
     long long int totalHours()
     {
-        using namespace GeneralUtilities;
         if  (!this->cacheIsValid()) {
             this->validateCache();
             this->update();
@@ -204,20 +197,20 @@ public:
         }
         std::string returnString{""};
         if (this->hours() != 0) {
-            returnString = GeneralUtilities::toString(this->hours()) + ':';
+            returnString = std::to_string(this->hours()) + ':';
         }
-        returnString += GeneralUtilities::toString(this->minutes())
+        returnString += std::to_string(this->minutes())
                         + ':'
-                        + GeneralUtilities::toString(this->seconds())
+                        + std::to_string(this->seconds())
                         + '.';
         long long int millisecond{this->milliseconds()};
         std::string millisecondsString{""};
         if (millisecond < 10) {
-            millisecondsString = "00" + GeneralUtilities::toString(millisecond);
+            millisecondsString = "00" + std::to_string(millisecond);
         } else if (millisecond < 100) {
-            millisecondsString = "0" + GeneralUtilities::toString(millisecond);
+            millisecondsString = "0" + std::to_string(millisecond);
         } else {
-            millisecondsString = GeneralUtilities::toString(millisecond);
+            millisecondsString = std::to_string(millisecond);
         }
         returnString += millisecondsString.substr(0, millisecondDigits);
         
@@ -297,7 +290,26 @@ private:
     {
         this->m_cacheStartTime = platform_clock_t::now();
     }
-
+    const long long int constexpr NANOSECONDS_PER_MICROSECOND{1000};
+    const long long int constexpr NANOSECONDS_PER_MILLISECOND{1000000};
+    const long long int constexpr NANOSECONDS_PER_SECOND{1000000000};
+    const long long int constexpr NANOSECONDS_PER_MINUTE{60000000000};
+    const long long int constexpr NANOSECONDS_PER_HOUR{3600000000000};
+    const long long int constexpr NANOSECONDS_PER_DAY{86400000000000};
+    const long long int constexpr MICROSECONDS_PER_MILLISECOND{1000};
+    const long long int constexpr MICROSECONDS_PER_SECOND{1000000};
+    const long long int constexpr MICROSECONDS_PER_MINUTE{60000000};
+    const long long int constexpr MICROSECONDS_PER_HOUR{3600000000};
+    const long long int constexpr MICROSECONDS_PER_DAY{86400000000};
+    const long long int constexpr MILLISECONDS_PER_SECOND{1000};
+    const long long int constexpr MILLISECONDS_PER_MINUTE{60000};
+    const long long int constexpr MILLISECONDS_PER_HOUR{3600000};
+    const long long int constexpr MILLISECONDS_PER_DAY{86400000};
+    const long long int constexpr SECONDS_PER_MINUTE{60};
+    const long long int constexpr SECONDS_PER_HOUR{3600};
+    const long long int constexpr MINUTES_PER_HOUR{60};
+    const long long int constexpr MINUTES_PER_DAY{1440};
+    const long long int constexpr HOURS_PER_DAY{24};
     static const int INVALIDATE_CACHE_TIMEOUT{100};
 };
 
