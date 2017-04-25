@@ -1609,41 +1609,45 @@ std::vector<const char *> SerialPort::availableDataBits()
 
 std::vector<std::string> SerialPort::availableSerialPorts()
 {
+    std::vector<std::string> returnVector;
 #if (defined(_WIN32) || defined(__CYGWIN__))
-    std::vector<std::string> returnVector;
-	HKEY hRegistryKey;
-    LONG operationResult{ RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
-	if (operationResult != ERROR_SUCCESS) {
-        throw std::runtime_error("ERROR: Could not open registry path " + std::string{SERIAL_PORT_REGISTRY_PATH} + " for reading values");
-	}
-	// error checking by testing res omitted
-	for (DWORD index = 0; ; index++) {
-		char SubKeyName[PATH_MAX];
-		DWORD cName{ PATH_MAX };
-		DWORD cbData{ PATH_MAX };
-		char hRegistryKeyValue[PATH_MAX];
-        operationResult = RegEnumValueA(hRegistryKey, index, SubKeyName, &cName, NULL, NULL, NULL, NULL);
-		if (operationResult != ERROR_SUCCESS) {
-			break;
-		}
-        operationResult = RegGetValueA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, SubKeyName, RRF_RT_REG_SZ, NULL, hRegistryKeyValue, &cbData);
-		if (operationResult != ERROR_SUCCESS) {
-            break;
-		}
-		returnVector.emplace_back(hRegistryKeyValue);
-	}
-	RegCloseKey(hRegistryKey);
-    std::set<std::string> uniques;
-    for (auto &it : returnVector) {
-        uniques.emplace(it);
+	try {
+        HKEY hRegistryKey;
+        LONG operationResult{ RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, 0, KEY_READ, &hRegistryKey) };
+        if (operationResult != ERROR_SUCCESS) {
+            throw std::runtime_error("ERROR: Could not open registry path " + std::string{SERIAL_PORT_REGISTRY_PATH} + " for reading values");
+        }
+        // error checking by testing res omitted
+        for (DWORD index = 0; ; index++) {
+            char SubKeyName[PATH_MAX];
+            DWORD cName{ PATH_MAX };
+            DWORD cbData{ PATH_MAX };
+            char hRegistryKeyValue[PATH_MAX];
+            operationResult = RegEnumValueA(hRegistryKey, index, SubKeyName, &cName, NULL, NULL, NULL, NULL);
+            if (operationResult != ERROR_SUCCESS) {
+                break;
+            }
+            operationResult = RegGetValueA(HKEY_LOCAL_MACHINE, SERIAL_PORT_REGISTRY_PATH, SubKeyName, RRF_RT_REG_SZ, NULL, hRegistryKeyValue, &cbData);
+            if (operationResult != ERROR_SUCCESS) {
+                break;
+            }
+            returnVector.emplace_back(hRegistryKeyValue);
+        }
+        RegCloseKey(hRegistryKey);
+        std::set<std::string> uniques;
+        for (auto &it : returnVector) {
+            uniques.emplace(it);
+        }
+        std::vector<std::string> realReturn;
+        for (auto &it : uniques) {
+            realReturn.emplace_back(it);
+        }
+        return realReturn;
+    } catch (std::exception &e) {
+        (void)e;
+        return returnVector;
     }
-    std::vector<std::string> realReturn;
-    for (auto &it : uniques) {
-        realReturn.emplace_back(it);
-    }
-    return realReturn;
 #else
-    std::vector<std::string> returnVector;
     for (auto &it : SerialPort::SERIAL_PORT_NAMES) {
         if (SerialPort::fileExists(it)) {
             returnVector.emplace_back(it);

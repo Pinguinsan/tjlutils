@@ -39,6 +39,8 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+#include <fstream>
+#include <stdexcept>
 #include <cctype>
 #include <algorithm>
 #include <future>
