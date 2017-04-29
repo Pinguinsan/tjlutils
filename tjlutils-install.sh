@@ -288,7 +288,7 @@ else
     suLinkFile "$sourceDir/tstream/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/eventtimer/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/eventtimer/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}    
+    suLinkFile "$sourceDir/bitset/bitset.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}    
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed, bailing out"; exit 1;}

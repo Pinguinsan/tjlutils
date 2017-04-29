@@ -18,6 +18,8 @@
 
 #include "serialport.h"
 
+#include "generalutilities.h"
+
 const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};

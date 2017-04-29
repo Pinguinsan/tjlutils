@@ -33,7 +33,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/stringformat/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/"
-		    "${CMAKE_CURRENT_SOURCE_DIR}/bitset/")
+		            "${CMAKE_CURRENT_SOURCE_DIR}/bitset/")
 
 set(SOURCE_BASE ${CMAKE_CURRENT_SOURCE_DIR})
 
