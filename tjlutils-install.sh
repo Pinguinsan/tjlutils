@@ -234,6 +234,7 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/tscriptexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tscriptreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/stringformat.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/bitset.h" || { echo "Could not remove file, bailing out"; exit 1;}
 
     if [[ -z "$cygwinCheck" ]]; then
         suRemoveFile "$ul/libtjlutils.so" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -270,23 +271,24 @@ else
         fi
     fi
 
-    suLinkFile "$sourceDir/systemcommand/include/systemcommand.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/generalutilities/include/generalutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/fileutilities/include/fileutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/mathutilities/include/mathutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/datetime/include/datetime.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/pythoncrypto/include/pythoncrypto.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/serialport/include/serialport.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/prettyprinter/include/prettyprinter.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/systemcommand/systemcommand.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/generalutilities/generalutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/fileutilities/fileutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/mathutilities/mathutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/datetime/datetime.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/pythoncrypto/pythoncrypto.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/serialport/serialport.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/prettyprinter/prettyprinter.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/templateobjects/templateobjects.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/udpserver/include/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/udpclient/include/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/udpduplex/include/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/stringformat/include/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/tstream/include/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/tstream/include/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/tstream/include/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/udpserver/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/udpclient/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/udpduplex/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/stringformat/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tstream/tscriptreader.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/eventtimer/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/eventtimer/eventtimer.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}    
     
     changeDirectory "$buildDir" || { echo "Could not enter build directory, bailing out"; exit 1;}
     runCmake "$sourceDir" || { echo "Cmake failed, bailing out"; exit 1;}

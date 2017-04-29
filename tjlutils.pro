@@ -13,21 +13,21 @@ DEFINES += TJLUTILS_LIBRARY
 
 CONFIG += static_and_shared build_all c++14
 
-INCLUDEPATH += systemcommand/include/ \
-               pythoncrypto/include/ \
-               crypto/include/ \
-               templateobjects/include/ \
-               mathutilities/include/ \
-               fileutilities/include/ \
-               generalutilities/include/ \
-               serialport/include/ \
-               eventtimer/include/ \
-               datetime/include/ \
-               prettyprinter/include/ \
-               arduino/include/ \
-               udpserver/include/ \
-               udpclient/include \
-               udpduplex/include \
+INCLUDEPATH += systemcommand/ \
+               pythoncrypto/ \
+               crypto/ \
+               templateobjects/ \
+               mathutilities/ \
+               fileutilities/ \
+               generalutilities/ \
+               serialport/ \
+               eventtimer/ \
+               datetime/ \
+               prettyprinter/ \
+               arduino/ \
+               udpserver/ \
+               udpclient/ \
+               udpduplex/ \
                common/
 
 SOURCES += systemcommand/src/systemcommand.cpp \
@@ -45,23 +45,20 @@ SOURCES += systemcommand/src/systemcommand.cpp \
            udpduplex/src/udpduplex.cpp \
            prettyprinter/src/prettyprinter.cpp
 
-HEADERS += systemcommand/include/systemcommand.h \
-           pythoncrypto/include/pythoncrypto.h \
-           crypto/include/crypto.h \
-           crypto/include/hash.h \
-           mathutilities/include/mathutilities.h \
-           fileutilities/include/fileutilities.h \
-           generalutilities/include/generalutilities.h \
-           datetime/include/datetime.h \
-           serialport/include/serialport.h \
-           eventtimer/include/eventtimer.h \
-           prettyprinter/include/prettyprinter \
-           arduino/include/arduino.h \
-           udpserver/include/udpserver.h \
-           udpclient/include/updclient.h \
-           udpduplex/include/udpduplex.h \
+HEADERS += systemcommand/systemcommand.h \
+           pythoncrypto/pythoncrypto.h \
+           mathutilities/mathutilities.h \
+           fileutilities/fileutilities.h \
+           generalutilities/generalutilities.h \
+           datetime/datetime.h \
+           serialport/serialport.h \
+           eventtimer/eventtimer.h \
+           prettyprinter/prettyprinter \
+           udpserver/udpserver.h \
+           udpclient/updclient.h \
+           udpduplex/udpduplex.h \
            templateobjects/templateobjects.h \
-           common/tjlutils.h            
+           bitset/bitset.h
 
 unix {
     target.path = /usr/lib
