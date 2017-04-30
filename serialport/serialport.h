@@ -48,8 +48,8 @@
 #include <mutex>
 #include <wchar.h>
 
-#include <eventtimer.h>
-#include <tstream.h>
+#include "eventtimer.h"
+#include "tstream.h"
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
     #include <Windows.h>
@@ -240,9 +240,7 @@ private:
     bool m_isListening;
     bool m_shutEmDown;
     std::mutex m_ioMutex;
-    std::deque<std::string> m_stringQueue;
     std::string m_stringBuilderQueue;
-    std::unique_ptr<EventTimer<std::chrono::steady_clock>> m_lastTransmissionTimer;
 
     #if defined(__ANDROID__)
         std::thread *m_asyncFuture;

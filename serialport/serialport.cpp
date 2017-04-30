@@ -153,8 +153,7 @@ SerialPort::SerialPort(SerialPort &&other) :
     m_lineEnding{std::move(other.m_lineEnding)},
     m_timeout{std::move(other.m_timeout)},
     m_retryCount{std::move(other.m_retryCount)},
-    m_isOpen{std::move(other.m_isOpen)},
-    m_lastTransmissionTimer{std::move(other.m_lastTransmissionTimer)}
+    m_isOpen{std::move(other.m_isOpen)}
 {
 
 }
@@ -172,8 +171,7 @@ SerialPort::SerialPort(const std::string &name, BaudRate baudRate, StopBits stop
     m_retryCount{DEFAULT_RETRY_COUNT},
     m_isOpen{false},
     m_isListening{false},
-    m_shutEmDown{false},
-    m_lastTransmissionTimer{new EventTimer<std::chrono::steady_clock>()}
+    m_shutEmDown{false}
 {
     std::pair<int, std::string> truePortNameAndNumber{getPortNameAndNumber(this->m_portName)};
     this->m_portNumber = truePortNameAndNumber.first;
@@ -540,15 +538,15 @@ unsigned char SerialPort::rawRead()
 unsigned char SerialPort::timedRead()
 {
     unsigned char byteRead{0};
-    auto startTime = std::chrono::high_resolution_clock::now();
-    auto endTime = std::chrono::high_resolution_clock::now();
+    SteadyEventTimer eventTimer;
+    eventTimer.start();
     do {
         byteRead = this->rawRead();
         if (byteRead != 0) {
             return byteRead;
         }
-        endTime = std::chrono::high_resolution_clock::now();
-    } while (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() < this->m_timeout);
+        eventTimer.update();
+    } while (eventTimer.totalMilliseconds() < this->m_timeout);
     return 0;
 }
 
@@ -860,13 +858,19 @@ ssize_t SerialPort::writeLine(char chr)
 
 std::string SerialPort::readLine()
 {
-    this->syncStringListener();
-    if (this->m_stringQueue.size() == 0) {
-        return "";
-    }
-    std::string stringToReturn{this->m_stringQueue.front()};
-    this->m_stringQueue.pop_front();
-    return stringToReturn;
+    SteadyEventTimer eventTimer;
+    std::string returnString{""};
+    eventTimer.start();
+    do {
+        this->syncStringListener();
+        if (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
+            returnString = this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding));
+            this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding + this->m_lineEnding.length()));
+            return returnString;
+        }
+        eventTimer.update();
+    } while (eventTimer.totalMilliseconds() < this->m_timeout);
+    return returnString;
 }
 
 std::string SerialPort::readUntil(char readUntil)
@@ -1270,20 +1274,7 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
-            if (!this->m_stringQueue.empty()) {
-                break;
-            }
-            this->m_lastTransmissionTimer->restart();
         } else {
-            if ((this->m_timeout != 0) && (this->m_lastTransmissionTimer->isRunning())) {
-                this->m_lastTransmissionTimer->update();
-                if (this->m_lastTransmissionTimer->totalMilliseconds() >= this->m_timeout) {
-                    this->m_stringQueue.push_back(this->m_stringBuilderQueue);
-                    this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
-                    this->m_lastTransmissionTimer->stop();
-                }
-                this->m_lastTransmissionTimer->stop();
-            }
             break;
         }
     } while (eventTimer.totalMilliseconds() <= this->m_timeout);
@@ -1293,107 +1284,37 @@ void SerialPort::syncStringListener()
 void SerialPort::addToStringBuilderQueue(unsigned char byte)
 {
     if (this->m_stringBuilderQueue.size() >= SINGLE_MESSAGE_BUFFER_MAX) {
-        this->m_stringQueue.push_back(this->m_stringBuilderQueue);
-        this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
-        this->m_lastTransmissionTimer->stop();
-        return;
+        this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(1);
     }
     this->m_stringBuilderQueue += static_cast<char>(byte);
-    if (this->m_stringBuilderQueue.length() == 0) {
-        return;
-    } else if (this->m_stringBuilderQueue.find(this->m_lineEnding) == std::string::npos) {
-        if ((this->m_timeout != 0) && (this->m_lastTransmissionTimer->isRunning())) {
-            this->m_lastTransmissionTimer->update();
-            if (this->m_lastTransmissionTimer->totalMilliseconds() >= this->m_timeout) {
-                this->m_stringQueue.push_back(this->m_stringBuilderQueue);
-                this->m_stringBuilderQueue = this->m_stringBuilderQueue = "";
-                this->m_lastTransmissionTimer->stop();
-            }
-        }
-    } else {
-        while (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
-            this->m_stringQueue.push_back(this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding)));
-            this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + 1);
-        }
-    }
 }
 
 ssize_t SerialPort::available()
 {
     this->syncStringListener();
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_stringQueue.empty()) {
-        if (this->m_stringBuilderQueue.size() == 0) {
-            return 0;
-        } else {
-            return this->m_stringBuilderQueue.length();
-        }
-     } else {
-        return this->m_stringQueue.front().length();
-    }  
+    return this->m_stringBuilderQueue.size();
 }
 
 std::string SerialPort::peek()
 {
     this->syncStringListener();
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_stringQueue.empty()) {
-        if (this->m_stringBuilderQueue.size() == 0) {
-            return "";
-        } else {
-            return this->m_stringBuilderQueue;
-        }
-     } else {
-        return this->m_stringQueue.front();
-    }
+    return "";
 }
 
 char SerialPort::peekByte()
 {
     this->syncStringListener();
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    if (this->m_stringQueue.size() == 0) {
-        if (this->m_stringBuilderQueue.size() == 0) {
-            return 0;
-        } else {
-            return this->m_stringBuilderQueue[0];
-        }
-    } else {
-        if (this->m_stringQueue.front().size() == 0) {
-            if (this->m_stringBuilderQueue.size() == 0) {
-                return 0;
-            } else {
-                return this->m_stringBuilderQueue[0];
-            }
-        } else {
-            return this->m_stringQueue.front()[0];
-        }
-    }
+    return 0;
 }
 
 unsigned char SerialPort::readByte()
 {
-    this->syncStringListener();
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    char charToReturn{0};
-    if (this->m_stringBuilderQueue.size() == 0) {
-        if (this->m_stringQueue.size() == 0) {
-            return 0;
-        } else {
-            if (this->m_stringQueue.front().size() != 0) {
-                std::string tempString{this->m_stringQueue.front()};
-                this->m_stringQueue.pop_front();
-                charToReturn = tempString[0];
-                this->m_stringQueue.push_front(tempString.substr(1));
-            } else {
-                return 0;
-            }
-        }
+    if (this->m_stringBuilderQueue.empty() {
+        return this->rawRead();
     } else {
-        charToReturn = this->m_stringBuilderQueue[0];
+        unsigned char returnChar{static_cast<unsigned char>(this->m_stringBuilderQueue[0]};
         this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(1);
     }
-    return charToReturn;
 }
 
 
@@ -1409,18 +1330,7 @@ void SerialPort::putBack(const char *str)
 
 void SerialPort::putBack(const std::string &str)
 {
-    if (str.length() == 0) {
-        return;
-    }
-    std::lock_guard<std::mutex> ioMutexLock{this->m_ioMutex};
-    std::string newString{""};
-    if (this->m_stringQueue.empty()) {
-        newString = str;
-    } else {
-        newString = str + this->m_stringQueue.front();
-    }
-    this->m_stringQueue.pop_front();
-    this->m_stringQueue.push_front(newString);
+    this->m_stringBuilderQueue = str + this->m_stringBuilderQueue;
 }
 
 BaudRate SerialPort::parseBaudRateFromRaw(const char *baudRate) { return parseBaudRateFromRaw(std::string{baudRate}); }
