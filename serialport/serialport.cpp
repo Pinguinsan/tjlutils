@@ -865,7 +865,7 @@ std::string SerialPort::readLine()
         this->syncStringListener();
         if (this->m_stringBuilderQueue.find(this->m_lineEnding) != std::string::npos) {
             returnString = this->m_stringBuilderQueue.substr(0, this->m_stringBuilderQueue.find(this->m_lineEnding));
-            this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding + this->m_lineEnding.length()));
+            this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(this->m_stringBuilderQueue.find(this->m_lineEnding) + this->m_lineEnding.length());
             return returnString;
         }
         eventTimer.update();
@@ -1309,11 +1309,12 @@ char SerialPort::peekByte()
 
 unsigned char SerialPort::readByte()
 {
-    if (this->m_stringBuilderQueue.empty() {
+    if (this->m_stringBuilderQueue.empty()) {
         return this->rawRead();
     } else {
-        unsigned char returnChar{static_cast<unsigned char>(this->m_stringBuilderQueue[0]};
+        unsigned char returnChar{static_cast<unsigned char>(this->m_stringBuilderQueue.front())};
         this->m_stringBuilderQueue = this->m_stringBuilderQueue.substr(1);
+        return returnChar;
     }
 }
 

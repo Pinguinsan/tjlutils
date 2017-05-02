@@ -42,8 +42,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <generalutilities.h>
-#include <systemcommand.h>
+#include "generalutilities.h"
+#include "systemcommand.h"
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
     #include <direct.h>

@@ -19,13 +19,20 @@
 
 #include "tscriptreader.h"
 
+#include <iostream>
+#include <fstream>
+#include <utility>
+#include <algorithm>
+
+#include "fileutilities.h"
+#include "generalutilities.h"
+
 TScriptReader::TScriptReader(const std::string &scriptFilePath) :
     m_scriptFilePath{scriptFilePath},
     m_commands{std::make_shared<std::vector<TStreamCommand>>()}
 {
     using namespace FileUtilities;
     using namespace GeneralUtilities;
-    using namespace MathUtilities;
     if (!fileExists(this->m_scriptFilePath)) {
         throw std::runtime_error(SCRIPT_FILE_DOES_NOT_EXISTS_STRING + tQuoted(this->m_scriptFilePath));
     }
@@ -93,7 +100,8 @@ TScriptReader::TScriptReader(const std::string &scriptFilePath) :
                     continue;
                 } else {
                     try {
-                        loopCount = tAbs(GeneralUtilities::decStringToInt(targetLoopCount));
+                        int temp{GeneralUtilities::decStringToInt(targetLoopCount)};
+                        loopCount = temp > 0 ? temp : temp*-1;
                         loops++;
                         this->m_commands->emplace_back(TStreamCommandType::LOOP_START, GeneralUtilities::toString(loopCount));
                     } catch (std::exception &e) {

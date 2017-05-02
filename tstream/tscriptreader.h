@@ -21,17 +21,10 @@
 #define TJLUTILS_TSCRIPTREADER_H
 
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <utility>
-#include <vector>
 #include <memory>
-#include <algorithm>
+#include <vector>
 
-#include <fileutilities.h>
-#include <generalutilities.h>
-#include <mathutilities.h>
-#include <tstream.h>
+#include "tstream.h"
 
 class TScriptReader
 {
