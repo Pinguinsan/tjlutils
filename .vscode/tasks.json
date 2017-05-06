@@ -1,0 +1,7 @@
+{
+    "version": "0.1.0",
+    "command": "./tjlutils-install.sh",
+    "isShellCommand": true,
+    "args": [],
+    "showOutput": "always"
+}

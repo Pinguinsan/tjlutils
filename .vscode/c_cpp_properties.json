@@ -1,0 +1,128 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}",
+                "/usr/include",
+                "/usr/local/include"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceRoot}",
+                "/usr/include/c++/6.3.1/x86_64-pc-linux-gnu/32",
+                "/usr/local/include",
+                "/usr/lib/clang/4.0.0/include",
+                "/usr/include",
+                "${workspaceRoot}/datetime",
+                "${workspaceRoot}/eventtimer",
+                "${workspaceRoot}/fileutilities",
+                "${workspaceRoot}/generalutilities",
+                "${workspaceRoot}/mathutilities",
+                "${workspaceRoot}/prettyprinter",
+                "${workspaceRoot}/pythoncrypto",
+                "${workspaceRoot}/serialport",
+                "${workspaceRoot}/stringformat",
+                "${workspaceRoot}/systemcommand",
+                "${workspaceRoot}/tcpclient",
+                "${workspaceRoot}/tcpserver",
+                "${workspaceRoot}/templateobjects",
+                "${workspaceRoot}/tstream",
+                "${workspaceRoot}/udpclient",
+                "${workspaceRoot}/udpserver",
+                "${workspaceRoot}/udpduplex"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "/usr/include/c++/6.3.1/x86_64-pc-linux-gnu/32",
+                    "/usr/local/include",
+                    "/usr/lib/clang/4.0.0/include",
+                    "/usr/include",
+                    "${workspaceRoot}/datetime",
+                    "${workspaceRoot}/eventtimer",
+                    "${workspaceRoot}/fileutilities",
+                    "${workspaceRoot}/generalutilities",
+                    "${workspaceRoot}/mathutilities",
+                    "${workspaceRoot}/prettyprinter",
+                    "${workspaceRoot}/pythoncrypto",
+                    "${workspaceRoot}/serialport",
+                    "${workspaceRoot}/stringformat",
+                    "${workspaceRoot}/systemcommand",
+                    "${workspaceRoot}/tcpclient",
+                    "${workspaceRoot}/tcpserver",
+                    "${workspaceRoot}/templateobjects",
+                    "${workspaceRoot}/tstream",
+                    "${workspaceRoot}/udpclient",
+                    "${workspaceRoot}/udpserver",
+                    "${workspaceRoot}/udpduplex"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceRoot}",
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
+                "${workspaceRoot}/datetime",
+                "${workspaceRoot}/eventtimer",
+                "${workspaceRoot}/fileutilities",
+                "${workspaceRoot}/generalutilities",
+                "${workspaceRoot}/mathutilities",
+                "${workspaceRoot}/prettyprinter",
+                "${workspaceRoot}/pythoncrypto",
+                "${workspaceRoot}/serialport",
+                "${workspaceRoot}/stringformat",
+                "${workspaceRoot}/systemcommand",
+                "${workspaceRoot}/tcpclient",
+                "${workspaceRoot}/tcpserver",
+                "${workspaceRoot}/templateobjects",
+                "${workspaceRoot}/tstream",
+                "${workspaceRoot}/udpclient",
+                "${workspaceRoot}/udpserver",
+                "${workspaceRoot}/udpduplex"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE"
+            ],
+            "browse": {
+                "path": [
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                    "${workspaceRoot}/datetime",
+                    "${workspaceRoot}/eventtimer",
+                    "${workspaceRoot}/fileutilities",
+                    "${workspaceRoot}/generalutilities",
+                    "${workspaceRoot}/mathutilities",
+                    "${workspaceRoot}/prettyprinter",
+                    "${workspaceRoot}/pythoncrypto",
+                    "${workspaceRoot}/serialport",
+                    "${workspaceRoot}/stringformat",
+                    "${workspaceRoot}/systemcommand",
+                    "${workspaceRoot}/tcpclient",
+                    "${workspaceRoot}/tcpserver",
+                    "${workspaceRoot}/templateobjects",
+                    "${workspaceRoot}/tstream",
+                    "${workspaceRoot}/udpclient",
+                    "${workspaceRoot}/udpserver",
+                    "${workspaceRoot}/udpduplex"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ]
+}
