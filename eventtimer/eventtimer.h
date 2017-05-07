@@ -314,7 +314,7 @@ private:
     static const int INVALIDATE_CACHE_TIMEOUT{100};
 
     template <typename T> std::string toStdString(T convert) {
-        return (std::stringstream{} << convert).str();
+        return (dynamic_cast<std::stringstream&>(std::stringstream{} << convert)).str();
     }
     inline std::string toStdString(const std::string &rhs) {
         return rhs;
