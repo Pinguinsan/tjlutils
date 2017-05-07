@@ -30,6 +30,7 @@
 #include <future>
 #include <list>
 #include <functional>
+#include <sstream>
 
 template <typename ClockType = std::chrono::steady_clock>
 class EventTimer
@@ -314,6 +315,12 @@ private:
 
     template <typename T> std::string toStdString(T convert) {
         return (std::stringstream{} << convert).str();
+    }
+    inline std::string toStdString(const std::string &rhs) {
+        return rhs;
+    }
+    inline std::string toStdString(const char *rhs) {
+        return std::string{rhs};
     }
 };
 
