@@ -81,16 +81,17 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
     m_udpServer{nullptr},
     m_udpObjectType{udpObjectType}
 {
-
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
-        this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{serverPortNumber}};
-    }
-
-
     if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
         this->m_udpClient = std::unique_ptr<UDPClient>{new UDPClient{clientHostName, 
                                                                      clientPortNumber,
                                                                      clientReturnAddressPortNumber}};
+    }
+    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+        if (this->m_udpClient != nullptr) {
+            this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{this->m_udpClient->returnAddressPortNumber()}};
+        } else {
+            this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{serverPortNumber}};
+        }
     }
 }
 
@@ -231,7 +232,7 @@ long UDPDuplex::clientTimeout() const
 uint16_t UDPDuplex::serverPortNumber() const
 {
     if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
-        return this->m_udpClient->portNumber();   
+        return this->m_udpServer->portNumber();   
     } else {
         return 0;
     }

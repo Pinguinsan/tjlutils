@@ -20,7 +20,7 @@
 
 //Loopback
 const char *UDPClient::DEFAULT_HOST_NAME{"127.0.0.1"};
-const std::string UDPClient::DEFAULT_LINE_ENDING{"\r"};
+const std::string UDPClient::DEFAULT_LINE_ENDING{"\r\n"};
 
 UDPClient::UDPClient() :
     UDPClient(static_cast<std::string>(UDPClient::DEFAULT_HOST_NAME),
@@ -57,7 +57,7 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber) :
     m_destinationAddress{},
     m_returnAddress{},
-    m_udpSocketIndex{},
+    m_udpSocketIndex{0},
     m_timeout{DEFAULT_TIMEOUT},
     m_lineEnding{DEFAULT_LINE_ENDING}
 {
@@ -139,6 +139,7 @@ bool UDPClient::isOpen() const
 std::string UDPClient::hostName() const
 {
     char lowLevelTempBuffer[INET_ADDRSTRLEN];
+    memset(lowLevelTempBuffer, '\0', INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(this->m_destinationAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
     return std::string{lowLevelTempBuffer};
 }
@@ -156,7 +157,7 @@ unsigned long int UDPClient::timeout() const
 void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber)
 {
     using namespace GeneralUtilities;
-    this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, 0);
+    this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
     if (!this->isValidPortNumber(portNumber)) {
         uint16_t temp{portNumber};
@@ -191,16 +192,18 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->hostName()));
     }
 
-/*
+    /*
     temp = sockaddr_storage{};
     if (resolveAddressHelper (this->returnAddressHostName(), AF_INET, std::to_string(this->returnAddressPortNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->returnAddressHostName()));
     }
-*/
-
-    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
-       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
-    }
+    */
+    //if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_destinationAddress), sizeof(this->m_destinationAddress)) != 0) {
+    //   throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
+    //}
+    //if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
+    //   throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
+    //}
     
 }
 
