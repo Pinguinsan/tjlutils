@@ -41,8 +41,11 @@
 #include <generalutilities.h>
 #include <tstream.h>
 
+class UDPDuplex;
+
 class UDPClient
 {
+    friend class UDPDuplex;
 public:
     UDPClient();
     UDPClient(uint16_t portNumber);
@@ -84,6 +87,7 @@ private:
 
     unsigned int m_timeout;
     int m_udpSocketIndex;
+    int m_returnAddressSocketIndex;
     std::string m_lineEnding;
     
     ssize_t writeByte(char toSend);
