@@ -39,6 +39,8 @@
 #include <eventtimer.h>
 #include <tstream.h>
 
+class UDPDuplex;
+
 #if defined(__ANDROID__)
     using platform_socklen_t = socklen_t;
 #elif defined(_WIN32)
@@ -77,9 +79,9 @@ public:
 
     uint16_t portNumber() const { return ntohs(this->m_socketAddress.sin_port); }
     std::string message() const { return this->m_message; }
-    std::string hostName() const 
-    { 
+    std::string hostName() const  { 
         char lowLevelTempBuffer[INET_ADDRSTRLEN];
+        memset(lowLevelTempBuffer, '\0', INET_ADDRSTRLEN);
         inet_ntop(AF_INET, &(this->m_socketAddress.sin_addr), lowLevelTempBuffer, INET_ADDRSTRLEN);
         return std::string{lowLevelTempBuffer};
     }
@@ -91,6 +93,7 @@ private:
 
 class UDPServer
 {
+friend class UDPDuplex;
 public:
     UDPServer();
     UDPServer(uint16_t port);
@@ -124,7 +127,6 @@ public:
     void putBack(char back);
     void putBack(const UDPDatagram &datagram);
 
-
     void setLineEnding(const std::string &str);
     std::string peek();
     char peekByte();
@@ -155,6 +157,22 @@ private:
 
     void asyncDatagramListener();
     void syncDatagramListener();
+
+    char readByte(int socketNumber);
+    UDPDatagram readDatagram(int socketNumber);
+    std::string readLine(int socketNumber);
+    std::string readUntil(int socketNumber, const std::string &until);
+    std::string readUntil(int socketNumber, const char *until);
+    std::string readUntil(int socketNumber, char until);
+    ssize_t available(int socketNumber);
+    
+    std::string peek(int socketNumber);
+    char peekByte(int socketNumber);
+    UDPDatagram peekDatagram(int socketNumber);
+    void asyncDatagramListener(int socketNumber);
+    void syncDatagramListener(int socketNumber);
+
+    void startListening(int socketNumber);
 
     static const uint16_t BROADCAST;
     static const constexpr size_t RECEIVED_BUFFER_MAX{65535};
