@@ -201,9 +201,9 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
     //if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_destinationAddress), sizeof(this->m_destinationAddress)) != 0) {
     //   throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
     //}
-    //if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
-    //   throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
-    //}
+    if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
+       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?");
+    }
     
 }
 
