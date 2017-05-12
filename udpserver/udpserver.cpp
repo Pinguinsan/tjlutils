@@ -243,6 +243,36 @@ void UDPServer::syncDatagramListener()
     }
 }
 
+void UDPServer::asyncDatagramListener()
+{
+    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
+    do {
+        char lowLevelReceiveBuffer[UDPServer::RECEIVED_BUFFER_MAX];
+        memset(lowLevelReceiveBuffer, 0, UDPServer::RECEIVED_BUFFER_MAX);
+        std::string receivedString{""};
+        sockaddr_in receivedAddress{};
+        platform_socklen_t socketSize{sizeof(sockaddr)};
+        ssize_t returnValue {recvfrom(this->m_socketAddress,
+                            lowLevelReceiveBuffer,
+                            sizeof(lowLevelReceiveBuffer)-1,
+                            MSG_DONTWAIT,
+                            reinterpret_cast<sockaddr *>(&receivedAddress),
+                            &socketSize)};
+        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
+            //No data;
+        } else {
+            receivedString = std::string{lowLevelReceiveBuffer};
+            if (receivedString.length() > 0) {
+                ioMutexLock.lock();
+                this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
+                ioMutexLock.unlock();
+
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    } while (!this->m_shutEmDown);
+}
+
 void UDPServer::setLineEnding(const std::string &lineEnding)
 {
     this->m_lineEnding = lineEnding;
@@ -473,6 +503,11 @@ char UDPServer::peekByte(int socketNumber)
     }
 }
 
+ssize_t UDPServer::available() 
+{
+    this->syncDatagramListener();
+    return this->m_datagramQueue.size();
+}
 
 ssize_t UDPServer::available(int socketNumber) 
 {
