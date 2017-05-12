@@ -347,8 +347,10 @@ char UDPDuplex::readByte()
 std::string UDPDuplex::readLine()
 {
     if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+        std::cout << "readLine() vanilla" << std::endl;
         return this->m_udpServer->readLine();
     } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+        std::cout << "readLine(int)" << std::endl;
         return this->m_udpServer->readLine(this->m_udpClient->returnAddressPortNumber());
     } else {
         return "";
