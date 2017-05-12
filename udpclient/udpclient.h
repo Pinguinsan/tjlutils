@@ -87,7 +87,6 @@ private:
 
     unsigned int m_timeout;
     int m_udpSocketIndex;
-    int m_returnAddressSocketIndex;
     std::string m_lineEnding;
     
     ssize_t writeByte(char toSend);
