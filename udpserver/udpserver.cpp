@@ -252,7 +252,7 @@ void UDPServer::asyncDatagramListener()
         std::string receivedString{""};
         sockaddr_in receivedAddress{};
         platform_socklen_t socketSize{sizeof(sockaddr)};
-        ssize_t returnValue {recvfrom(this->m_socketAddress,
+        ssize_t returnValue {recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
                             MSG_DONTWAIT,
