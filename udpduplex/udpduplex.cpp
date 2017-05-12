@@ -353,6 +353,7 @@ std::string UDPDuplex::readLine()
         std::cout << "readLine(int)" << std::endl;
         return this->m_udpServer->readLine(this->m_udpClient->returnAddressPortNumber());
     } else {
+        std::cout << "readLine() empty" << std::endl;
         return "";
     }
 }
