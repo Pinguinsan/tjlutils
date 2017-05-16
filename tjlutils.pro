@@ -28,6 +28,9 @@ INCLUDEPATH += systemcommand/ \
                udpserver/ \
                udpclient/ \
                udpduplex/ \
+               tcpserver/ \
+               tcpclient/ \
+               tcpduplex/ \
                tstream/
 
 SOURCES += systemcommand/systemcommand.cpp \
@@ -40,6 +43,9 @@ SOURCES += systemcommand/systemcommand.cpp \
            udpserver/udpserver.cpp \
            udpclient/udpclient.cpp \
            udpduplex/udpduplex.cpp \
+           tcpserver/udpserver.cpp \
+           tcpclient/udpclient.cpp \
+           tcpduplex/udpduplex.cpp \
            prettyprinter/prettyprinter.cpp \
            tstream/tstream.cpp \
            tstream/tscriptreader.cpp \
@@ -57,6 +63,9 @@ HEADERS += systemcommand/systemcommand.h \
            udpserver/udpserver.h \
            udpclient/updclient.h \
            udpduplex/udpduplex.h \
+           tcpserver/udpserver.h \
+           tcpclient/updclient.h \
+           tcpduplex/udpduplex.h \
            templateobjects/templateobjects.h \
            bitset/bitset.h \
            tstream/tstream.h \

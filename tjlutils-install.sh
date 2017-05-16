@@ -227,6 +227,9 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/serialport.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/eventtimer.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/prettyprinter.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tcpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tcpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/tcpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
@@ -283,6 +286,9 @@ else
     suLinkFile "$sourceDir/udpserver/udpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpclient/udpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/udpduplex/udpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tcpserver/tcpserver.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tcpclient/tcpclient.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
+    suLinkFile "$sourceDir/tcpduplex/tcpduplex.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/stringformat/stringformat.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/tstream.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/tstream/tscriptexecutor.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
