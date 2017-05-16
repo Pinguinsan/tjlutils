@@ -131,7 +131,7 @@ void UDPServer::initialize(uint16_t portNumber)
 
     this->m_setSocketResult = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (this->m_setSocketResult == -1) {
-       throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
+       throw std::runtime_error("ERROR: UDPClient could not set socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?)");
     }
 
     setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_SNDBUF, &UDPServer::BROADCAST, sizeof(UDPServer::BROADCAST));
@@ -141,7 +141,7 @@ void UDPServer::initialize(uint16_t portNumber)
     this->m_socketAddress.sin_port = htons(portNumber);
 
     if (bind(this->m_setSocketResult, reinterpret_cast<sockaddr *>(&this->m_socketAddress), sizeof(sockaddr)) == -1) {
-       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?");
+       throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?)");
     }
 }
 
@@ -151,16 +151,25 @@ void UDPServer::startListening(int socketNumber)
         this->m_isListening = true;
 #if defined(__ANDROID__)
         if (this->m_asyncFuture) {
+            this->m_asyncFuture.join();
             delete this->m_asyncFuture;
         }
-        this->m_asyncFuture = new std::thread{&UDPServer::asyncDatagramListener,
-                                                          this,
-                                                          socketNumber};
+        this->m_asyncFuture = new std::thread{&static_cast<void (UDPServer::*)(int)>(&UDPServer::asyncDatagramListener),
+                                              this,
+                                              socketNumber};
 #else
-        this->m_asyncFuture = std::async(std::launch::async,
-                                         static_cast<void (UDPServer::*)(int)>(&UDPServer::asyncDatagramListener),
-                                         this,
-                                         socketNumber);
+    try {
+        do {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        } while (this->m_asyncFuture.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready);
+        //this->m_asyncFuture.reset();
+    } catch (std::exception &e) {
+        
+    }
+    this->m_asyncFuture = std::async(std::launch::async,
+                                    static_cast<void (UDPServer::*)(int)>(&UDPServer::asyncDatagramListener),
+                                    this,
+                                    socketNumber);
 #endif
     }
 }
@@ -171,13 +180,23 @@ void UDPServer::startListening()
         this->m_isListening = true;
 #if defined(__ANDROID__)
         if (this->m_asyncFuture) {
+            this->m_asyncFuture.join();
             delete this->m_asyncFuture;
         }
-        this->m_asyncFuture = new std::thread{&UDPServer::asyncDatagramListener, this};
+        this->m_asyncFuture = new std::thread{&static_cast<void (UDPServer::*)()>(&UDPServer::asyncDatagramListener),
+                                              this};
 #else
-        this->m_asyncFuture = std::async(std::launch::async,
-                                         static_cast<void (UDPServer::*)()>(&UDPServer::asyncDatagramListener),
-                                         this);
+    try {
+        do {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        } while (this->m_asyncFuture.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready);
+        //this->m_asyncFuture.reset();
+    } catch (std::exception &e) {
+        
+    }
+    this->m_asyncFuture = std::async(std::launch::async,
+                                    static_cast<void (UDPServer::*)()>(&UDPServer::asyncDatagramListener),
+                                    this);
 #endif
     }
 }
@@ -186,12 +205,58 @@ void UDPServer::stopListening()
 {
     this->m_shutEmDown = true;
     this->m_isListening = false;
+#if defined(__ANDROID__)
+    if (this->m_asyncFuture) {
+        this->m_asyncFuture->join();
+        delete this->m_asyncFuture;
+    }
+#else
+    try {
+        do {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        } while (this->m_asyncFuture.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready);
+        //this->m_asyncFuture.reset();
+    } catch (std::exception &e) {
+
+    }
+
+#endif
 }
 
 bool UDPServer::isListening() const
 {
     return this->m_isListening;
 }
+
+void UDPServer::asyncDatagramListener()
+{
+    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
+    do {
+        char lowLevelReceiveBuffer[UDPServer::RECEIVED_BUFFER_MAX];
+        memset(lowLevelReceiveBuffer, 0, UDPServer::RECEIVED_BUFFER_MAX);
+        std::string receivedString{""};
+        sockaddr_in receivedAddress{};
+        platform_socklen_t socketSize{sizeof(sockaddr)};
+        ssize_t returnValue {recvfrom(this->m_setSocketResult,
+                            lowLevelReceiveBuffer,
+                            sizeof(lowLevelReceiveBuffer)-1,
+                            0,
+                            reinterpret_cast<sockaddr *>(&receivedAddress),
+                            &socketSize)};
+        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
+            //No data;
+        } else {
+            receivedString = std::string{lowLevelReceiveBuffer};
+            if (receivedString.length() > 0) {
+                ioMutexLock.lock();
+                this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
+                ioMutexLock.unlock();
+
+            }
+        }
+    } while (!this->m_shutEmDown);
+}
+
 
 void UDPServer::asyncDatagramListener(int socketNumber)
 {
@@ -219,7 +284,6 @@ void UDPServer::asyncDatagramListener(int socketNumber)
 
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
     } while (!this->m_shutEmDown);
 }
 
@@ -271,36 +335,6 @@ void UDPServer::syncDatagramListener()
         this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
         ioMutexLock.unlock();
     }
-}
-
-void UDPServer::asyncDatagramListener()
-{
-    std::unique_lock<std::mutex> ioMutexLock{this->m_ioMutex, std::defer_lock};
-    do {
-        char lowLevelReceiveBuffer[UDPServer::RECEIVED_BUFFER_MAX];
-        memset(lowLevelReceiveBuffer, 0, UDPServer::RECEIVED_BUFFER_MAX);
-        std::string receivedString{""};
-        sockaddr_in receivedAddress{};
-        platform_socklen_t socketSize{sizeof(sockaddr)};
-        ssize_t returnValue {recvfrom(this->m_setSocketResult,
-                            lowLevelReceiveBuffer,
-                            sizeof(lowLevelReceiveBuffer)-1,
-                            0,
-                            reinterpret_cast<sockaddr *>(&receivedAddress),
-                            &socketSize)};
-        if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
-            //No data;
-        } else {
-            receivedString = std::string{lowLevelReceiveBuffer};
-            if (receivedString.length() > 0) {
-                ioMutexLock.lock();
-                this->m_datagramQueue.emplace_back(receivedAddress, receivedString);
-                ioMutexLock.unlock();
-
-            }
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-    } while (!this->m_shutEmDown);
 }
 
 void UDPServer::setLineEnding(const std::string &lineEnding)
@@ -593,5 +627,6 @@ std::string UDPServer::readLine(int socketNumber)
 
 UDPServer::~UDPServer()
 {
+    this->stopListening();
     shutdown(this->m_setSocketResult, SHUT_RDWR);
 }
