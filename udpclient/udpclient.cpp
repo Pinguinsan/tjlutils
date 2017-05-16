@@ -283,3 +283,9 @@ std::shared_ptr<UDPClient> UDPClient::doUserSelectUDPClient()
                                                                      returnAddressPortNumber)};
     return udpClient;
 }
+
+UDPClient::~UDPClient()
+{
+    shutdown(this->m_udpSocketIndex, SHUT_RDWR);
+}
+

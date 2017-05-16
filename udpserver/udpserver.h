@@ -97,6 +97,7 @@ friend class UDPDuplex;
 public:
     UDPServer();
     UDPServer(uint16_t port);
+    ~UDPServer();
 
     char readByte();
     UDPDatagram readDatagram();
@@ -171,6 +172,7 @@ private:
     UDPDatagram peekDatagram(int socketNumber);
     void asyncDatagramListener(int socketNumber);
     void syncDatagramListener(int socketNumber);
+    void setTimeout(int socketNumber, long timeout);
 
     void startListening(int socketNumber);
 

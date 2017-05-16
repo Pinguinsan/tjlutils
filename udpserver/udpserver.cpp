@@ -57,7 +57,37 @@ void UDPServer::setPortNumber(uint16_t portNumber)
 
 void UDPServer::setTimeout(long timeout)
 {
-    this->m_timeout = timeout;
+    long tempTimeout{this->m_timeout};
+    if (timeout < 0) {
+        this->m_timeout = 0;
+    } else {
+        this->m_timeout = timeout;
+    }
+    struct timeval tv{};
+    tv.tv_sec = 0;
+    tv.tv_usec = this->m_timeout * 3;
+    if (setsockopt(this->m_setSocketResult, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        this->m_timeout = tempTimeout;
+        throw std::runtime_error("In UDPServer::setTimeout(long): An error occurred while attempting to set the socket timeout");
+    }
+}
+
+
+void UDPServer::setTimeout(int socketIndex, long timeout)
+{
+    long tempTimeout{this->m_timeout};
+    if (timeout < 0) {
+        this->m_timeout = 0;
+    } else {
+        this->m_timeout = timeout;
+    }
+    struct timeval tv{};
+    tv.tv_sec = 0;
+    tv.tv_usec = this->m_timeout * 3;
+    if (setsockopt(socketIndex, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        this->m_timeout = tempTimeout;
+        throw std::runtime_error("In UDPServer::setTimeout(int, long): An error occurred while attempting to set the socket timeout");
+    }
 }
 
 long UDPServer::timeout() const
@@ -175,7 +205,7 @@ void UDPServer::asyncDatagramListener(int socketNumber)
         ssize_t returnValue {recvfrom(socketNumber,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
-                            MSG_DONTWAIT,
+                            0,
                             reinterpret_cast<sockaddr *>(&receivedAddress),
                             &socketSize)};
         if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
@@ -204,7 +234,7 @@ void UDPServer::syncDatagramListener(int socketNumber)
     ssize_t returnValue{recvfrom(socketNumber,
                         lowLevelReceiveBuffer,
                         sizeof(lowLevelReceiveBuffer)-1,
-                        MSG_DONTWAIT,
+                        0,
                         reinterpret_cast<sockaddr *>(&receivedAddress),
                         &socketSize)};
     if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
@@ -229,7 +259,7 @@ void UDPServer::syncDatagramListener()
     ssize_t returnValue{recvfrom(this->m_setSocketResult,
                         lowLevelReceiveBuffer,
                         sizeof(lowLevelReceiveBuffer)-1,
-                        MSG_DONTWAIT,
+                        0,
                         reinterpret_cast<sockaddr *>(&receivedAddress),
                         &socketSize)};
     if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
@@ -255,7 +285,7 @@ void UDPServer::asyncDatagramListener()
         ssize_t returnValue {recvfrom(this->m_setSocketResult,
                             lowLevelReceiveBuffer,
                             sizeof(lowLevelReceiveBuffer)-1,
-                            MSG_DONTWAIT,
+                            0,
                             reinterpret_cast<sockaddr *>(&receivedAddress),
                             &socketSize)};
         if ((returnValue == EAGAIN) || (returnValue == EWOULDBLOCK) || (returnValue == -1)) {
@@ -559,4 +589,9 @@ std::string UDPServer::readLine(int socketNumber)
     std::string stringToReturn{this->m_datagramQueue.front().message()};
     this->m_datagramQueue.pop_front();
     return stringToReturn;
+}
+
+UDPServer::~UDPServer()
+{
+    shutdown(this->m_setSocketResult, SHUT_RDWR);
 }

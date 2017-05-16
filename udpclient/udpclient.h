@@ -52,6 +52,7 @@ public:
     UDPClient(const std::string &hostName);
     UDPClient(const std::string &hostName, uint16_t portNumber);
     UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t clientReturnAddressPortNumber);
+    ~UDPClient();
 
     ssize_t writeLine(const char *str);
     ssize_t writeLine(const std::string &str);

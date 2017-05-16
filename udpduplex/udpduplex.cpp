@@ -93,6 +93,7 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
             this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{serverPortNumber}};
         }
     }
+    this->setServerTimeout(UDPDuplex::DEFAULT_SERVER_TIMEOUT);
 }
 
 std::string UDPDuplex::lineEnding() const
@@ -256,8 +257,10 @@ void UDPDuplex::setServerPortNumber(uint16_t portNumber)
 
 void UDPDuplex::setServerTimeout(long timeout)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
-        this->m_udpServer->setTimeout(timeout);
+    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+        this->m_udpServer->setTimeout(timeout); 
+    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+        this->m_udpServer->setTimeout(this->m_udpClient->m_udpSocketIndex, timeout);
     }
 }
 
