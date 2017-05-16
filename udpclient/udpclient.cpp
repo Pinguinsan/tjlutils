@@ -191,9 +191,7 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
     if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->portNumber()), temp.get()) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
     } else {
-        struct sockaddr_in *tempCopy{reinterpret_cast<sockaddr_in *>(temp.get())};
-        char *ip{inet_ntoa(tempCopy->sin_addr)};
-        inet_pton(AF_INET, ip, &(this->m_destinationAddress.sin_addr));
+        inet_pton(AF_INET, inet_ntoa(reinterpret_cast<sockaddr_in *>(temp.get())->sin_addr), &(this->m_destinationAddress.sin_addr));
     }
 
     if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
