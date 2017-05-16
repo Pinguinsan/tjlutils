@@ -28,22 +28,22 @@ INCLUDEPATH += systemcommand/ \
                udpserver/ \
                udpclient/ \
                udpduplex/ \
-               common/
+               tstream/
 
-SOURCES += systemcommand/src/systemcommand.cpp \
-           pythoncrypto/src/pythoncrypto.cpp \
-           crypto/src/crypto.cpp \
-           generalutilities/src/generalutilities.cpp \
-           fileutilities/src/fileutilities.cpp \
-           mathutilities/src/mathutilities.cpp \
-           datetime/src/datetime.cpp \
-           serialport/src/serialport.cpp \
-           eventtimer/src/eventtimer.cpp \
-           arduino/src/arduino.cpp \
-           udpserver/src/udpserver.cpp \
-           udpclient/src/udpclient.cpp \
-           udpduplex/src/udpduplex.cpp \
-           prettyprinter/src/prettyprinter.cpp
+SOURCES += systemcommand/systemcommand.cpp \
+           pythoncrypto/pythoncrypto.cpp \
+           generalutilities/generalutilities.cpp \
+           fileutilities/fileutilities.cpp \
+           mathutilities/mathutilities.cpp \
+           datetime/datetime.cpp \
+           serialport/serialport.cpp \
+           udpserver/udpserver.cpp \
+           udpclient/udpclient.cpp \
+           udpduplex/udpduplex.cpp \
+           prettyprinter/prettyprinter.cpp \
+           tstream/tstream.cpp \
+           tstream/tscriptreader.cpp \
+           tstream/tscriptexecutor.cpp
 
 HEADERS += systemcommand/systemcommand.h \
            pythoncrypto/pythoncrypto.h \
@@ -58,7 +58,10 @@ HEADERS += systemcommand/systemcommand.h \
            udpclient/updclient.h \
            udpduplex/udpduplex.h \
            templateobjects/templateobjects.h \
-           bitset/bitset.h
+           bitset/bitset.h \
+           tstream/tstream.h \
+           tstream/tscriptreader.h \
+           tstream/tscriptexecutor.h
 
 unix {
     target.path = /usr/lib
