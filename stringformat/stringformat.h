@@ -31,7 +31,7 @@
 #include <utility>
 #include <tuple>
 
-#
+
 /*snprintf style*/
 template<typename ... Args>
 std::string PStringFormat(const char *format, Args& ... args)

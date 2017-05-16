@@ -181,16 +181,19 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
 
     this->m_destinationAddress.sin_family = AF_INET;
     this->m_destinationAddress.sin_port = htons(portNumber);
-    inet_pton(AF_INET, hostName.c_str(), &(this->m_destinationAddress.sin_addr));
     
     this->m_returnAddress.sin_family = AF_INET;
     this->m_returnAddress.sin_port = htons(returnAddressPortNumber);
     //This cannot be set with UDP sockets:
     //inet_pton(AF_INET, returnAddressHostName.c_str(), &(this->m_returnAddress.sin_addr));
     
-    sockaddr_storage temp{};
-    if (resolveAddressHelper (this->hostName(), AF_INET, std::to_string(this->portNumber()), &temp) != 0) {
-       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(this->hostName()));
+    std::unique_ptr<sockaddr_storage> temp{std::unique_ptr<sockaddr_storage>{new sockaddr_storage{}}};
+    if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->portNumber()), temp.get()) != 0) {
+       throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
+    } else {
+        struct sockaddr_in *tempCopy{reinterpret_cast<sockaddr_in *>(temp.get())};
+        char *ip{inet_ntoa(tempCopy->sin_addr)};
+        inet_pton(AF_INET, ip, &(this->m_destinationAddress.sin_addr));
     }
 
     if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
