@@ -1274,6 +1274,7 @@ void SerialPort::syncStringListener()
             ioMutexLock.lock();
             addToStringBuilderQueue(byteRead);
             ioMutexLock.unlock();
+            return;
         } else {
             break;
         }
