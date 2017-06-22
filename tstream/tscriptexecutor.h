@@ -28,9 +28,9 @@
 #include <cstdlib>
 #include <utility>
 
-#include <generalutilities.h>
-#include <tstream.h>
-#include <tscriptreader.h>
+#include "generalutilities.h"
+#include "tstream.h"
+#include "tscriptreader.h"
 
 class TScriptExecutor
 {

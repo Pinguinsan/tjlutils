@@ -24,7 +24,7 @@ const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
 const Parity SerialPort::DEFAULT_PARITY{Parity::NONE};
 const BaudRate SerialPort::DEFAULT_BAUD_RATE{BaudRate::BAUD115200};
-const std::string SerialPort::DEFAULT_LINE_ENDING{"\r"};
+const std::string SerialPort::DEFAULT_LINE_ENDING{"\r\n"};
 const long SerialPort::DEFAULT_TIMEOUT{100};
 const long SerialPort::DEFAULT_RETRY_COUNT{0};
 const std::string SerialPort::DEFAULT_DATA_BITS_STRING{"8"};
@@ -950,14 +950,7 @@ void SerialPort::setLineEnding(const std::string &lineEnding)
 
 bool SerialPort::isWhitespace(const std::string &stringToCheck)
 {
-    for (std::string::const_iterator iter = stringToCheck.begin(); iter != stringToCheck.end(); iter++) {
-        if (static_cast<unsigned>(*iter) > ASCII_WHITESPACE_MAXIMUM_VALUE) {
-            return false;
-        } else if (((*iter) != '\r') || ((*iter) != '\n')) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(stringToCheck.begin(), stringToCheck.end(), [](char c) { return c == ' '; });
 }
 
 bool SerialPort::isWhitespace(char charToCheck)
