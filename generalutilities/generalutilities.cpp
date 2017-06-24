@@ -18,6 +18,16 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
+#include <random>
+#include <cstdlib>
+#include <memory>
+#include <chrono>
+#include <map>
+#include <thread>
+#include <unordered_map>
+#include <iterator>
+#include <typeinfo>
+
 #include "generalutilities.h"
 
 namespace GeneralUtilities

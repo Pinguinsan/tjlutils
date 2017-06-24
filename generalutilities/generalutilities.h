@@ -38,18 +38,9 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <random>
-#include <cstdlib>
-#include <memory>
-#include <chrono>
-#include <map>
-#include <thread>
 #include <algorithm>
-#include <unordered_map>
 #include <exception>
-#include <iterator>
 #include <functional>
-#include <typeinfo>
 #include <list>
 
 #if defined(__ANDROID__)
@@ -676,7 +667,7 @@ namespace std {
                 }
                 int userEntry{0};
                 try {
-                    userEntry = GeneralUtilities::decStringToInt(userOption);
+                    userEntry = std::stoi(userOption);
                     if (userEntry < lowLimit) {
                         std::cout << tQuoted(userEntry) << " is less than the minimum value for " <<
                         name << " (" << name << " < " << lowLimit << std::endl << std::endl;
@@ -762,7 +753,7 @@ namespace std {
                 unsigned int userOptionIndex{0};
                 bool userSelectedQuit{false};
                 try {
-                    userOptionIndex = GeneralUtilities::decStringToInt(userOption);
+                    userOptionIndex = std::stoi(userOption);
                     if (userOptionIndex > availableOptions.size() + 1) {
                         std::cout << tQuoted(userOption) <<
                         " wasn't one of the selections, please a number between (inclusive) 1 and " <<

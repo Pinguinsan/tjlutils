@@ -135,7 +135,6 @@ void UDPServer::flushTX()
 
 void UDPServer::initialize(uint16_t portNumber)
 {
-    using namespace GeneralUtilities;
     if (!this->isValidPortNumber(portNumber)) {
         portNumber = UDPServer::DEFAULT_PORT_NUMBER;
         throw std::runtime_error("ERROR: Invalid port set for UDPServer, must be between 1 and " +
@@ -515,7 +514,7 @@ void UDPServer::putBack(const std::string &str)
 
 uint16_t UDPServer::doUserSelectPortNumber()
 {
-    return GeneralUtilities::doUserEnterNumericParameter("Server Port Number",
+    return doUserEnterNumericParameter("Server Port Number",
                                                          static_cast<std::function<bool(uint16_t)>>(UDPServer::isValidPortNumber),
                                                          std::numeric_limits<uint16_t>::min()+1,
                                                          std::numeric_limits<uint16_t>::max());
@@ -743,7 +742,6 @@ void UDPClient::setTimeout(unsigned long int timeout)
 
 void UDPClient::setHostName(const std::string &hostName)
 {
-    using namespace GeneralUtilities;
     sockaddr_storage temp{};
     if (resolveAddressHelper (hostName, AF_INET, std::to_string(this->portNumber()), &temp) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not resolve adress " + tQuoted(hostName));
@@ -786,7 +784,6 @@ unsigned long int UDPClient::timeout() const
 
 void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber)
 {
-    using namespace GeneralUtilities;
     this->m_udpSocketIndex = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 
@@ -857,7 +854,6 @@ ssize_t UDPClient::writeLine(const char *str)
 
 ssize_t UDPClient::writeLine(const std::string &str)
 {
-    using namespace GeneralUtilities;
     std::string copyString{str};
     if (!endsWith(copyString, this->m_lineEnding)) {
         copyString += this->m_lineEnding;
@@ -884,13 +880,13 @@ bool constexpr UDPClient::isValidPortNumber(int portNumber)
 
 std::string UDPClient::doUserSelectHostName()
 {
-    return GeneralUtilities::doUserEnterStringParameter("Client Host Name", [](std::string str) -> bool { return true; });
+    return doUserEnterStringParameter("Client Host Name", [](std::string str) -> bool { return true; });
                                                         //TODO: Add validation for host name
 } 
 
 uint16_t UDPClient::doUserSelectPortNumber()
 {
-    return GeneralUtilities::doUserEnterNumericParameter("Client Port Number",
+    return doUserEnterNumericParameter("Client Port Number",
                                                          static_cast<std::function<bool(uint16_t)>>(UDPClient::isValidPortNumber),
                                                          std::numeric_limits<uint16_t>::min()+1,
                                                          std::numeric_limits<uint16_t>::max());
@@ -898,7 +894,7 @@ uint16_t UDPClient::doUserSelectPortNumber()
 
 uint16_t UDPClient::doUserSelectReturnAddressPortNumber()
 {
-    return GeneralUtilities::doUserEnterNumericParameter("Client Return Address Port Number",
+    return doUserEnterNumericParameter("Client Return Address Port Number",
                                                          static_cast<std::function<bool(uint16_t)>>(UDPClient::isValidPortNumber),
                                                          std::numeric_limits<uint16_t>::min()+1,
                                                          std::numeric_limits<uint16_t>::max());
@@ -983,12 +979,12 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
     m_udpServer{nullptr},
     m_udpObjectType{udpObjectType}
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpClient = std::unique_ptr<UDPClient>{new UDPClient{clientHostName, 
                                                                      clientPortNumber,
                                                                      clientReturnAddressPortNumber}};
     }
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         if (this->m_udpClient != nullptr) {
             this->m_udpServer = std::unique_ptr<UDPServer>{new UDPServer{}};
         } else {
@@ -1000,9 +996,9 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
 
 std::string UDPDuplex::lineEnding() const
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->lineEnding();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         return this->m_udpClient->lineEnding();
     } else {
         return this->m_udpServer->lineEnding() + " " + this->m_udpClient->lineEnding();
@@ -1011,9 +1007,9 @@ std::string UDPDuplex::lineEnding() const
 
 void UDPDuplex::setLineEnding(const std::string &lineEnding)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    if (this->m_udpObjectType == UDPObjectType::Client) {
         this->m_udpClient->setLineEnding(lineEnding);
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    } else if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->setLineEnding(lineEnding);
     } else {
         this->m_udpClient->setLineEnding(lineEnding);
@@ -1023,9 +1019,9 @@ void UDPDuplex::setLineEnding(const std::string &lineEnding)
 
 void UDPDuplex::openPort()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->openPort();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         this->m_udpClient->openPort();
     } else {
         this->m_udpServer->openPort();
@@ -1035,9 +1031,9 @@ void UDPDuplex::openPort()
 
 void UDPDuplex::closePort()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->closePort();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         this->m_udpClient->closePort();
     } else {
         this->m_udpServer->closePort();
@@ -1047,9 +1043,9 @@ void UDPDuplex::closePort()
 
 bool UDPDuplex::isOpen() const
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->isOpen();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         return this->m_udpClient->isOpen();
     } else {
         return ((this->m_udpClient->isOpen()) && (this->m_udpServer->isOpen()));
@@ -1058,37 +1054,37 @@ bool UDPDuplex::isOpen() const
 
 void UDPDuplex::setClientPortNumber(uint16_t portNumber)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
        this->m_udpClient->setPortNumber(portNumber);
     }
 }
 
 void UDPDuplex::setClientHostName(const std::string &hostName)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpClient->setHostName(hostName);
     }
 }
 
 void UDPDuplex::setClientReturnAddressPortNumber(uint16_t portNumber)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
        this->m_udpClient->setReturnAddressPortNumber(portNumber);
     }
 }
 
 void UDPDuplex::setClientTimeout(long timeout)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpClient->setTimeout(timeout);   
     }
 }
 
 void UDPDuplex::setTimeout(long timeout)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->setTimeout(timeout);
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         this->m_udpClient->setTimeout(timeout);
     } else {
         this->m_udpClient->setTimeout(timeout);
@@ -1098,7 +1094,7 @@ void UDPDuplex::setTimeout(long timeout)
 
 uint16_t UDPDuplex::clientPortNumber() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->portNumber();
     } else {
         return 0;
@@ -1107,7 +1103,7 @@ uint16_t UDPDuplex::clientPortNumber() const
 
 std::string UDPDuplex::clientHostName() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->hostName();
     } else {
         return "";
@@ -1116,7 +1112,7 @@ std::string UDPDuplex::clientHostName() const
     
 uint16_t UDPDuplex::clientReturnAddressPortNumber() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->m_udpSocketIndex;
     } else {
         return 0;
@@ -1125,7 +1121,7 @@ uint16_t UDPDuplex::clientReturnAddressPortNumber() const
 
 long UDPDuplex::clientTimeout() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->timeout();
     } else {
         return 0;
@@ -1134,7 +1130,7 @@ long UDPDuplex::clientTimeout() const
 
 uint16_t UDPDuplex::serverPortNumber() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->portNumber();   
     } else {
         return 0;
@@ -1143,7 +1139,7 @@ uint16_t UDPDuplex::serverPortNumber() const
 
 long UDPDuplex::serverTimeout() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->timeout();
     } else {
         return 0;
@@ -1152,25 +1148,25 @@ long UDPDuplex::serverTimeout() const
 
 void UDPDuplex::setServerPortNumber(uint16_t portNumber)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpServer->setPortNumber(portNumber);
     }
 }
 
 void UDPDuplex::setServerTimeout(long timeout)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->setTimeout(timeout); 
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         this->m_udpServer->setTimeout(this->m_udpClient->m_udpSocketIndex, timeout);
     }
 }
 
 long UDPDuplex::timeout() const
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->timeout();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (this->m_udpObjectType == UDPObjectType::Client) {
         return this->m_udpClient->timeout();
     } else {
         return (this->m_udpClient->timeout() > this->m_udpServer->timeout() 
@@ -1181,7 +1177,7 @@ long UDPDuplex::timeout() const
 
 std::string UDPDuplex::portName() const
 {   
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->hostName();
     } else {
         return "server - no port name";
@@ -1190,28 +1186,28 @@ std::string UDPDuplex::portName() const
 
 void UDPDuplex::flushRXTX()
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpServer->flushRXTX();
     }
 } 
 
 void UDPDuplex::flushRX()
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpServer->flushRX();
     }
 }
 
 void UDPDuplex::flushTX()
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         this->m_udpServer->flushTX();
     }
 }  
 
 ssize_t UDPDuplex::writeLine(const char *str)
 { 
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->writeLine(str); 
     } else {
         return 0;
@@ -1220,7 +1216,7 @@ ssize_t UDPDuplex::writeLine(const char *str)
 
 ssize_t UDPDuplex::writeLine(const std::string &str)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_CLIENT) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpClient->writeLine(str);
     } else {
         return 0;
@@ -1229,9 +1225,9 @@ ssize_t UDPDuplex::writeLine(const std::string &str)
 
 UDPDatagram UDPDuplex::readDatagram()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readDatagram();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readDatagram(this->m_udpClient->m_udpSocketIndex);
     } else {
         return UDPDatagram{};
@@ -1240,9 +1236,9 @@ UDPDatagram UDPDuplex::readDatagram()
 
 char UDPDuplex::readByte()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readByte();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readByte(this->m_udpClient->m_udpSocketIndex);
     } else {
         return 0;
@@ -1251,9 +1247,9 @@ char UDPDuplex::readByte()
 
 std::string UDPDuplex::readLine()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readLine();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readLine(this->m_udpClient->m_udpSocketIndex);
     } else {
         return "";
@@ -1262,9 +1258,9 @@ std::string UDPDuplex::readLine()
 
 std::string UDPDuplex::readUntil(const std::string &str)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readUntil(str);
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readUntil(this->m_udpClient->m_udpSocketIndex, str);
     } else {
         return "";
@@ -1273,9 +1269,9 @@ std::string UDPDuplex::readUntil(const std::string &str)
 
 std::string UDPDuplex::readUntil(const char *str)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readUntil(str);
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readUntil(this->m_udpClient->m_udpSocketIndex, str);
     }  else {
         return "";
@@ -1284,9 +1280,9 @@ std::string UDPDuplex::readUntil(const char *str)
 
 std::string UDPDuplex::readUntil(char until)
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->readUntil(until);
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->readUntil(this->m_udpClient->m_udpSocketIndex, until);
     } else {
         return "";
@@ -1295,37 +1291,37 @@ std::string UDPDuplex::readUntil(char until)
 
 void UDPDuplex::putBack(const UDPDatagram &datagram)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->putBack(datagram);
     }
 }
 
 void UDPDuplex::putBack(const std::string &str)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->putBack(str);
     }
 }
 
 void UDPDuplex::putBack(const char *str)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->putBack(str);
     }
 }
 
 void UDPDuplex::putBack(char back)
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->putBack(back);
     }
 }
 
 std::string UDPDuplex::peek()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->peek();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->peek(this->m_udpClient->m_udpSocketIndex);
     } else {
         return "";
@@ -1334,9 +1330,9 @@ std::string UDPDuplex::peek()
 
 UDPDatagram UDPDuplex::peekDatagram()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->peekDatagram();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->peekDatagram(this->m_udpClient->m_udpSocketIndex);
     } else {
         return UDPDatagram{};
@@ -1345,9 +1341,9 @@ UDPDatagram UDPDuplex::peekDatagram()
 
 char UDPDuplex::peekByte()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->peekByte();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->peekByte(this->m_udpClient->m_udpSocketIndex);
     } else {
         return 0;
@@ -1356,9 +1352,9 @@ char UDPDuplex::peekByte()
     
 ssize_t UDPDuplex::available()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         return this->m_udpServer->available();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         return this->m_udpServer->available(this->m_udpClient->m_udpSocketIndex);
     } else {
         return 0;
@@ -1367,23 +1363,23 @@ ssize_t UDPDuplex::available()
 
 void UDPDuplex::startListening()
 {
-    if (this->m_udpObjectType == UDPObjectType::UDP_SERVER) {
+    if (this->m_udpObjectType == UDPObjectType::Server) {
         this->m_udpServer->startListening();
-    } else if (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    } else if (this->m_udpObjectType == UDPObjectType::Duplex) {
         this->m_udpServer->startListening(this->m_udpClient->m_udpSocketIndex);
     }
 }
 
 void UDPDuplex::stopListening()
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->stopListening();
     }
 }
 
 bool UDPDuplex::isListening() const
 {
-    if ((this->m_udpObjectType == UDPObjectType::UDP_SERVER) || (this->m_udpObjectType == UDPObjectType::UDP_DUPLEX)) {
+    if ((this->m_udpObjectType == UDPObjectType::Server) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
         return this->m_udpServer->isListening();    
     } else {
         return 0;
@@ -1422,13 +1418,13 @@ uint16_t UDPDuplex::doUserSelectServerPortNumber()
 
 UDPObjectType UDPDuplex::doUserSelectUDPObjectType()
 {
-    std::vector<std::string> udpObjectTypeChoices{UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_DUPLEX),
-                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_SERVER),
-                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_CLIENT)};
-    return GeneralUtilities::doUserSelectParameter("UDP Object Type",
+    std::vector<std::string> udpObjectTypeChoices{UDPDuplex::udpObjectTypeToString(UDPObjectType::Duplex),
+                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::Server),
+                                                  UDPDuplex::udpObjectTypeToString(UDPObjectType::Client)};
+    return doUserSelectParameter("UDP Object Type",
                                                     static_cast< std::function<UDPObjectType(const std::string &)> >(UDPDuplex::parseUDPObjectTypeFromRaw),
                                                     udpObjectTypeChoices,
-                                                    UDPDuplex::udpObjectTypeToString(UDPObjectType::UDP_DUPLEX).c_str());
+                                                    UDPDuplex::udpObjectTypeToString(UDPObjectType::Duplex).c_str());
 
 }
 
@@ -1436,7 +1432,7 @@ std::shared_ptr<UDPDuplex> UDPDuplex::doUserSelectUDPDuplex()
 {
     std::shared_ptr<UDPDuplex> udpDuplex{nullptr};
     UDPObjectType udpObjectType{UDPDuplex::doUserSelectUDPObjectType()};
-    if (udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    if (udpObjectType == UDPObjectType::Duplex) {
         std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
         uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
         uint16_t clientReturnAddressPortNumber{UDPDuplex::doUserSelectClientReturnAddressPortNumber()};
@@ -1447,10 +1443,10 @@ std::shared_ptr<UDPDuplex> UDPDuplex::doUserSelectUDPDuplex()
                                                 clientReturnAddressPortNumber, 
                                                 udpObjectType);
 
-    } else if (udpObjectType == UDPObjectType::UDP_SERVER) {
+    } else if (udpObjectType == UDPObjectType::Server) {
         uint16_t serverPortNumber{UDPDuplex::doUserSelectServerPortNumber()};
         udpDuplex = std::make_shared<UDPDuplex>(serverPortNumber, udpObjectType);
-    } else if (udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (udpObjectType == UDPObjectType::Client) {
         std::string clientHostName{UDPDuplex::doUserSelectClientHostName()};
         uint16_t clientPortNumber{UDPDuplex::doUserSelectClientPortNumber()};
         uint16_t clientReturnAddressPortNumber{UDPDuplex::doUserSelectClientReturnAddressPortNumber()};
@@ -1467,7 +1463,6 @@ std::shared_ptr<UDPDuplex> UDPDuplex::doUserSelectUDPDuplex()
 
 UDPObjectType UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &udpObjectType)
 {
-    using namespace GeneralUtilities;
     std::string copyString{udpObjectType};
     std::transform(copyString.begin(), copyString.end(), copyString.begin(), ::tolower);
     std::string secondCopy{""};
@@ -1477,11 +1472,11 @@ UDPObjectType UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &udpObjectT
         }
     }
     if (secondCopy == "udpduplex") {
-        return UDPObjectType::UDP_DUPLEX;
+        return UDPObjectType::Duplex;
     } else if (secondCopy == "udpserver") {
-        return UDPObjectType::UDP_SERVER;
+        return UDPObjectType::Server;
     } else if (secondCopy == "udpclient") {
-        return UDPObjectType::UDP_CLIENT;
+        return UDPObjectType::Client;
     } else {
         throw std::runtime_error("Could not parse UDPObjectType in UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &): unknown identifier " + tQuoted(udpObjectType));
     }
@@ -1489,11 +1484,11 @@ UDPObjectType UDPDuplex::parseUDPObjectTypeFromRaw(const std::string &udpObjectT
 
 std::string UDPDuplex::udpObjectTypeToString(UDPObjectType udpObjectType)
 {
-    if (udpObjectType == UDPObjectType::UDP_DUPLEX) {
+    if (udpObjectType == UDPObjectType::Duplex) {
         return "UDP Duplex";
-    } else if (udpObjectType == UDPObjectType::UDP_SERVER) {
+    } else if (udpObjectType == UDPObjectType::Server) {
         return "UDP Server";
-    } else if (udpObjectType == UDPObjectType::UDP_CLIENT) {
+    } else if (udpObjectType == UDPObjectType::Client) {
         return "UDP Client";
     } else {
         throw std::runtime_error("Unknown UDPObjectType passed to UDPDuplex::udpObjectTypeToString(UDPObjectType)");
