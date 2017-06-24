@@ -1494,3 +1494,17 @@ std::string UDPDuplex::udpObjectTypeToString(UDPObjectType udpObjectType)
         throw std::runtime_error("Unknown UDPObjectType passed to UDPDuplex::udpObjectTypeToString(UDPObjectType)");
     }
 }
+
+
+bool endsWith(const std::string &stringToCheck, const std::string &matchString)
+{
+    if (matchString.size() > stringToCheck.size()) {
+        return false;
+    }
+    return std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
+}
+
+bool endsWith(const std::string &stringToCheck, char matchChar)
+{
+    return endsWith(stringToCheck, std::string(1, matchChar));
+}

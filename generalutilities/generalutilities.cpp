@@ -21,10 +21,7 @@
 #include <random>
 #include <cstdlib>
 #include <memory>
-#include <chrono>
-#include <map>
 #include <thread>
-#include <unordered_map>
 #include <iterator>
 #include <typeinfo>
 
@@ -602,19 +599,6 @@ namespace GeneralUtilities
         return endsWith(stringToCheck, std::string(1, matchChar));
     }
 
-    bool endsWithNotIncludingWhitespace(const std::string &stringToCheck, const std::string &matchString)
-    {
-        (void)stringToCheck;
-        (void)matchString;
-        return false;
-    }
-
-
-    bool endsWithNotIncludingWhitespace(const std::string &stringToCheck, char matchChar)
-    {
-        return endsWithNotIncludingWhitespace(stringToCheck, std::string(1, matchChar));
-    }
-
     bool startsWith(const std::string &stringToCheck, const std::string &matchString)
     {
        return (stringToCheck.find(matchString) == 0);
@@ -628,23 +612,6 @@ namespace GeneralUtilities
     bool startsWith(const std::string &str, const char *compare)
     {
         return startsWith(str, static_cast<std::string>(compare));
-    }
-
-    bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, const std::string &matchString)
-    {
-        (void)stringToCheck;
-        (void)matchString;
-        return false;
-    }
-
-    bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, char matchChar)
-    {
-        return startsWithNotIncludingWhitespace(stringToCheck, std::string{1, matchChar});
-    }
-
-    bool startsWithNotIncludingWhitespace(const std::string &stringToCheck, const char *compare)
-    {
-        return startsWithNotIncludingWhitespace(stringToCheck, static_cast<std::string>(compare));
     }
 
     /*Logging simple strings to stdout or to a file. On file opening failure, the string will be output to stdout*/

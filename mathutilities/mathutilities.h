@@ -33,12 +33,8 @@
 #include <limits>
 #include <sstream>
 #include <string>
-#include <exception>
-#include <cstdlib>
-#include <stdexcept>
-#include <iomanip>
+#include <sstream>
 #include <random>
-#include "generalutilities.h"
 
 namespace MathUtilities
 {
@@ -64,6 +60,12 @@ namespace MathUtilities
     int roundUp(float numberToRound, double threshold=0.00000001);
     int roundDown(float numberToRound, double threshold=0.999999999);
     int intExp(int base, int super);
+    template<typename T> inline std::string toStdString(const T &t) { 
+        return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
+    }
+    template<typename T> inline std::string tQuoted(const T &t) {
+        return "\"" + toStdString(t) + "\"";
+    }
 
     template <typename T>
     T intExp(T base, int super)

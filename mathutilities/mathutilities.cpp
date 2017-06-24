@@ -17,6 +17,11 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
+#include <exception>
+#include <cstdlib>
+#include <stdexcept>
+#include <iomanip>
+
 #include "mathutilities.h"
 
 namespace MathUtilities
@@ -94,7 +99,7 @@ namespace MathUtilities
     int roundIntuitively(double numberToRound)
     {
         if (numberToRound > std::numeric_limits<int>::max()) {
-            throw std::invalid_argument("Error, numeric argument " + GeneralUtilities::toString(numberToRound) + " passed to round will exceed maximum value for int");
+            throw std::invalid_argument("Error, numeric argument " + toStdString(numberToRound) + " passed to round will exceed maximum value for int");
         } else {
             double tempContainer{numberToRound - static_cast<int>(numberToRound)};
             if (tempContainer >= 0.5) {
@@ -108,11 +113,11 @@ namespace MathUtilities
     int roundUp(double numberToRound, double threshold)
     {
         if (threshold > 1) {
-            throw std::invalid_argument("Error, threshold  " + GeneralUtilities::toString(threshold) + " is larger than 1");
+            throw std::invalid_argument("Error, threshold  " + toStdString(threshold) + " is larger than 1");
         } else if (threshold < 0) {
-            throw std::invalid_argument("Error, threshold  " + GeneralUtilities::toString(threshold) + " is less than 0");
+            throw std::invalid_argument("Error, threshold  " + toStdString(threshold) + " is less than 0");
         } else if (numberToRound > std::numeric_limits<int>::max()) {
-            throw std::invalid_argument("Error, numeric argument " + GeneralUtilities::toString(numberToRound) + " passed to round will exceed maximum value for int");
+            throw std::invalid_argument("Error, numeric argument " + toStdString(numberToRound) + " passed to round will exceed maximum value for int");
         } else {
             double tempContainer{numberToRound - static_cast<int>(numberToRound)};
             if (tempContainer >= threshold) {
@@ -126,11 +131,11 @@ namespace MathUtilities
     int roundDown(double numberToRound, double threshold)
     {
         if (threshold > 1) {
-            throw std::invalid_argument("Error, threshold " + GeneralUtilities::toString(threshold) + " is larger than 1");
+            throw std::invalid_argument("Error, threshold " + toStdString(threshold) + " is larger than 1");
         } else if (threshold < 0) {
-            throw std::invalid_argument("Error, threshold " + GeneralUtilities::toString(threshold) + " is less than 0");
+            throw std::invalid_argument("Error, threshold " + toStdString(threshold) + " is less than 0");
         } else if (numberToRound > std::numeric_limits<int>::max()) {
-            throw std::invalid_argument("Error, numeric argument " + GeneralUtilities::toString(numberToRound) + " passed to round will exceed maximum value for int");
+            throw std::invalid_argument("Error, numeric argument " + toStdString(numberToRound) + " passed to round will exceed maximum value for int");
         } else {
             float tempContainer = numberToRound - static_cast<int>(numberToRound);
             if (tempContainer <= threshold) {

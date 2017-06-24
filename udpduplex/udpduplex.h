@@ -18,8 +18,8 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
-#ifndef TJLUTILS_UDPDuplex_H
-#define TJLUTILS_UDPDuplex_H
+#ifndef TJLUTILS_UDPDUPLEX_H
+#define TJLUTILS_UDPDUPLEX_H
 
 #include <iostream>
 #include <memory>
@@ -348,6 +348,15 @@ private:
     static constexpr bool isValidPortNumber(int portNumber);
 };
 
+inline constexpr bool endsWith(const std::string &stringToCheck, const std::string &matchString)
+{
+    return (matchString.size() > stringToCheck.size()) ? false : std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
+}
+
+inline constexpr bool endsWith(const std::string &stringToCheck, char matchChar)
+{
+    return endsWith(stringToCheck, std::string(1, matchChar));
+}
 
 template <typename T> static inline std::string toStdString(const T &t) { 
     return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
@@ -484,4 +493,4 @@ T doUserSelectParameter(const std::string &name,
     }
 }
 
-#endif //TJLUTILS_UDPDuplex_H
+#endif //TJLUTILS_UDPDUPLEX_H
