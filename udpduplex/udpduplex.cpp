@@ -18,15 +18,6 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
-#if defined(_WIN32)
-
-#else
-    #include <netdb.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
-    #include <unistd.h>
-    #include <signal.h>
-#endif //defined(_WIN32)
 
 #include <algorithm>
 #include <cerrno>
