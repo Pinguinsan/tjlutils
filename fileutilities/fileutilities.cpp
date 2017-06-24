@@ -38,6 +38,23 @@
 #endif
 
 #include "fileutilities.h"
+    
+template <typename Container, typename InputIter>
+Container parseToContainer(InputIter first, InputIter last, typename std::remove_reference<decltype(*first)>::type delimiter)
+{
+    Container returnContainer;
+    InputIter it;
+    do {
+        it = std::find(first, last, delimiter);
+        typename Container::value_type tempContainer;
+        std::copy(first, it, std::inserter(tempContainer, tempContainer.end()));
+        if (!tempContainer.empty()) {
+            returnContainer.insert(returnContainer.end(), tempContainer);
+        }
+        first = it+1;
+    } while (it != last);
+    return returnContainer;
+}
 
 namespace FileUtilities
 {
