@@ -51,12 +51,21 @@ const char *UNEXPECTED_LOOP_CLOSING_STRING{"WARNING: A loop closure was found, b
 const char *CLOSING_LOOP_IDENTIFIER{"}"};
 */
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+    #include <Windows.h>
+    #include "Shlwapi.h"
+    #include <direct.h>
+#else
+    #include <sys/types.h>
+    #include <sys/stat.h>
+	#include <dirent.h>
+    #include <unistd.h>
+#endif
+
 IByteStreamScriptReader::IByteStreamScriptReader(const std::string &scriptFilePath) :
     m_scriptFilePath{scriptFilePath},
     m_commands{std::make_shared<std::vector<IByteStreamCommand>>()}
 {
-    using namespace FileUtilities;
-    using namespace ;
     if (!fileExists(this->m_scriptFilePath)) {
         throw std::runtime_error(SCRIPT_FILE_DOES_NOT_EXISTS_STRING + tQuoted(this->m_scriptFilePath));
     }
@@ -253,6 +262,21 @@ IByteStreamScriptReader::IByteStreamScriptReader(const std::string &scriptFilePa
         this->m_commands->clear();
         return; 
     }
+}
+
+
+bool IByteStreamScriptReader::fileExists(const std::string &fileToCheck)
+{
+    #if defined(_WIN32)
+        return (PathFileExists(directoryToCheck.c_str()) == 1);
+    #else
+        return (access(fileToCheck.c_str(),F_OK) != -1);
+    #endif
+}
+
+bool IByteStreamScriptReader::fileExists(const char *fileToCheck)
+{
+    return fileExists(static_cast<std::string>(fileToCheck));
 }
 
 std::string IByteStreamScriptReader::scriptFilePath() const

@@ -30,33 +30,12 @@
 #endif
 
 #include <string>
-#include <vector>
-#include <fstream>
-#include <algorithm>
 #include <list>
-#include <memory>
-#include <cstdio>
-#include <cstdlib>
-#include <stdexcept>
-#include <exception>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <vector>
 
-#include "generalutilities.h"
-#include "systemcommand.h"
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-    #include <direct.h>
- 	#include "win32-dirent.h"
-#else
-	#include <dirent.h>
-    #include <unistd.h>
-    #include <climits>
-#endif
 
 namespace FileUtilities
 {
-    const std::string _CWD_MALLOC_EXCEPTION_STRING{"Could not allocate memory for buffer to determine current working directory"};
     const std::string _PATV_ARGC_ZERO_EXCEPTION_STRING{"argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToVector variant"};
     const std::string _PATL_ARGC_ZERO_EXCEPTION_STRING{"argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant"};
 

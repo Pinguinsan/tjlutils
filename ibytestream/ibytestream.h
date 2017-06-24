@@ -133,7 +133,8 @@ public:
 private:
     std::string m_scriptFilePath;
     std::shared_ptr<std::vector<IByteStreamCommand>> m_commands;
-
+    bool fileExists(const std::string &fileToCheck);
+    bool fileExists(const char *fileToCheck);
 };
 
 class TScriptExecutor
