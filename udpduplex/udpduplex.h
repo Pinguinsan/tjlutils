@@ -101,104 +101,6 @@ private:
 class UDPClient;
 class UDPServer;
 
-class UDPDuplex : public IByteStream
-{
-public:
-    UDPDuplex(UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-    UDPDuplex(uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-    UDPDuplex(const std::string &clientHostName, UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType = UDPObjectType::UDP_Duplex);
-
-    /*Client/Sender*/
-    ssize_t writeLine(const std::string &str);
-    ssize_t writeLine(const char *str);
-
-    void setClientHostName(const std::string &hostName);
-    void setClientTimeout(long timeout);
-    void setClientPortNumber(uint16_t portNumber);
-    void setClientReturnAddressPortNumber(uint16_t returnAddressPortNumber);
-
-    std::string clientHostName() const;
-    long clientTimeout() const;
-    uint16_t clientPortNumber() const;
-    uint16_t clientReturnAddressPortNumber() const;
-
-    /*Host/Server*/
-    char readByte();
-    UDPDatagram readDatagram();
-    std::string readLine();
-    std::string readUntil(const std::string &until);
-    std::string readUntil(const char *until);
-    std::string readUntil(char until);
-    ssize_t available();
-    void startListening();
-    void stopListening();
-    bool isListening() const;
-    void putBack(const UDPDatagram &datagram);
-    void putBack(const std::string &str);
-    void putBack(const char *str);
-    void putBack(char back);
-
-    UDPDatagram peekDatagram();
-    std::string peek();
-    char peekByte();
-
-    void flushRXTX();
-    void flushRX();
-    void flushTX();
-    
-    long serverTimeout() const;
-    void setServerPortNumber(uint16_t portNumber);
-    uint16_t serverPortNumber() const;
-    void setServerTimeout(long timeout);
-    void flush();
-
-    /*Both - TStream interface compliance*/
-    void openPort();
-    void closePort();
-    bool isOpen() const;
-    long timeout() const;
-    std::string portName() const;
-    void setTimeout(long timeout);
-    
-    static UDPObjectType parseUDPObjectTypeFromRaw(const std::string &udpObjectType);
-    static std::string udpObjectTypeToString(UDPObjectType udpObjectType);
-    
-    void setLineEnding(const std::string &lineEnding);
-    std::string lineEnding() const;
-
-    UDPObjectType udpObjectType() const;
-
-    static uint16_t doUserSelectClientPortNumber();
-    static std::string doUserSelectClientHostName();
-    static uint16_t doUserSelectClientReturnAddressPortNumber();
-    static uint16_t doUserSelectServerPortNumber();
-    static UDPObjectType doUserSelectUDPObjectType();
-    static std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex();
-    
-    static const char *DEFAULT_CLIENT_HOST_NAME;
-
-    static const constexpr uint16_t DEFAULT_CLIENT_PORT_NUMBER{UDPClient::DEFAULT_PORT_NUMBER};
-    static const constexpr uint16_t DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER{UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER};
-    static const constexpr long DEFAULT_CLIENT_TIMEOUT{UDPClient::DEFAULT_TIMEOUT};
-
-    static const constexpr uint16_t DEFAULT_SERVER_PORT_NUMBER{UDPServer::DEFAULT_PORT_NUMBER};
-    static const constexpr long DEFAULT_SERVER_TIMEOUT{UDPServer::DEFAULT_TIMEOUT};
-
-private:
-    std::unique_ptr<UDPServer> m_udpServer;
-    std::unique_ptr<UDPClient> m_udpClient;
-    UDPObjectType m_udpObjectType;
-    
-    int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
-
-    void initialize();
-
-    static constexpr bool isValidPortNumber(int portNumber);
-};
-
 class UDPServer
 {
 friend class UDPDuplex;
@@ -348,12 +250,111 @@ private:
     static constexpr bool isValidPortNumber(int portNumber);
 };
 
-inline constexpr bool endsWith(const std::string &stringToCheck, const std::string &matchString)
+class UDPDuplex : public IByteStream
+{
+public:
+    UDPDuplex(UDPObjectType udpObjectType = UDPObjectType::Duplex);
+    UDPDuplex(uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::Duplex);
+    UDPDuplex(const std::string &clientHostName, UDPObjectType udpObjectType = UDPObjectType::Duplex);
+    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, UDPObjectType udpObjectType = UDPObjectType::Duplex);
+    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, UDPObjectType udpObjectType = UDPObjectType::Duplex);
+    UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType = UDPObjectType::Duplex);
+
+    /*Client/Sender*/
+    ssize_t writeLine(const std::string &str);
+    ssize_t writeLine(const char *str);
+
+    void setClientHostName(const std::string &hostName);
+    void setClientTimeout(long timeout);
+    void setClientPortNumber(uint16_t portNumber);
+    void setClientReturnAddressPortNumber(uint16_t returnAddressPortNumber);
+
+    std::string clientHostName() const;
+    long clientTimeout() const;
+    uint16_t clientPortNumber() const;
+    uint16_t clientReturnAddressPortNumber() const;
+
+    /*Host/Server*/
+    char readByte();
+    UDPDatagram readDatagram();
+    std::string readLine();
+    std::string readUntil(const std::string &until);
+    std::string readUntil(const char *until);
+    std::string readUntil(char until);
+    ssize_t available();
+    void startListening();
+    void stopListening();
+    bool isListening() const;
+    void putBack(const UDPDatagram &datagram);
+    void putBack(const std::string &str);
+    void putBack(const char *str);
+    void putBack(char back);
+
+    UDPDatagram peekDatagram();
+    std::string peek();
+    char peekByte();
+
+    void flushRXTX();
+    void flushRX();
+    void flushTX();
+
+    long serverTimeout() const;
+    void setServerPortNumber(uint16_t portNumber);
+    uint16_t serverPortNumber() const;
+    void setServerTimeout(long timeout);
+    void flush();
+
+    /*Both - TStream interface compliance*/
+    void openPort();
+    void closePort();
+    bool isOpen() const;
+    long timeout() const;
+    std::string portName() const;
+    void setTimeout(long timeout);
+
+    static UDPObjectType parseUDPObjectTypeFromRaw(const std::string &udpObjectType);
+    static std::string udpObjectTypeToString(UDPObjectType udpObjectType);
+
+    void setLineEnding(const std::string &lineEnding);
+    std::string lineEnding() const;
+
+    UDPObjectType udpObjectType() const;
+
+    static uint16_t doUserSelectClientPortNumber();
+    static std::string doUserSelectClientHostName();
+    static uint16_t doUserSelectClientReturnAddressPortNumber();
+    static uint16_t doUserSelectServerPortNumber();
+    static UDPObjectType doUserSelectUDPObjectType();
+    static std::shared_ptr<UDPDuplex> doUserSelectUDPDuplex();
+
+    static const char *DEFAULT_CLIENT_HOST_NAME;
+
+    static const constexpr uint16_t DEFAULT_CLIENT_PORT_NUMBER{UDPClient::DEFAULT_PORT_NUMBER};
+    static const constexpr uint16_t DEFAULT_CLIENT_RETURN_ADDRESS_PORT_NUMBER{UDPClient::DEFAULT_RETURN_ADDRESS_PORT_NUMBER};
+    static const constexpr long DEFAULT_CLIENT_TIMEOUT{UDPClient::DEFAULT_TIMEOUT};
+
+    static const constexpr uint16_t DEFAULT_SERVER_PORT_NUMBER{UDPServer::DEFAULT_PORT_NUMBER};
+    static const constexpr long DEFAULT_SERVER_TIMEOUT{UDPServer::DEFAULT_TIMEOUT};
+
+private:
+    std::unique_ptr<UDPServer> m_udpServer;
+    std::unique_ptr<UDPClient> m_udpClient;
+    UDPObjectType m_udpObjectType;
+
+    int resolveAddressHelper(const std::string &hostName, int family, const std::string &service, sockaddr_storage* addressPtr);
+
+    void initialize();
+
+    static constexpr bool isValidPortNumber(int portNumber);
+};
+
+
+inline bool endsWith(const std::string &stringToCheck, const std::string &matchString)
 {
     return (matchString.size() > stringToCheck.size()) ? false : std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
 }
 
-inline constexpr bool endsWith(const std::string &stringToCheck, char matchChar)
+inline bool endsWith(const std::string &stringToCheck, char matchChar)
 {
     return endsWith(stringToCheck, std::string(1, matchChar));
 }
@@ -492,5 +493,6 @@ T doUserSelectParameter(const std::string &name,
         }
     }
 }
+
 
 #endif //TJLUTILS_UDPDUPLEX_H
