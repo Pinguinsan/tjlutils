@@ -28,14 +28,14 @@ namespace DateTime
     {
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
-        return DateTime::toString(now->tm_year + 1900);
+        return DateTime::toStdString(now->tm_year + 1900);
     }
 
     std::string currentMonth()
     {
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
-        return DateTime::toString(now->tm_mon + 1);
+        return DateTime::toStdString(now->tm_mon + 1);
     }
 
     std::string currentMonthName()
@@ -117,7 +117,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentDay{now->tm_mday};
-        std::string returnDay{DateTime::toString(currentDay)};
+        std::string returnDay{DateTime::toStdString(currentDay)};
         if (currentDay < 10) {
             returnDay.insert(returnDay.begin(), '0');
         }
@@ -133,7 +133,7 @@ namespace DateTime
         if (currentHour > 24) {
             currentHour -= 12;
         }
-        std::string returnHour{DateTime::toString(currentHour)};
+        std::string returnHour{DateTime::toStdString(currentHour)};
         if (currentHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }
@@ -145,7 +145,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentHour{now->tm_hour};
-        std::string returnHour{DateTime::toString(currentHour)};
+        std::string returnHour{DateTime::toStdString(currentHour)};
         if (currentHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }
@@ -157,7 +157,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentMinute{now->tm_min};
-        std::string returnMinute{DateTime::toString(currentMinute)};
+        std::string returnMinute{DateTime::toStdString(currentMinute)};
         if (currentMinute < 10) {
             returnMinute.insert(returnMinute.begin(), '0');
         }
@@ -169,7 +169,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentSecond{now->tm_sec};
-        std::string returnSecond{DateTime::toString(currentSecond)};
+        std::string returnSecond{DateTime::toStdString(currentSecond)};
         if (currentSecond < 10) {
             returnSecond.insert(returnSecond.begin(), '0');
         }
@@ -191,7 +191,7 @@ namespace DateTime
         } else {
             AMPM = "AM";
         }
-        std::string returnHour{DateTime::toString(tempHour)};
+        std::string returnHour{DateTime::toStdString(tempHour)};
         if (tempHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }

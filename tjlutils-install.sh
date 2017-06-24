@@ -16,16 +16,12 @@ function cleanUp() {
     #suRemoveFile "$ui/fileutilities.h"
     #suRemoveFile "$ui/mathutilities.h"
     #suRemoveFile "$ui/datetime.h"
-    #suRemoveFile "$ui/pythoncrypto.h"
     #suRemoveFile "$ui/templateobjects.h"
     #suRemoveFile "$ui/serialport.h"
     #suRemoveFile "$ui/eventtimer.h"
     #suRemoveFile "$ui/prettyprinter.h"
-    #suRemoveFile "$ui/udpserver.h"
-    #suRemoveFile "$ui/udpclient.h"
-    #suRemoveFile "$ui/tstream.h"
-    #suRemoveFile "$ui/tscriptreader.h"
-    #suRemoveFile "$ui/tscriptexecutor.h"
+    #suRemoveFile "$ui/udpduplex.h"
+    #suRemoveFile "$ui/ibytestream.h"
     #suRemoveFile "$ui/stringformat.h"
     echo "All cleaned up"
 }
@@ -222,20 +218,14 @@ if [[ "$1" == "-u" || "$1" == "--u" || "$1" == "-uninstall" || "$1" == "--uninst
     suRemoveFile "$ui/fileutilities.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/mathutilities.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/datetime.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/pythoncrypto.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/templateobjects.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/serialport.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/eventtimer.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/prettyprinter.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tcpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tcpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/tcpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/udpserver.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/udpclient.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/udpduplex.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tstream.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tscriptexecutor.h" || { echo "Could not remove file, bailing out"; exit 1;}
-    suRemoveFile "$ui/tscriptreader.h" || { echo "Could not remove file, bailing out"; exit 1;}
+    suRemoveFile "$ui/ibytestream.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/stringformat.h" || { echo "Could not remove file, bailing out"; exit 1;}
     suRemoveFile "$ui/bitset.h" || { echo "Could not remove file, bailing out"; exit 1;}
 
@@ -279,7 +269,6 @@ else
     suLinkFile "$sourceDir/fileutilities/fileutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/mathutilities/mathutilities.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/datetime/datetime.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
-    suLinkFile "$sourceDir/pythoncrypto/pythoncrypto.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/serialport/serialport.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/prettyprinter/prettyprinter.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}
     suLinkFile "$sourceDir/templateobjects/templateobjects.h" "$ui/" || { echo "Could not link file, bailing out"; exit 1;}

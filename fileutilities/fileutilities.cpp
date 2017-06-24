@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <exception>
+#include <climits>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
     #include <Windows.h>
@@ -34,7 +35,6 @@
     #include <sys/stat.h>
 	#include <dirent.h>
     #include <unistd.h>
-    #include <climits>
 #endif
 
 #include "fileutilities.h"
@@ -120,7 +120,7 @@ namespace FileUtilities
     std::vector<std::string> getPathDirectoriesAsVector()
     {
         std::string temp{static_cast<std::string>(getenv("PATH"))};
-        return GeneralUtilities::parseToContainer<std::vector<std::string>>(temp.begin(), temp.end(), ':');
+        return parseToContainer<std::vector<std::string>>(temp.begin(), temp.end(), ':');
     }
 
     std::list<std::string> getPathDirectories()
@@ -285,7 +285,7 @@ namespace FileUtilities
     std::vector<std::string> parseArgsToVector(int argcIn,char **argvIn) 
     {
         if (argcIn == 0) {
-            throw std::logic_error(_PATL_ARGC_ZERO_EXCEPTION_STRING);
+            throw std::logic_error("argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant");
         }
         std::vector<std::string> returnVector;
         //No need to check, c++ standard ensures argv[0..argc-1] is not null
@@ -298,7 +298,7 @@ namespace FileUtilities
     std::list<std::string> parseArgsToList(int argcIn, char **argvIn)
     {
         if (argcIn == 0) {
-            throw std::logic_error("argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant"});
+            throw std::logic_error("argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant");
         }
         std::list<std::string> returnList;
         //No need to check, c++ standard ensures argv[0..argc-1] is not null

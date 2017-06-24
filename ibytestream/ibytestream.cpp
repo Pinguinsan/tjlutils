@@ -289,31 +289,31 @@ std::shared_ptr<std::vector<IByteStreamCommand>> IByteStreamScriptReader::comman
     return this->m_commands;
 }
 
-IByteStreamScriptExecutor::IByteStreamScriptExecutor(const std::string &tScriptFilePath) :
-    m_tScriptReader{std::make_shared<IByteStreamScriptReader>(tScriptFilePath)}
+IByteStreamScriptExecutor::IByteStreamScriptExecutor(const std::string &iByteStreamScriptFilePath) :
+    m_iByteStreamScriptReader{std::make_shared<IByteStreamScriptReader>(iByteStreamScriptFilePath)}
 {
 
 }
 
 std::string IByteStreamScriptExecutor::scriptFilePath() const
 {
-    return this->m_tScriptReader->scriptFilePath();
+    return this->m_iByteStreamScriptReader->scriptFilePath();
 }
 
 bool IByteStreamScriptExecutor::hasCommands() const
 {
-    return (this->m_tScriptReader->commands()->size() > 0);
+    return (this->m_iByteStreamScriptReader->commands()->size() > 0);
 }
 
 size_t IByteStreamScriptExecutor::numberOfCommands() const
 {
-    return this->m_tScriptReader->commands()->size();
+    return this->m_iByteStreamScriptReader->commands()->size();
 }
 
-void IByteStreamScriptExecutor::setScriptFilePath(const std::string &tScriptFilePath)
+void IByteStreamScriptExecutor::seiByteStreamScriptFilePath(const std::string &iByteStreamScriptFilePath)
 {
-    this->m_tScriptReader.reset();
-    this->m_tScriptReader = std::make_shared<IByteStreamScriptReader>(tScriptFilePath);
+    this->m_iByteStreamScriptReader.reset();
+    this->m_iByteStreamScriptReader = std::make_shared<IByteStreamScriptReader>(iByteStreamScriptFilePath);
 }
 
 std::vector<IByteStreamCommand> IByteStreamScriptExecutor::doUnrollLoopCommands(const std::vector<IByteStreamCommand> &IByteStreamCommands)

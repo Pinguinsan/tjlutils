@@ -29,41 +29,16 @@
     #endif
 #endif
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
+
 #include <string>
-#include <iostream>
-#include <utility>
 #include <set>
 #include <vector>
-#include <chrono>
-#include <memory>
-#include <fstream>
-#include <stdexcept>
-#include <cctype>
-#include <algorithm>
-#include <future>
-#include <deque>
-#include <mutex>
-#include <wchar.h>
+
+
 
 #include "eventtimer.h"
-#include "tstream.h"
+#include "ibytestream.h"
 
-#if (defined(_WIN32) || defined(__CYGWIN__))
-    #include <Windows.h>
-#else
-    #include <termios.h>
-    #include <sys/ioctl.h>
-    #include <unistd.h>
-    #include <fcntl.h>
-    #include <sys/types.h>
-    #include <sys/stat.h>
-    #include <limits.h>
-    #include <sys/file.h>
-    #include <errno.h>
-#endif
 
 enum class StopBits { ONE, TWO };
 enum class DataBits { FIVE, SIX, SEVEN, EIGHT };
@@ -84,7 +59,7 @@ enum class BaudRate { BAUD50, BAUD75, BAUD110, BAUD134, BAUD150,
                       BAUD3000000, BAUD3500000, BAUD4000000 };
 #endif
 
-class SerialPort : public TStream
+class SerialPort : public IByteStream
 {
 public:
     SerialPort(const std::string &name);
@@ -292,6 +267,75 @@ private:
     static const unsigned int ASCII_WHITESPACE_MAXIMUM_VALUE;
     static const unsigned int ASCII_HIGH_LIMIT;
     static const unsigned int ASCII_LOW_LIMIT;
+
+
+    template<typename T> static inline std::string toStdString(const T &t) {
+        return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
+    }
+    template<typename T> static inline std::string tQuoted(const T &t) {
+        return "\"" + toStdString(t) + "\"";
+    }
+
+
+    template<typename T, typename TOps>
+    static T doUserSelectParameter(const std::string &name,
+                            const std::function<T(const std::string &)> &func,
+                            const std::vector<TOps> &availableOptions,
+                            const char *defaultOption) {
+        std::cout << std::endl;
+        if (availableOptions.size() == 0) {
+            throw std::runtime_error("No " + name + " are available");
+        } else if (availableOptions.size() == 1) {
+            return func(availableOptions.at(0));
+        }
+        unsigned int quitOption{0};
+        for (unsigned int selectionIndex = 1;
+                selectionIndex <= availableOptions.size(); selectionIndex++) {
+            std::cout << selectionIndex << ".) " << availableOptions.at(selectionIndex - 1);
+            if (static_cast<std::string>(availableOptions.at(selectionIndex - 1)) ==
+                static_cast<std::string>(defaultOption)) {
+                std::cout << "    <----DEFAULT" << std::endl;
+            } else {
+                std::cout << std::endl;
+            }
+            quitOption = selectionIndex + 1;
+        }
+        std::cout << quitOption << ".) Quit" << std::endl << std::endl;
+        std::string userOption{""};
+        while (true) {
+            userOption = "";
+            std::cout << "Select a " << name <<
+            " from the above options, or press CTRL+C to quit: ";
+            std::getline(std::cin, userOption);
+            if (userOption == "") {
+                return func(defaultOption);
+            }
+            unsigned int userOptionIndex{0};
+            bool userSelectedQuit{false};
+            try {
+                userOptionIndex = std::stoi(userOption);
+                if (userOptionIndex > availableOptions.size() + 1) {
+                    std::cout << tQuoted(userOption) <<
+                    " wasn't one of the selections, please a number between (inclusive) 1 and " <<
+                    quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+                    continue;
+                }
+                if (userOptionIndex == quitOption) {
+                    userSelectedQuit = true;
+                    throw std::invalid_argument(
+                            "In GeneralUtilities::doUserSelectParameter(): User selected quit option");
+                }
+                return func(availableOptions.at(userOptionIndex - 1));
+            } catch (std::exception &e) {
+                if (userSelectedQuit) {
+                    throw e;
+                }
+                std::cout << tQuoted(userOption) <<
+                " wasn't one of the selections, enter a number between (inclusive) 1 and " <<
+                quitOption << ", or press CTRL+C to quit" << std::endl << std::endl;
+            }
+        }
+    }
 
 };
 

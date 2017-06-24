@@ -72,12 +72,8 @@ public:
 
     }
 
-    template <typename T>
-    std::string TO_STRING(const T &item)
-    {
-        std::stringstream stringStream{};
-        stringStream << item;
-        return stringStream.str();
+    template <typename T> static inline std::string toStdString(const T &t) {
+        return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str();
     }
 
     void start()
@@ -181,20 +177,20 @@ public:
         }
         std::string returnString{""};
         if (this->m_hours != 0) {
-            returnString = TO_STRING(this->m_hours) + ':';
+            returnString = toStdString(this->m_hours) + ':';
         }
-        returnString += TO_STRING(this->m_minutes)
+        returnString += toStdString(this->m_minutes)
                         + ':'
-                        + TO_STRING(this->m_seconds)
+                        + toStdString(this->m_seconds)
                         + '.';
         long long int millisecond{this->m_milliseconds};
         std::string millisecondsString{""};
         if (millisecond < 10) {
-            millisecondsString = "00" + TO_STRING(millisecond);
+            millisecondsString = "00" + toStdString(millisecond);
         } else if (millisecond < 100) {
-            millisecondsString = "0" + TO_STRING(millisecond);
+            millisecondsString = "0" + toStdString(millisecond);
         } else {
-            millisecondsString = TO_STRING(millisecond);
+            millisecondsString = toStdString(millisecond);
         }
         returnString += millisecondsString.substr(0, millisecondDigits);
 

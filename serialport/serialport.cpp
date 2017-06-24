@@ -16,9 +16,36 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
-#include "serialport.h"
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <iostream>
+#include <utility>
+#include <chrono>
+#include <memory>
+#include <fstream>
+#include <stdexcept>
+#include <cctype>
+#include <algorithm>
+#include <future>
+#include <deque>
+#include <mutex>
+#include <wchar.h>
+#if (defined(_WIN32) || defined(__CYGWIN__))
+    #include <Windows.h>
+#else
+    #include <termios.h>
+    #include <sys/ioctl.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <limits.h>
+    #include <sys/file.h>
+    #include <errno.h>
+#endif
 
-#include "generalutilities.h"
+#include "serialport.h"
 
 const DataBits SerialPort::DEFAULT_DATA_BITS{DataBits::EIGHT};
 const StopBits SerialPort::DEFAULT_STOP_BITS{StopBits::ONE};
@@ -1606,7 +1633,7 @@ bool SerialPort::isValidSerialPortName(const std::string &serialPortName)
 
 std::string SerialPort::doUserSelectSerialPortName()
 {
-    return GeneralUtilities::doUserSelectParameter<std::string>(std::string{"serial port"}, 
+    return SerialPort::doUserSelectParameter<std::string>(std::string{"serial port"}, 
                                              [](const std::string &str) -> std::string { return str; },
                                              SerialPort::availableSerialPorts(),
                                              ""); 
@@ -1615,7 +1642,7 @@ std::string SerialPort::doUserSelectSerialPortName()
 BaudRate SerialPort::doUserSelectBaudRate()
 {
     std::function<BaudRate(const std::string &)> tempFunc{static_cast<BaudRate (*)(const std::string &)>(&SerialPort::parseBaudRateFromRaw)};
-    return GeneralUtilities::doUserSelectParameter<BaudRate>(std::string{"baud rate"}, 
+    return SerialPort::doUserSelectParameter<BaudRate>(std::string{"baud rate"}, 
                                                         tempFunc,
                                                         SerialPort::availableBaudRates(),
                                                         SerialPort::DEFAULT_BAUD_RATE_STRING.c_str());
@@ -1623,7 +1650,7 @@ BaudRate SerialPort::doUserSelectBaudRate()
 
 StopBits SerialPort::doUserSelectStopBits()
 {
-    return GeneralUtilities::doUserSelectParameter<StopBits>(std::string{"stop bits"}, 
+    return SerialPort::doUserSelectParameter<StopBits>(std::string{"stop bits"}, 
                                              static_cast<StopBits (*)(const std::string &)>(&SerialPort::parseStopBitsFromRaw),
                                              SerialPort::availableStopBits(),
                                              SerialPort::DEFAULT_STOP_BITS_STRING.c_str());
@@ -1631,7 +1658,7 @@ StopBits SerialPort::doUserSelectStopBits()
 
 DataBits SerialPort::doUserSelectDataBits()
 {
-    return GeneralUtilities::doUserSelectParameter<DataBits>(std::string{"data bits"}, 
+    return SerialPort::doUserSelectParameter<DataBits>(std::string{"data bits"}, 
                                              static_cast<DataBits (*)(const std::string &)>(&SerialPort::parseDataBitsFromRaw),
                                              SerialPort::availableDataBits(),
                                              SerialPort::DEFAULT_DATA_BITS_STRING.c_str());
@@ -1639,7 +1666,7 @@ DataBits SerialPort::doUserSelectDataBits()
 
 Parity SerialPort::doUserSelectParity()
 {
-    return GeneralUtilities::doUserSelectParameter<Parity>(std::string{"parity"}, 
+    return SerialPort::doUserSelectParameter<Parity>(std::string{"parity"}, 
                                              static_cast<Parity (*)(const std::string &)>(&SerialPort::parseParityFromRaw),
                                              SerialPort::availableParity(),
                                              SerialPort::DEFAULT_PARITY_STRING.c_str());

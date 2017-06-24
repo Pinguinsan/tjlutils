@@ -32,13 +32,10 @@
 #include <string>
 #include <list>
 #include <vector>
-
+#include <algorithm>
 
 namespace FileUtilities
 {
-    const std::string _PATV_ARGC_ZERO_EXCEPTION_STRING{"argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToVector variant"};
-    const std::string _PATL_ARGC_ZERO_EXCEPTION_STRING{"argc can never be zero due to the c++ standard, but zero was passed as an argument to parseArgsToList variant"};
-
     std::string getCurrentDirectory();
     
     std::vector<std::string> getFileListAsVector(const std::string &directory, const std::string &mask = "", bool caseSensitive = true);
@@ -68,6 +65,23 @@ namespace FileUtilities
     unsigned int getInstanceCount(const std::string &str);
     std::vector<std::string> parseArgsToVector(int argcIn,char **argvIn);
     std::list<std::string> parseArgsToList(int argcIn, char **argvIn);
+    
+    template <typename Container, typename InputIter>
+    Container parseToContainer(InputIter first, InputIter last, typename std::remove_reference<decltype(*first)>::type delimiter)
+    {
+        Container returnContainer;
+        InputIter it;
+        do {
+            it = std::find(first, last, delimiter);
+            typename Container::value_type tempContainer;
+            std::copy(first, it, std::inserter(tempContainer, tempContainer.end()));
+            if (!tempContainer.empty()) {
+                returnContainer.insert(returnContainer.end(), tempContainer);
+            }
+            first = it+1;
+        } while (it != last);
+        return returnContainer;
+    }
 }
 
 #endif //TJLUTILS_FILEUTILITIES_H

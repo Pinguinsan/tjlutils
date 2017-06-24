@@ -21,7 +21,6 @@ else()
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/pythoncrypto/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/generalutilities/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/fileutilities/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/datetime/"  
@@ -38,7 +37,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/"
 set(SOURCE_BASE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SYSTEMCOMMAND_SOURCES "${SOURCE_BASE}/systemcommand/systemcommand.cpp")
-set (PYTHONCRYPTO_SOURCES "${SOURCE_BASE}/pythoncrypto/pythoncrypto.cpp")
 set (GENERALUTILITIES_SOURCES "${SOURCE_BASE}/generalutilities/generalutilities.cpp")
 set (FILEUTILITIES_SOURCES "${SOURCE_BASE}/fileutilities/fileutilities.cpp")
 set (DATETIME_SOURCES "${SOURCE_BASE}/datetime/datetime.cpp")
@@ -47,26 +45,22 @@ set (SERIALPORT_SOURCES "${SOURCE_BASE}/serialport/serialport.cpp")
 set (PRETTYPRINTER_SOURCES "${SOURCE_BASE}/prettyprinter/prettyprinter.cpp")
 set (UDPDUPLEX_SOURCES "${SOURCE_BASE}/udpduplex/udpduplex.cpp")
 set (STRINGFORMAT_SOURCES "${SOURCE_BASE}/stringformat/stringformat.cpp")
-set (ibytestream_SOURCES "${SOURCE_BASE}/ibytestream/tscriptexecutor.cpp" 
-                     "${SOURCE_BASE}/ibytestream/tscriptreader.cpp")
+set (IBYTESTREAM_SOURCES "${SOURCE_BASE}/ibytestream/ibytestream.cpp")
 
 
 add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
-                            "${PYTHONCRYPTO_SOURCES}"
                             "${GENERALUTILITIES_SOURCES}"
                             "${FILEUTILITIES_SOURCES}"
                             "${DATETIME_SOURCES}"
                             "${MATHUTILITIES_SOURCES}"
                             "${SERIALPORT_SOURCES}"
                             "${PRETTYPRINTER_SOURCES}"
-                            "${UDPSERVER_SOURCES}"
-                            "${UDPCLIENT_SOURCES}"
                             "${UDPDUPLEX_SOURCES}"
                             "${TCPSERVER_SOURCES}"
                             "${TCPCLIENT_SOURCES}"
                             "${TCPDUPLEX_SOURCES}"
                             "${STRINGFORMAT_SOURCES}"
-                            "${ibytestream_SOURCES}")
+                            "${IBYTESTREAM_SOURCES}")
                         
 add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${PYTHONCRYPTO_SOURCES}"
@@ -76,13 +70,11 @@ add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${MATHUTILITIES_SOURCES}"
                                   "${SERIALPORT_SOURCES}"
                                   "${PRETTYPRINTER_SOURCES}"
-                                  "${UDPSERVER_SOURCES}"
-                                  "${UDPCLIENT_SOURCES}"
                                   "${UDPDUPLEX_SOURCES}"
                                   "${TCPSERVER_SOURCES}"
                                   "${TCPCLIENT_SOURCES}"
                                   "${TCPDUPLEX_SOURCES}"
                                   "${STRINGFORMAT_SOURCES}"
-                                  "${ibytestream_SOURCES}")
+                                  "${IBYTESTREAM_SOURCES}")
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)

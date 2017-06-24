@@ -113,9 +113,9 @@ const char * const DELAY_MICROSECONDS_PARAMETER_NOT_AN_INTEGER_STRING{"    Delay
 const char * const GENERIC_CONFIG_WARNING_BASE_STRING{"WARNING: line "};
 const char * const GENERIC_CONFIG_WARNING_TAIL_STRING{" of configuration file:"};
 const char * const CONFIG_EXPRESSION_MALFORMED_STRING{"    expression is malformed/has invalid syntax, ignoring option"};
-const char * const EXCEPTION_IN_CONSTRUCTOR_STRING{"WARNING: Standard exception caught in TScriptFileReader constructor: "};
+const char * const EXCEPTION_IN_CONSTRUCTOR_STRING{"WARNING: Standard exception caught in IByteStreamScriptReader constructor: "};
 const char * const COMMAND_TYPE_NOT_IMPLEMENTED_STRING{"WARNING: Command type not implemented, skipping command: "};
-const char * const NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING{"WARNING: Null IByteStream passed to TScriptExecutor::execute(std::shared_ptr<IByteStream>), skipping script execution"};
+const char * const NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING{"WARNING: Null IByteStream passed to IByteStreamScriptExecutor::execute(std::shared_ptr<IByteStream>), skipping script execution"};
 const char * const SCRIPT_FILE_DOES_NOT_EXISTS_STRING{"WARNING: Script file does not exist, skipping script: "};
 const char * const UNABLE_TO_OPEN_SCRIPT_FILE_STRING{"WARNING: Unable to open script file, skipping script: "};
 const char * const LOOP_COUNT_PARAMETER_NOT_AN_INTEGER_STRING{"LoopCount() parameter is not an integer, ignoring option"};
@@ -124,10 +124,10 @@ const char * const UNEXPECTED_LOOP_CLOSING_STRING{"WARNING: A loop closure was f
 const char * const CLOSING_LOOP_IDENTIFIER{"}"};
 
 
-class TScriptReader
+class IByteStreamScriptReader
 {
 public:
-    TScriptReader(const std::string &scriptFilePath);
+    IByteStreamScriptReader(const std::string &scriptFilePath);
     std::string scriptFilePath() const;
     std::shared_ptr<std::vector<IByteStreamCommand>> commands() const;
 private:
@@ -135,22 +135,27 @@ private:
     std::shared_ptr<std::vector<IByteStreamCommand>> m_commands;
     bool fileExists(const std::string &fileToCheck);
     bool fileExists(const char *fileToCheck);
+    template <typename T> static inline std::string toStdString(const T &t) { 
+        return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
+    }
+    template <typename T> static inline std::string tQuoted(const T &t) {
+        return "\"" + toStdString(t) + "\"";
+    }
 };
 
-class TScriptExecutor
+class IByteStreamScriptExecutor
 {
 private:
     static inline void delayMilliseconds(unsigned long long howLong) { std::this_thread::sleep_for(std::chrono::milliseconds(howLong)); }
     static inline void delaySeconds(unsigned long long howLong) { std::this_thread::sleep_for(std::chrono::seconds(howLong)); }
-
-    static inline const template<typename T> toString(const T &t) { 
+    template <typename T> static inline std::string toStdString(const T &t) { 
         return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
     }
-    static inline const template <typename T> tQuoted(const T &t) {
-        return "\"" + DateTime::toString(t) + "\"";
+    template <typename T> static inline std::string tQuoted(const T &t) {
+        return "\"" + toStdString(t) + "\"";
     }
 public:
-    TScriptExecutor(const std::string &scriptFilePath);
+    IByteStreamScriptExecutor(const std::string &scriptFilePath);
     void setScriptFilePath(const std::string &scriptFilePath);
     std::string scriptFilePath() const;
     bool hasCommands() const;
@@ -164,7 +169,6 @@ public:
                  const std::function<void(FlushArgs...)> &printFlushResult,
                  const std::function<void(LoopArgs...)> &printLoopResult)
     {
-        using namespace GeneralUtilities;
         if (!ioStream) {
             throw std::runtime_error(NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING);
         }
@@ -222,7 +226,6 @@ public:
                  const std::function<void(InstanceArg *, FlushArgs...)> &printFlushResult,
                  const std::function<void(InstanceArg *, LoopArgs...)> &printLoopResult)
     {
-        using namespace GeneralUtilities;
         (void)printLoopResult;
         if (!ioStream) {
             throw std::runtime_error(NULL_IO_STREAM_PASSED_TO_EXECUTE_STRING);
@@ -273,7 +276,7 @@ public:
         }
     }
 private:
-    std::shared_ptr<TScriptReader> m_iByteStreamScriptReader;
+    std::shared_ptr<IByteStreamScriptReader> m_iByteStreamScriptReader;
     std::vector<IByteStreamCommand> m_iByteStreamScriptCommands;
 
     std::vector<IByteStreamCommand> doUnrollLoopCommands(const std::vector<IByteStreamCommand> &iByteStreamCommands);
