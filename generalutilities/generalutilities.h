@@ -176,15 +176,21 @@ namespace GeneralUtilities
     void delayNanoseconds(unsigned long long howLong);
 
     bool isDigit(char charToCheck);
-
-    bool endsWith(const std::string &stringToCheck, const std::string &matchString);
-
-    bool endsWith(const std::string &stringToCheck, char matchChar);
-
-    bool startsWith(const std::string &stringToCheck, const std::string &matchString);
-    bool startsWith(const std::string &stringToCheck, char matchChar);
-    bool startsWith(const std::string &str, const char *compare);
-
+    inline bool endsWith(const std::string &stringToCheck, const std::string &matchString) {
+        return (matchString.size() > stringToCheck.size() ? false : std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin()));
+    }
+    inline bool endsWith(const std::string &stringToCheck, char matchChar) {
+        return endsWith(stringToCheck, std::string(1, matchChar));
+    }
+    inline bool startsWith(const std::string &stringToCheck, const std::string &matchString) {
+       return (stringToCheck.find(matchString) == 0);
+    }
+    inline bool startsWith(const std::string &stringToCheck, char matchChar) {
+       return startsWith(stringToCheck, std::string{1, matchChar});
+    }
+    inline bool startsWith(const std::string &str, const char *compare) {
+        return startsWith(str, static_cast<std::string>(compare));
+    }
     bool startsWithNotIncludingWhitespace(const std::string &stringToCheck,
                                             const std::string &matchString);
 

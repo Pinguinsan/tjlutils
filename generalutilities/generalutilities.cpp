@@ -586,33 +586,6 @@ namespace GeneralUtilities
         return ret;
     }
 
-    bool endsWith(const std::string &stringToCheck, const std::string &matchString)
-    {
-        if (matchString.size() > stringToCheck.size()) {
-            return false;
-        }
-        return std::equal(matchString.rbegin(), matchString.rend(), stringToCheck.rbegin());
-    }
-
-    bool endsWith(const std::string &stringToCheck, char matchChar)
-    {
-        return endsWith(stringToCheck, std::string(1, matchChar));
-    }
-
-    bool startsWith(const std::string &stringToCheck, const std::string &matchString)
-    {
-       return (stringToCheck.find(matchString) == 0);
-    }
-
-    bool startsWith(const std::string &stringToCheck, char matchChar)
-    {
-       return startsWith(stringToCheck, std::string{1, matchChar});
-    } 
-
-    bool startsWith(const std::string &str, const char *compare)
-    {
-        return startsWith(str, static_cast<std::string>(compare));
-    }
 
     /*Logging simple strings to stdout or to a file. On file opening failure, the string will be output to stdout*/
     void logString(const std::string &stringToLog) { std::cout << stringToLog << std::endl; }
