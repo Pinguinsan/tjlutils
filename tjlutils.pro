@@ -24,9 +24,6 @@ INCLUDEPATH += systemcommand/ \
                datetime/ \
                prettyprinter/ \
                udpduplex/ \
-               tcpserver/ \
-               tcpclient/ \
-               tcpduplex/ \
                ibytestream/
 
 SOURCES += systemcommand/systemcommand.cpp \
@@ -36,9 +33,6 @@ SOURCES += systemcommand/systemcommand.cpp \
            datetime/datetime.cpp \
            serialport/serialport.cpp \
            udpduplex/udpduplex.cpp \
-           tcpserver/tcpserver.cpp \
-           tcpclient/tcpclient.cpp \
-           tcpduplex/tcpduplex.cpp \
            prettyprinter/prettyprinter.cpp \
            ibytestream/ibytestream.cpp \
 
@@ -51,9 +45,6 @@ HEADERS += systemcommand/systemcommand.h \
            eventtimer/eventtimer.h \
            prettyprinter/prettyprinter \
            udpduplex/udpduplex.h \
-           tcpserver/tcpserver.h \
-           tcpclient/tcpclient.h \
-           tcpduplex/tcpduplex.h \
            templateobjects/templateobjects.h \
            bitset/bitset.h \
            stringformat/stringformat.h \

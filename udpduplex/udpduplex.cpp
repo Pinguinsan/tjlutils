@@ -28,7 +28,7 @@
     #include <signal.h>
 #endif //defined(_WIN32)
 
-
+#include <algorithm>
 #include <cerrno>
 #include <cstdlib>
 #include <memory.h>
@@ -45,11 +45,13 @@ UDPServer::UDPServer() :
 
 UDPServer::UDPServer(uint16_t portNumber) :
     m_socketAddress{},
-    m_isListening{false},
     m_setSocketResult{0},
+    m_isListening{false},
     m_timeout{UDPServer::DEFAULT_TIMEOUT},
     m_datagramQueue{},
-    m_shutEmDown{false}
+    m_ioMutex{},
+    m_shutEmDown{false},
+    m_lineEnding{""}
 {
     this->initialize(portNumber);
 }
@@ -686,8 +688,8 @@ UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber) :
 UDPClient::UDPClient(const std::string &hostName, uint16_t portNumber, uint16_t returnAddressPortNumber) :
     m_destinationAddress{},
     m_returnAddress{},
-    m_udpSocketIndex{0},
     m_timeout{DEFAULT_TIMEOUT},
+    m_udpSocketIndex{0},
     m_lineEnding{DEFAULT_LINE_ENDING}
 {
     this->initialize(hostName,
@@ -880,7 +882,7 @@ bool constexpr UDPClient::isValidPortNumber(int portNumber)
 
 std::string UDPClient::doUserSelectHostName()
 {
-    return doUserEnterStringParameter("Client Host Name", [](std::string str) -> bool { return true; });
+    return doUserEnterStringParameter("Client Host Name", [](std::string str) -> bool { return (str.length() != 0); });
                                                         //TODO: Add validation for host name
 } 
 
@@ -975,8 +977,8 @@ UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumbe
 
 
 UDPDuplex::UDPDuplex(const std::string &clientHostName, uint16_t clientPortNumber, uint16_t serverPortNumber, uint16_t clientReturnAddressPortNumber, UDPObjectType udpObjectType) :
-    m_udpClient{nullptr},
     m_udpServer{nullptr},
+    m_udpClient{nullptr},
     m_udpObjectType{udpObjectType}
 {
     if ((this->m_udpObjectType == UDPObjectType::Client) || (this->m_udpObjectType == UDPObjectType::Duplex)) {
@@ -1495,7 +1497,7 @@ std::string UDPDuplex::udpObjectTypeToString(UDPObjectType udpObjectType)
     }
 }
 
-
+/*
 bool endsWith(const std::string &stringToCheck, const std::string &matchString)
 {
     if (matchString.size() > stringToCheck.size()) {
@@ -1508,3 +1510,4 @@ bool endsWith(const std::string &stringToCheck, char matchChar)
 {
     return endsWith(stringToCheck, std::string(1, matchChar));
 }
+*/

@@ -27,7 +27,9 @@
 #include <exception>
 #include <sstream>
 #include <limits>
-
+#include <deque>
+#include <mutex>
+#include <future>
 
 
 #if defined (_WIN32)
@@ -97,9 +99,6 @@ private:
     std::string m_message;
 };
 
-
-class UDPClient;
-class UDPServer;
 
 class UDPServer
 {
@@ -235,8 +234,8 @@ public:
     static uint16_t doUserSelectReturnAddressPortNumber();
     static std::shared_ptr<UDPClient> doUserSelectUDPClient();
 private:
-    sockaddr_in m_destinationAddress;
-    sockaddr_in m_returnAddress;
+    struct sockaddr_in m_destinationAddress;
+    struct sockaddr_in m_returnAddress;
 
     unsigned int m_timeout;
     int m_udpSocketIndex;
