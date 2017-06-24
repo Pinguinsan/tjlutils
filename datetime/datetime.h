@@ -32,9 +32,6 @@
 
 #include <string>
 #include <sstream>
-#include <algorithm>
-#include <ctime>
-#include "generalutilities.h"
 
 namespace DateTime
 {
@@ -56,6 +53,12 @@ namespace DateTime
     std::string getOverallStampDMY24();
     std::string getOverallStampMDY12();
     std::string getOverallStampMDY24();
+    static inline const template<typename T> toString(const T &t) { 
+        return dynamic_cast<std::stringstream &>(std::stringstream{} << t).str(); 
+    }
+    static inline const template <typename T> tQuoted(const T &t) {
+        return "\"" + DateTime::toString(t) + "\"";
+    }
 }
 
 #endif //TJLUTILS_DATETIME_H

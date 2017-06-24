@@ -28,13 +28,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/systemcommand/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/mathutilities/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/serialport/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/prettyprinter/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/udpserver/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/udpclient/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/udpduplex/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/tcpserver/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/tcpclient/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/tcpduplex/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/tstream/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/ibytestream/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/stringformat/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/templateobjects/"
                     "${CMAKE_CURRENT_SOURCE_DIR}/eventtimer/"
@@ -50,15 +45,10 @@ set (DATETIME_SOURCES "${SOURCE_BASE}/datetime/datetime.cpp")
 set (MATHUTILITIES_SOURCES "${SOURCE_BASE}/mathutilities/mathutilities.cpp")
 set (SERIALPORT_SOURCES "${SOURCE_BASE}/serialport/serialport.cpp")
 set (PRETTYPRINTER_SOURCES "${SOURCE_BASE}/prettyprinter/prettyprinter.cpp")
-set (UDPSERVER_SOURCES "${SOURCE_BASE}/udpserver/udpserver.cpp")
-set (UDPCLIENT_SOURCES "${SOURCE_BASE}/udpclient/udpclient.cpp")
 set (UDPDUPLEX_SOURCES "${SOURCE_BASE}/udpduplex/udpduplex.cpp")
-set (TCPSERVER_SOURCES "${SOURCE_BASE}/tcpserver/tcpserver.cpp")
-set (TCPCLIENT_SOURCES "${SOURCE_BASE}/tcpclient/tcpclient.cpp")
-set (TCPDUPLEX_SOURCES "${SOURCE_BASE}/tcpduplex/tcpduplex.cpp")
 set (STRINGFORMAT_SOURCES "${SOURCE_BASE}/stringformat/stringformat.cpp")
-set (TSTREAM_SOURCES "${SOURCE_BASE}/tstream/tscriptexecutor.cpp" 
-                     "${SOURCE_BASE}/tstream/tscriptreader.cpp")
+set (ibytestream_SOURCES "${SOURCE_BASE}/ibytestream/tscriptexecutor.cpp" 
+                     "${SOURCE_BASE}/ibytestream/tscriptreader.cpp")
 
 
 add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
@@ -76,7 +66,7 @@ add_library(tjlutils SHARED "${SYSTEMCOMMAND_SOURCES}"
                             "${TCPCLIENT_SOURCES}"
                             "${TCPDUPLEX_SOURCES}"
                             "${STRINGFORMAT_SOURCES}"
-                            "${TSTREAM_SOURCES}")
+                            "${ibytestream_SOURCES}")
                         
 add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${PYTHONCRYPTO_SOURCES}"
@@ -93,6 +83,6 @@ add_library(tjlutilsstatic STATIC "${SYSTEMCOMMAND_SOURCES}"
                                   "${TCPCLIENT_SOURCES}"
                                   "${TCPDUPLEX_SOURCES}"
                                   "${STRINGFORMAT_SOURCES}"
-                                  "${TSTREAM_SOURCES}")
+                                  "${ibytestream_SOURCES}")
 
 set_target_properties(tjlutilsstatic PROPERTIES OUTPUT_NAME tjlutils)

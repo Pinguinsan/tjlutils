@@ -1,6 +1,6 @@
 /***********************************************************************
 *    tscriptexecutor.h:                                                *
-*    TScriptReader, script executor for TStream objects                *
+*    TScriptReader, script executor for IByteStream objects                *
 *    Copyright (c) 2016 Tyler Lewis                                    *
 ************************************************************************
 *    This is a header file for tjlutils:                               *
@@ -9,7 +9,7 @@
 *    but may also be distributed as a standalone file                  *
 *    The source code is released under the GNU LGPL                    *
 *    This file holds the declarations of a TScripExecutor class that   *
-*    executes TStreamCommand objects directly on a TStream object      *
+*    executes IByteStreamCommand objects directly on a IByteStream object      *
 *                                                                      *
 *    You should have received a copy of the GNU Lesser General         *
 *    Public license along with tjlutils                                *
@@ -29,8 +29,21 @@
 #include <utility>
 
 #include "generalutilities.h"
-#include "tstream.h"
+#include "IByteStream.h"
 #include "tscriptreader.h"
+
+
+class TScriptReader
+{
+public:
+    TScriptReader(const std::string &scriptFilePath);
+    std::string scriptFilePath() const;
+    std::shared_ptr<std::vector<IByteStreamCommand>> commands() const;
+private:
+    std::string m_scriptFilePath;
+    std::shared_ptr<std::vector<IByteStreamCommand>> m_commands;
+
+};
 
 class TScriptExecutor
 {
@@ -42,7 +55,7 @@ public:
     size_t numberOfCommands() const;
     
     template <typename ... RxArgs, typename ... TxArgs, typename ... DelayArgs, typename ... FlushArgs, typename ... LoopArgs>
-    void execute(std::shared_ptr<TStream> ioStream, 
+    void execute(std::shared_ptr<IByteStream> ioStream, 
                  const std::function<void(RxArgs...)> &printRxResult, 
                  const std::function<void(TxArgs...)> &printTxResult,
                  const std::function<void(DelayArgs...)> &printDelayResult,
@@ -62,30 +75,30 @@ public:
         }
         int loop {false};
         int loopCount{0};
-        this->m_tScriptCommands = doUnrollLoopCommands(*this->m_tScriptReader->commands());
-        for (auto &it : this->m_tScriptCommands) {
+        this->m_iByteStreamScriptCommands = doUnrollLoopCommands(*this->m_iByteStreamScriptReader->commands());
+        for (auto &it : this->m_iByteStreamScriptCommands) {
             try {
-                if (it.commandType() == TStreamCommandType::WRITE) {
+                if (it.commandType() == IByteStreamCommandType::WRITE) {
                     ioStream->writeLine(it.commandArgument());
                     printTxResult(it.commandArgument());
-                } else if (it.commandType() == TStreamCommandType::READ) {
+                } else if (it.commandType() == IByteStreamCommandType::READ) {
                     printRxResult(ioStream->readLine());
-                } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_SECONDS) {
                     printDelayResult(DelayType::SECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delaySeconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::DELAY_MILLISECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_MILLISECONDS) {
                     printDelayResult(DelayType::MILLISECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delayMilliseconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::DELAY_MICROSECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_MICROSECONDS) {
                     printDelayResult(DelayType::MICROSECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delayMilliseconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::FLUSH_RX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_RX) {
                     printFlushResult(FlushType::RX);
                     ioStream->flushRX();
-                } else if (it.commandType() == TStreamCommandType::FLUSH_TX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_TX) {
                     printFlushResult(FlushType::TX);
                     ioStream->flushTX();
-                } else if (it.commandType() == TStreamCommandType::FLUSH_RX_TX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_RX_TX) {
                     printFlushResult(FlushType::RX_TX);
                     ioStream->flushRXTX();
                 } else {
@@ -100,7 +113,7 @@ public:
 
     template <typename InstanceArg, typename ... RxArgs, typename ... TxArgs, typename ... DelayArgs, typename ... FlushArgs, typename ... LoopArgs>
     void execute(InstanceArg *instanceArg,
-                 std::shared_ptr<TStream> ioStream, 
+                 std::shared_ptr<IByteStream> ioStream, 
                  const std::function<void(InstanceArg *, RxArgs...)> &printRxResult, 
                  const std::function<void(InstanceArg *, TxArgs...)> &printTxResult,
                  const std::function<void(InstanceArg *, DelayArgs...)> &printDelayResult,
@@ -121,32 +134,32 @@ public:
         }
         int loop {false};
         int loopCount{0};
-        this->m_tScriptCommands = doUnrollLoopCommands(*this->m_tScriptReader->commands());
+        this->m_iByteStreamScriptCommands = doUnrollLoopCommands(*this->m_iByteStreamScriptReader->commands());
         (void)loop;
         (void)loopCount;
-        for (auto &it : this->m_tScriptCommands) {
+        for (auto &it : this->m_iByteStreamScriptCommands) {
             try {
-                if (it.commandType() == TStreamCommandType::WRITE) {
+                if (it.commandType() == IByteStreamCommandType::WRITE) {
                     ioStream->writeLine(it.commandArgument());
                     printTxResult(instanceArg, it.commandArgument());
-                } else if (it.commandType() == TStreamCommandType::READ) {
+                } else if (it.commandType() == IByteStreamCommandType::READ) {
                     printRxResult(instanceArg, ioStream->readLine());
-                } else if (it.commandType() == TStreamCommandType::DELAY_SECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_SECONDS) {
                     printDelayResult(instanceArg, DelayType::SECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delaySeconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::DELAY_MILLISECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_MILLISECONDS) {
                     printDelayResult(instanceArg, DelayType::MILLISECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delayMilliseconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::DELAY_MICROSECONDS) {
+                } else if (it.commandType() == IByteStreamCommandType::DELAY_MICROSECONDS) {
                     printDelayResult(instanceArg, DelayType::MICROSECONDS, GeneralUtilities::decStringToInt(it.commandArgument()));
                     delayMilliseconds(GeneralUtilities::decStringToInt(it.commandArgument()));
-                } else if (it.commandType() == TStreamCommandType::FLUSH_RX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_RX) {
                     printFlushResult(instanceArg, FlushType::RX);
                     ioStream->flushRX();
-                } else if (it.commandType() == TStreamCommandType::FLUSH_TX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_TX) {
                     printFlushResult(instanceArg, FlushType::TX);
                     ioStream->flushTX();
-                } else if (it.commandType() == TStreamCommandType::FLUSH_RX_TX) {
+                } else if (it.commandType() == IByteStreamCommandType::FLUSH_RX_TX) {
                     printFlushResult(instanceArg, FlushType::RX_TX);
                     ioStream->flushRXTX();
                 } else {
@@ -158,12 +171,12 @@ public:
         }
     }
 private:
-    std::shared_ptr<TScriptReader> m_tScriptReader;
-    std::vector<TStreamCommand> m_tScriptCommands;
+    std::shared_ptr<TScriptReader> m_iByteStreamScriptReader;
+    std::vector<IByteStreamCommand> m_iByteStreamScriptCommands;
 
-    std::vector<TStreamCommand> doUnrollLoopCommands(const std::vector<TStreamCommand> &tStreamCommands);
-    bool containsLoopStart(const std::vector<TStreamCommand> &commands);
-    std::pair<int, int> findInnerLoopIndexes(const std::vector<TStreamCommand> &tStreamCommands);
+    std::vector<IByteStreamCommand> doUnrollLoopCommands(const std::vector<IByteStreamCommand> &iByteStreamCommands);
+    bool containsLoopStart(const std::vector<IByteStreamCommand> &commands);
+    std::pair<int, int> findInnerLoopIndexes(const std::vector<IByteStreamCommand> &iByteStreamCommands);
 
 
 };

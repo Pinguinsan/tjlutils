@@ -17,6 +17,9 @@
 *    If not, see <http://www.gnu.org/licenses/>                        *
 ***********************************************************************/
 
+#include <algorithm>
+#include <ctime>
+
 #include "datetime.h"
 
 namespace DateTime
@@ -25,14 +28,14 @@ namespace DateTime
     {
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
-        return GeneralUtilities::toString(now->tm_year + 1900);
+        return DateTime::toString(now->tm_year + 1900);
     }
 
     std::string currentMonth()
     {
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
-        return GeneralUtilities::toString(now->tm_mon + 1);
+        return DateTime::toString(now->tm_mon + 1);
     }
 
     std::string currentMonthName()
@@ -53,7 +56,7 @@ namespace DateTime
             case 10: return "October";
             case 11: return "November";
             case 12: return "December";
-        default: throw std::logic_error("Invalid argument " + GeneralUtilities::tQuoted(currentMonth) + " retrieved from localtime()");
+        default: throw std::logic_error("Invalid argument " + DateTime::tQuoted(currentMonth) + " retrieved from localtime()");
         }
     }
 
@@ -72,7 +75,7 @@ namespace DateTime
             case 10: return "October";
             case 11: return "November";
             case 12: return "December";
-            default: throw std::invalid_argument("Invalid argument " + GeneralUtilities::tQuoted(monthIndex) + " passed to monthName");
+            default: throw std::invalid_argument("Invalid argument " + DateTime::tQuoted(monthIndex) + " passed to monthName");
         }
     }
 
@@ -105,7 +108,7 @@ namespace DateTime
         } else if (copyString == "december") {
             return 11;
         } else {
-            throw std::invalid_argument("Invalid argument " + GeneralUtilities::tQuoted(copyString) + " passed to monthIndex");
+            throw std::invalid_argument("Invalid argument " + DateTime::tQuoted(copyString) + " passed to monthIndex");
         }
     }
 
@@ -114,7 +117,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentDay{now->tm_mday};
-        std::string returnDay{GeneralUtilities::toString(currentDay)};
+        std::string returnDay{DateTime::toString(currentDay)};
         if (currentDay < 10) {
             returnDay.insert(returnDay.begin(), '0');
         }
@@ -130,7 +133,7 @@ namespace DateTime
         if (currentHour > 24) {
             currentHour -= 12;
         }
-        std::string returnHour{GeneralUtilities::toString(currentHour)};
+        std::string returnHour{DateTime::toString(currentHour)};
         if (currentHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }
@@ -142,7 +145,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentHour{now->tm_hour};
-        std::string returnHour{GeneralUtilities::toString(currentHour)};
+        std::string returnHour{DateTime::toString(currentHour)};
         if (currentHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }
@@ -154,7 +157,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentMinute{now->tm_min};
-        std::string returnMinute{GeneralUtilities::toString(currentMinute)};
+        std::string returnMinute{DateTime::toString(currentMinute)};
         if (currentMinute < 10) {
             returnMinute.insert(returnMinute.begin(), '0');
         }
@@ -166,7 +169,7 @@ namespace DateTime
         time_t t{time(0)};
         struct tm *now{localtime(&t)};
         int currentSecond{now->tm_sec};
-        std::string returnSecond{GeneralUtilities::toString(currentSecond)};
+        std::string returnSecond{DateTime::toString(currentSecond)};
         if (currentSecond < 10) {
             returnSecond.insert(returnSecond.begin(), '0');
         }
@@ -188,7 +191,7 @@ namespace DateTime
         } else {
             AMPM = "AM";
         }
-        std::string returnHour{GeneralUtilities::toString(tempHour)};
+        std::string returnHour{DateTime::toString(tempHour)};
         if (tempHour < 10) {
             returnHour.insert(returnHour.begin(), '0');
         }
