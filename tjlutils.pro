@@ -14,45 +14,35 @@ DEFINES += TJLUTILS_LIBRARY
 CONFIG += static_and_shared build_all c++14
 
 INCLUDEPATH += systemcommand/ \
-               pythoncrypto/ \
-               crypto/ \
                templateobjects/ \
                mathutilities/ \
+               stringformat/ \
                fileutilities/ \
                generalutilities/ \
                serialport/ \
                eventtimer/ \
                datetime/ \
                prettyprinter/ \
-               arduino/ \
-               udpserver/ \
-               udpclient/ \
                udpduplex/ \
                tcpserver/ \
                tcpclient/ \
                tcpduplex/ \
-               tstream/
+               ibytestream/
 
 SOURCES += systemcommand/systemcommand.cpp \
-           pythoncrypto/pythoncrypto.cpp \
            generalutilities/generalutilities.cpp \
            fileutilities/fileutilities.cpp \
            mathutilities/mathutilities.cpp \
            datetime/datetime.cpp \
            serialport/serialport.cpp \
-           udpserver/udpserver.cpp \
-           udpclient/udpclient.cpp \
            udpduplex/udpduplex.cpp \
-           tcpserver/udpserver.cpp \
-           tcpclient/udpclient.cpp \
-           tcpduplex/udpduplex.cpp \
+           tcpserver/tcpserver.cpp \
+           tcpclient/tcpclient.cpp \
+           tcpduplex/tcpduplex.cpp \
            prettyprinter/prettyprinter.cpp \
-           tstream/tstream.cpp \
-           tstream/tscriptreader.cpp \
-           tstream/tscriptexecutor.cpp
+           ibytestream/ibytestream.cpp \
 
 HEADERS += systemcommand/systemcommand.h \
-           pythoncrypto/pythoncrypto.h \
            mathutilities/mathutilities.h \
            fileutilities/fileutilities.h \
            generalutilities/generalutilities.h \
@@ -60,17 +50,14 @@ HEADERS += systemcommand/systemcommand.h \
            serialport/serialport.h \
            eventtimer/eventtimer.h \
            prettyprinter/prettyprinter \
-           udpserver/udpserver.h \
-           udpclient/updclient.h \
            udpduplex/udpduplex.h \
-           tcpserver/udpserver.h \
-           tcpclient/updclient.h \
-           tcpduplex/udpduplex.h \
+           tcpserver/tcpserver.h \
+           tcpclient/tcpclient.h \
+           tcpduplex/tcpduplex.h \
            templateobjects/templateobjects.h \
            bitset/bitset.h \
-           tstream/tstream.h \
-           tstream/tscriptreader.h \
-           tstream/tscriptexecutor.h
+           stringformat/stringformat.h \
+           ibytestream/ibytestream.h
 
 unix {
     target.path = /usr/lib
