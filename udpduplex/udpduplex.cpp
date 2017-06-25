@@ -297,9 +297,11 @@ void UDPServer::initialize(uint16_t portNumber)
     this->m_socketAddress.sin_addr.s_addr = INADDR_ANY;
     this->m_socketAddress.sin_port = htons(portNumber);
 
+    /*
     if (bind(this->m_setSocketResult, reinterpret_cast<sockaddr *>(&this->m_socketAddress), sizeof(sockaddr)) == -1) {
        throw std::runtime_error("ERROR: UDPServer could not bind socket " + tQuoted(this->m_setSocketResult) + " (is something else using it?)");
     }
+    */
 }
 
 void UDPServer::startListening(int socketNumber)
@@ -959,11 +961,11 @@ void UDPClient::initialize(const std::string &hostName, uint16_t portNumber, uin
         inet_pton(AF_INET, inet_ntoa(reinterpret_cast<sockaddr_in *>(temp.get())->sin_addr), &(this->m_destinationAddress.sin_addr));
     }
 
-    /*
+    
     if (bind(this->m_udpSocketIndex, reinterpret_cast<sockaddr*>(&this->m_returnAddress), sizeof(this->m_returnAddress)) != 0) {
        throw std::runtime_error("ERROR: UDPClient could not bind socket " + tQuoted(this->m_udpSocketIndex) + " (is something else using it?)");
     }
-    */
+   
     
 }
 
