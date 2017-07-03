@@ -149,7 +149,7 @@ public:
 
 private:
     struct sockaddr_in m_socketAddress;
-    int m_setSocketResult;
+    int m_serverSocket;
     bool m_isListening;
     long m_timeout;
     std::deque<UDPDatagram> m_datagramQueue;
